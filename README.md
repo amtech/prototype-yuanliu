@@ -33,4 +33,4 @@ npm run build_win
 
 ## License
 
-[CC0 1.0 (Public Domain)](LICENSE.md)
+[Apache-2.0 license](LICENSE.md)
