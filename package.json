@@ -54,7 +54,7 @@
         "xlsx": "^0.18.5"
     },
     "build": {
-        "appId": "prototyping",
+        "appId": "yuanliu",
         "directories": {
             "output": "builder"
         },
