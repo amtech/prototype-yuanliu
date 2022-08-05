@@ -1,0 +1,74 @@
+{
+    "name": "yuanliu",
+    "version": "1.0.5",
+    "description": "源流-让设计跟接近产品",
+    "main": "dist/main.js",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc -w",
+        "lint": "eslint -c .eslintrc --ext .ts ./src",
+        "start": "npm run build && electron ./dist/main.js",
+        "build_win": "electron-builder --win --x64",
+        "build_mac": "electron-builder --mac --x64"
+    },
+    "keywords": [
+        "Electron",
+        "quick",
+        "start",
+        "tutorial",
+        "demo",
+        "typescript"
+    ],
+    "author": "GitHub",
+    "license": "CC0-1.0",
+    "devDependencies": {
+        "@types/d3": "^7.1.0",
+        "@types/sharp": "^0.30.4",
+        "@types/three": "^0.140.0",
+        "@typescript-eslint/eslint-plugin": "^4.33.0",
+        "@typescript-eslint/parser": "^4.33.0",
+        "electron": "^17.1.2",
+        "electron-builder": "^23.1.0",
+        "eslint": "^7.32.0",
+        "typescript": "^4.5.5",
+        "webpack-cli": "^4.10.0"
+    },
+    "dependencies": {
+        "@types/uuid": "^8.3.4",
+        "ace-builds": "^1.4.14",
+        "adm-zip": "^0.5.9",
+        "bootstrap-icons": "^1.8.1",
+        "d3": "^7.4.4",
+        "echarts": "^5.3.2",
+        "file-saver": "^2.0.5",
+        "font-list": "^1.4.5",
+        "html2canvas": "^1.4.1",
+        "markdown": "^0.5.0",
+        "node-stream-zip": "^1.15.0",
+        "request": "^2.88.2",
+        "sharp": "^0.30.7",
+        "ssh2-sftp-client": "^9.0.1",
+        "three": "^0.140.0",
+        "uuid": "^8.3.2",
+        "webpack": "^5.73.0",
+        "xlsx": "^0.18.5"
+    },
+    "build": {
+        "appId": "prototyping",
+        "directories": {
+            "output": "builder"
+        },
+        "mac": {
+            "target": [
+                "dmg",
+                "zip"
+            ]
+        },
+        "win": {
+            "target": [
+                "nsis",
+                "zip"
+            ]
+        }
+    }
+}

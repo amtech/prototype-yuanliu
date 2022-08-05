@@ -1,0 +1,521 @@
+/*! *****************************************************************************
+Copyright (c) taoyongwen. All rights reserved.
+***************************************************************************** */
+
+.dark {
+    /* background: #000; */
+    color: #eee;
+    border-color: #999;
+}
+
+.light {
+    /* background: #fff; */
+    color: #222;
+    border-color: #999;
+}
+
+.dark select {
+    /* background: #000; */
+    color: #eee;
+    border-color: #999;
+}
+
+.light select {
+    /* background: #fff; */
+    color: #222;
+    border-color: #999;
+}
+
+.dark .background {
+    background: #444;
+}
+
+.light .background {
+    background: #ccc;
+}
+
+.dark .foreground {
+    background: #eee;
+}
+
+.light .foreground {
+    background: #222;
+}
+
+.light .page_parent {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+.dark .page_parent {
+    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.8);
+}
+
+.workbench .dark {
+    background: #000;
+    color: #eee;
+}
+
+.workbench .light {
+    background: #fff;
+    color: #222;
+}
+
+.dark .workbench_tabs {}
+
+.light .workbench_tabs {}
+
+.dark .page_tab {
+    background-color: rgba(157, 157, 157, 0.2);
+}
+
+.dark .page_tab[selected=true] {
+    background-color: transparent;
+}
+
+.light .page_tab {
+    background-color: rgba(157, 157, 157, 0.2);
+}
+
+.light .page_tab[selected=true] {
+    background-color: transparent;
+}
+
+.dark input {
+    background: rgba(0, 0, 0, 0.4);
+    color: #eee;
+}
+
+.light input {
+    background: rgba(255, 255, 255, 0.4);
+    color: #222;
+}
+
+.dark textarea {
+    background: rgba(0, 0, 0, 0.4);
+    color: #eee;
+}
+
+.light textarea {
+    background: rgba(255, 255, 255, 0.4);
+    color: #222;
+}
+
+.dark select {
+    background: transparent;
+    color: #eee;
+}
+
+.light select {
+    background: transparent;
+    color: #222;
+}
+
+button {
+    border: 0;
+}
+
+.dark button {
+    background: rgba(0, 0, 0, 0.4);
+    color: #eee;
+}
+
+.light button {
+    background: rgba(255, 255, 255, 0.4);
+    color: #222;
+}
+
+.light[data-platform=win32] .sidebar {
+    background-color: rgb(236, 231, 227);
+    backdrop-filter: blur(10px);
+}
+
+.dark[data-platform=win32] .sidebar {
+    background-color: #333;
+    backdrop-filter: blur(10px);
+}
+
+.light[data-platform=win32] .toolBar {
+    background-color: rgb(236, 231, 227);
+    backdrop-filter: blur(10px);
+}
+
+.dark[data-platform=win32] .toolBar {
+    background-color: #333;
+    backdrop-filter: blur(10px);
+}
+
+.light #workbench {
+    background-color: rgb(236, 231, 227);
+}
+
+.dark #workbench {
+    background-color: #000;
+}
+
+.page_view .light {
+    background-color: #fff;
+}
+
+.page_view .dark {
+    background-color: #333;
+}
+
+.light .component {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.dark .component {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.light .component:hover {
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.dark .component:hover {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.light .explorer {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .explorer {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+}
+
+.light .explorer_view {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .explorer_view {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.light .explorer_row:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .explorer_row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.light .contextMenu {
+    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.dark .contextMenu {
+    background-color: rgba(0, 0, 0, 0.6);
+    box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.light .messageBox {
+    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.dark .messageBox {
+    background-color: rgba(0, 0, 0, 0.6);
+    box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.light .contextMenuItem:hover {
+    background-color: rgba(0, 157, 255, 0.2);
+}
+
+.dark .contextMenuItem:hover {
+    background-color: rgba(0, 157, 255, 0.2);
+}
+
+.light .explorer_row[selected="true"] {
+    background-color: rgba(0, 157, 255, 0.2);
+    user-select: none;
+}
+
+.dark .explorer_row[selected="true"] {
+    background-color: rgba(0, 157, 255, 0.2);
+    user-select: none;
+}
+
+.light #edgePanel {
+    background-color: rgb(245, 240, 236);
+}
+
+.dark #edgePanel {
+    background-color: #222;
+}
+
+.light .floatPanel {
+    background-color: rgb(245, 240, 236);
+}
+
+.dark .floatPanel {
+    background-color: #222;
+}
+
+.light .silderBarBlock {
+    background-color: #ccc;
+}
+
+.dark .silderBarBlock {
+    background-color: #555;
+}
+
+.light .silderBarBlock:hover {
+    background-color: var(--theme-color);
+}
+
+.dark .silderBarBlock:hover {
+    background-color: var(--theme-color);
+}
+
+.light .silderBarBlockV {
+    background-color: #ccc;
+}
+
+.dark .silderBarBlockV {
+    background-color: #555;
+}
+
+.light .silderBarBlockV:hover {
+    background-color: var(--theme-color);
+}
+
+.dark .silderBarBlockV:hover {
+    background-color: var(--theme-color);
+}
+
+.dark #pageContainer {
+    background: #000;
+    color: #eee;
+}
+
+.light #pageContainer {
+    background: #fff;
+    color: #222;
+}
+
+.dark .blueView {
+    background: #000;
+    color: #eee;
+}
+
+.light .blueView {
+    background: #f1f1f1;
+    color: #222;
+}
+
+.dark .blueContext {
+    color: #eee;
+    border: 1px solid rgba(175, 175, 175, 0.2);
+}
+
+.light .blueContext {
+    color: #222;
+    border: 1px solid rgba(175, 175, 175, 0.2);
+}
+
+.dark .blue {
+    /* background: rgba(255, 255, 255, 0.1); */
+    color: #eee;
+    /* box-shadow: 0px 0px 2px #333; */
+}
+
+.light .blue {
+    /* background: rgba(0, 0, 0, 0.1); */
+    color: #222;
+    /* box-shadow: 0px 0px 2px #999; */
+}
+
+.dark .component_canvas[selected=true] {
+    outline: 1px solid var(--theme-color);
+}
+
+.light .component_canvas[selected=true] {
+    outline: 1px solid var(--theme-color);
+}
+
+.dark .component_canvas[dataDrag=true]::before {
+    content: "";
+    width: 100%;
+    height: 5px;
+    position: absolute;
+    top: -5px;
+    background-color: var(--theme-color);
+    opacity: 0.5;
+    border-radius: 5px;
+    animation: fadeIn 2s;
+    animation-iteration-count: infinite;
+}
+
+.light .component_canvas[dataDrag=true]::before {
+    content: "";
+    width: 100%;
+    height: 5px;
+    position: absolute;
+    top: -5px;
+    background-color: var(--theme-color);
+    opacity: 0.5;
+    border-radius: 5px;
+    animation: fadeIn 2s;
+    animation-iteration-count: infinite;
+}
+
+.dark .component_canvas[dataDrag=true][dataFlex=true]::before {
+    content: "";
+    width: 5px;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: -5px;
+    background-color: var(--theme-color);
+    opacity: 0.5;
+    border-radius: 5px;
+    animation: fadeIn 2s;
+    animation-iteration-count: infinite;
+}
+
+.light .component_canvas[dataDrag=true][dataFlex=true]::before {
+    content: "";
+    width: 5px;
+    position: absolute;
+    left: -5px;
+    top: 0;
+    height: 100%;
+    background-color: var(--theme-color);
+    opacity: 0.5;
+    border-radius: 5px;
+    animation: fadeIn 2s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.dark #pageLayout {
+    background: #000;
+}
+
+.light #pageLayout {
+    background: #fff;
+}
+
+.component_canvas[vision=true] {
+    box-shadow: 0px 0px 2px var(--theme-color);
+}
+
+.dark .guide_list {
+    background: #000;
+}
+
+.light .guide_list {
+    background: #fff;
+}
+
+.dark .guideText {
+    background: #fff;
+    color: #000;
+}
+
+.light .guideText {
+    background: #000;
+    color: #fff;
+}
+
+.light .page[data-type=title]::before {
+    content: " ";
+    height: 44px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+}
+
+.picker {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid #999;
+}
+
+.hub_setting {
+    background-color: rgba(35, 40, 45, 0.9);
+    backdrop-filter: blur(5px);
+    border: 1px solid #999;
+    color: #fff;
+}
+
+.hub_catalog {
+    background-color: rgba(35, 40, 45, 0.9);
+    backdrop-filter: blur(5px);
+    border: 1px solid #999;
+    color: #fff;
+}
+
+.hub_blue {
+    background-color: rgba(35, 40, 45, 0.9);
+    backdrop-filter: blur(5px);
+    border: 1px solid #999;
+    color: #fff;
+}
+
+.light .form_bg {
+    background-color: #fff;
+}
+
+.dark .form_bg {
+    background-color: #000;
+}
+
+.light .componentContextMenuItem {
+    box-shadow: 1px 1px 2px #999;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px dotted #999;
+}
+
+.dark .componentContextMenuItem {
+    box-shadow: 1px 1px 2px #999;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px dotted #999;
+}
+
+.light .dialog {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.dark .dialog {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.light .dialog_tap {
+    background: #fff;
+}
+
+.dark .dialog_tap {
+    background: #000;
+}
+
+.light .dialog_tap:hover {
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .dialog_tap:hover {
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
