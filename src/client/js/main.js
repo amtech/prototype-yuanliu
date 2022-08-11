@@ -418,9 +418,16 @@ export function renderComponents(content, components, parent) {
                                 pi = element;
                             else
                                 pi = document.createElement("div");
-                            pi.innerHTML = "<i class='" + icon_e + "'></i>"
+                            // if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
+                            pi.setAttribute("icon_hover", "true");
+                            pi.innerHTML = "<i class='" + icon_e + "'></i>";
+                            pi.onclick = () => {
+                                    if (component.blue.event.click.on != undefined) {
+                                        component.blue.event.click.on();
+                                    }
 
-                            // pi.className = "bi bi-" + icon;
+                                }
+                                // pi.className = "bi bi-" + icon;
                             return { root: pi, body: pi };
                         };
                     } else if (component.type == "image") {

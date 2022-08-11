@@ -986,6 +986,10 @@ iframe {
     color: #fff;
 }
 
+[icon_hover=true]:hover i {
+    color: var(--theme-color);
+}
+
 [select=true] {
     background: var(--theme-color);
     color: #fff;

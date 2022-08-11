@@ -585,10 +585,10 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
             if (move) {
                 var top = blueTop + em.clientY - startY;
                 var left = blueLeft + em.clientX - startX;
-                if (top < 0) {
+                if (top < 10) {
                     top = 0;
                 }
-                if (left < 0) {
+                if (left < 10) {
                     left = 0;
                 }
                 if (conotent != undefined) {

@@ -46,30 +46,30 @@ export function setHover(ele: HTMLElement, style: string, hoverString: string) {
     }
 
 }
-export function renderStorePreview(content:HTMLElement,extension:IExtension,dropIndex?:number):HTMLElement{
+export function renderStorePreview(content: HTMLElement, extension: IExtension, dropIndex?: number): HTMLElement {
 
-    var preview=document.createElement("div");
-    preview.className="component_canvas";
-    preview.style.margin="10px 0px 10px 0px";
-    preview.style.padding="10px";
-    preview.style.pointerEvents="none";
-    preview.style.height="120px";
-    preview.style.width="200px";
-    preview.className="form_bg";
-    preview.style.borderRadius="5px";
+    var preview = document.createElement("div");
+    preview.className = "component_canvas";
+    preview.style.margin = "10px 0px 10px 0px";
+    preview.style.padding = "10px";
+    preview.style.pointerEvents = "none";
+    preview.style.height = "120px";
+    preview.style.width = "200px";
+    preview.className = "form_bg";
+    preview.style.borderRadius = "5px";
     preview.style.pointerEvents = "none";
     var i = document.createElement("img");
     i.src = extension.cover;
-    i.style.minWidth="200px";
-    i.style.maxHeight="100px";
-    i.style.pointerEvents="none";
+    i.style.minWidth = "200px";
+    i.style.maxHeight = "100px";
+    i.style.pointerEvents = "none";
     preview.appendChild(i);
     if (dropIndex != undefined && dropIndex >= 0) {
         content.children.item(dropIndex).insertAdjacentElement("beforebegin", preview);
     } else {
         content.appendChild(preview);
     }
-    
+
     return preview;
 
 
@@ -169,12 +169,12 @@ export function initComponent(componentT: IComponent, clone?: boolean): ICompone
             styles: copyStyles(componentT.styles),
             toogle: componentT.toogle,
             hidden: componentT.hidden,
-            blue:copyBlue(componentT.blue),
+            blue: copyBlue(componentT.blue),
             sort: 0,
             edge: componentT.edge,
             group: componentT.group,
             panel: componentT.panel,
-            onChild:componentT.onChild
+            onChild: componentT.onChild
         };
     } else {
         component = componentT;
@@ -183,34 +183,34 @@ export function initComponent(componentT: IComponent, clone?: boolean): ICompone
     return component;
 
 }
-function copyBlue(blue:any):any{
-    if(blue==undefined)
-    return undefined;
-    var event:any;
-    var method:any=blue.method;
-    var property:any;
-    if(blue.event!=undefined){
-        event={};
-        for(var key in blue.event){
-            var eve=blue.event[key];
-            var e={label:eve.label};
-            event[key]=e;
+function copyBlue(blue: any): any {
+    if (blue == undefined)
+        return undefined;
+    var event: any;
+    var method: any = blue.method;
+    var property: any;
+    if (blue.event != undefined) {
+        event = {};
+        for (var key in blue.event) {
+            var eve = blue.event[key];
+            var e = { label: eve.label };
+            event[key] = e;
         }
     }
-    if(blue.property!=undefined){
-        property={};
-        for(var key in blue.property){
-            var eve=blue.property[key];
-            var el:any={label:eve.label,get:eve.get,set:eve.set};
-            property[key]=el;
+    if (blue.property != undefined) {
+        property = {};
+        for (var key in blue.property) {
+            var eve = blue.property[key];
+            var el: any = { label: eve.label, get: eve.get, set: eve.set };
+            property[key] = el;
         }
     }
 
-    var temp={
-        event:event,
-        method:method,
-        property:property,
-        properties:blue.properties
+    var temp = {
+        event: event,
+        method: method,
+        property: property,
+        properties: blue.properties
 
     };
     return temp;
@@ -236,15 +236,15 @@ export function copyComponentProperty(property: any): any {
     if (property != undefined) {
         for (var key in property) {
             var p = property[key];
-            if(p instanceof Array){
+            if (p instanceof Array) {
                 result[key] = [];
-            }else{
+            } else {
                 var item: IComponentProperty = {
                     label: "" + p.label, type: p.type, context: p.context
                 }
                 result[key] = item;
             }
-        
+
         }
     }
     return result;
@@ -257,7 +257,7 @@ export function updateComponent(component: IComponent) {
 
     var componentDiv = document.getElementById(component.key);
     if (componentDiv != undefined) {
-        renderComponent(undefined,component,undefined,undefined,undefined,componentDiv);
+        renderComponent(undefined, component, undefined, undefined, undefined, componentDiv);
     }
 
 
@@ -303,22 +303,22 @@ export function renderComponents(content: HTMLElement, components: IComponent[],
         }
     })
 }
-export function copyComponent(cmpt:any,parentPath?:string) {
-   installComponent(cmpt);
+export function copyComponent(cmpt: any, parentPath?: string) {
+    installComponent(cmpt);
     cmpt.key = getUUID();
     //设置模板
-    cmpt.master=cmpt.path;
+    cmpt.master = cmpt.path;
     //更新path
-    if(parentPath==undefined){
-        cmpt.path=cmpt.key;
-    }else{
-        cmpt.path=parentPath+"/"+cmpt.key;
+    if (parentPath == undefined) {
+        cmpt.path = cmpt.key;
+    } else {
+        cmpt.path = parentPath + "/" + cmpt.key;
     }
-  
+
     //包括子项
     if (cmpt.children != undefined) {
-        cmpt.children.forEach((c:any)=> {
-            copyComponent(c,cmpt.path);
+        cmpt.children.forEach((c: any) => {
+            copyComponent(c, cmpt.path);
         })
     }
 }
@@ -341,7 +341,15 @@ export function installComponent(component: IComponent) {
                 pi = element;
             else
                 pi = document.createElement("div");
+           // if (component.blue!=undefined&&component.blue.event!=undefined&& component.blue.event.click != undefined)
+                pi.setAttribute("icon_hover", "true");
             pi.innerHTML = "<i class='" + icon_e + "'></i>";
+            pi.onclick = () => {
+                if (component.blue.event.click.on != undefined) {
+                    component.blue.event.click.on();
+                }
+
+            }
             return { root: pi, content: pi }
 
         };
@@ -365,7 +373,7 @@ export function installComponent(component: IComponent) {
             component.onPreview = template.onPreview;
             component.onRender = template.onRender;
             component.onChild = template.onChild;
-         
+
             component.blue = copyBlue(template.blue);
             component.edge = template.edge;
             if (template.toogle) {
@@ -385,7 +393,7 @@ export function onSelectComponent(componentPath: string) {
     })
     setSelectComponents([componentPath]);
     var div = document.getElementById(getPathKey(componentPath));
-    if (div) div.setAttribute("selected","true");
+    if (div) div.setAttribute("selected", "true");
 
 }
 /**
@@ -399,18 +407,18 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
 
     //设置母版
-    var noMaster=true;
+    var noMaster = true;
     if (component.master != undefined && component.master.length > 0) {
         var master = findCurPageComponent(component.master);
         if (master != undefined) {
             component.style = master.style;
             component.styles = master.styles;
-            noMaster=false;
+            noMaster = false;
 
         }
-    } 
-     if (noMaster&&getCurPage().style != undefined && getCurPage().style.length > 0) {
-        component.master=undefined;
+    }
+    if (noMaster && getCurPage().style != undefined && getCurPage().style.length > 0) {
+        component.master = undefined;
         //设置 样式
         var styles = getCurPage().styles[component.type];
         console.log(styles);
@@ -463,8 +471,8 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     }
     //控制层级 layer
     if (parent != undefined && index != undefined) {
-        if(parent.onChild!=undefined){
-            parent.onChild(parent,component,index,rs.root,rs.content);
+        if (parent.onChild != undefined) {
+            parent.onChild(parent, component, index, rs.root, rs.content);
         }
 
     }
@@ -472,7 +480,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
     var eventEle = root;
     if (component.type == "dialog") {
-        requestIdleCallback(()=>{
+        requestIdleCallback(() => {
             getCurPageContent().appendChild(root);
         })
         eventEle = body;
@@ -565,14 +573,14 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             }
         }
 
-        var dragStore=dargData.getData("store");
-        if(dragStore!=undefined){
+        var dragStore = dargData.getData("store");
+        if (dragStore != undefined) {
             //拖拽 商店 内容 至 界面
             if (previewComponent != null) {
                 previewComponent.remove();
                 previewComponent = null;
             }
-            previewComponent = renderStorePreview(body, dragStore,dropIndex)
+            previewComponent = renderStorePreview(body, dragStore, dropIndex)
             e.preventDefault();
             return;
         }
@@ -774,12 +782,12 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                     //右侧面板
                     // activePropertyPanel();
                     renderComponent(body, subComponent, dropIndex);
-           
+
                 }
             }
         }
-        var dragStore=dargData.getData("store");
-        if(dragStore!=undefined){
+        var dragStore = dargData.getData("store");
+        if (dragStore != undefined) {
             //拖拽 商店 内容 至 界面
 
         }
@@ -981,7 +989,7 @@ export function deleteComponent(component: IComponent) {
     activePropertyPanel();
     updateBlueView();
     pushHistory(getCurPage());
-    
+
 }
 /**
  * 根据组件路径获取组件key
@@ -989,7 +997,7 @@ export function deleteComponent(component: IComponent) {
  * @returns 
  */
 export function getPathKey(path: string): string {
-    if(path==undefined){
+    if (path == undefined) {
         return undefined;
     }
     if (path.indexOf("/") < 0)

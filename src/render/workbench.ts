@@ -369,6 +369,7 @@ export function renderPage(page: IPage) {
         pageView.style.right = "0px";
         pageView.style.bottom = "0px";
         workbenchpages.appendChild(pageView);
+        
         //渲染页面工作区
         renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
         //更新右侧、底部面板

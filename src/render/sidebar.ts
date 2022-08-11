@@ -4,6 +4,7 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染侧边栏
 ***************************************************************************** */
 import { clipboard, ipcRenderer } from "electron";
+import { renderDialog } from "../dialog/export";
 import { setComponentsTemplate } from "../common/components";
 import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
 import { icons } from "../common/icons";
@@ -36,9 +37,9 @@ export function renderSidebar(content: HTMLElement) {
     layoutBarText.innerText = "资源";
     layoutBarText.style.flex = "1";
     layoutBar.appendChild(layoutBarText);
-    var layoutBarIcon = document.createElement("i");
-    layoutBarIcon.className = "bi  bi-three-dots";
-    layoutBar.appendChild(layoutBarIcon);
+    // var layoutBarIcon = document.createElement("i");
+    // layoutBarIcon.className = "bi  bi-three-dots";
+    // layoutBar.appendChild(layoutBarIcon);
 
 
 
@@ -53,7 +54,14 @@ export function renderSidebar(content: HTMLElement) {
         label: "新建页面", icon: "bi bi-file-earmark-plus", onclick: () => {
             createPage("新建页面");
         }
-    }]);
+    },
+    {
+        label: "按模板新建页面", icon: "bi bi-node-plus", onclick: () => {
+            createPageByTemplate();
+        }
+    }
+
+]);
 
 
 
@@ -478,10 +486,24 @@ function renderIconExplorer(content: HTMLElement, filter: string) {
                         pi = element;
                     else
                         pi = document.createElement("div");
+                //    if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
+                        pi.setAttribute("icon_hover", "true");
                     pi.innerHTML = "<i class='" + icon_e + "'></i>"
+                    pi.onclick = () => {
+                        if (component.blue.event.click.on != undefined) {
+                            component.blue.event.click.on();
+                        }
 
+                    }
                     // pi.className = "bi bi-" + icon;
                     return { root: pi, content: pi }
+                },
+                blue: {
+                    event: {
+                        click: {
+                            label: "单击"
+                        }
+                    }
                 }
             };
             dargData.setData("componentTemplate", component);
@@ -566,8 +588,8 @@ function renderFileExplorer(content: HTMLElement) {
 function renderCatalog(content: HTMLElement, catalogs: ICatalog[], level: number) {
     if (catalogs != undefined) {
         //  catalogs.sort((a, b) => (a.sort - b.sort));
-       // console.log("load Catalog:---")
-        logj("load Catalog:---","sidebar",569);
+        // console.log("load Catalog:---")
+        logj("load Catalog:---", "sidebar", 569);
         console.log(catalogs);
         catalogs.forEach((catalog: ICatalog) => {
             renderFileTree(content, catalog, level);
@@ -582,12 +604,20 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
     if (catalog == undefined) {
         return;
     }
-    var menuItemsFolder: Array<IContextMenuItem> = [{
+    var menuItemsFolder: Array<IContextMenuItem> = [
+        {
         label: "新建页面", icon: "bi bi-file-earmark-plus",
         onclick: (args) => {
             console.log(args);
 
             createPage("新建页面", catalog);
+        }
+    }, {
+        label: "根据模板新建页面", icon: "bi bi-node-plus",
+        onclick: (args) => {
+            console.log(args);
+
+            createPageByTemplate(catalog);
         }
     }, {
         label: "新建文件夹", icon: "bi bi-folder-plus",
@@ -764,9 +794,9 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
             } else {
 
-                var old = parent.children.find(c => c.key ==dargData.getData("catalog"));
+                var old = parent.children.find(c => c.key == dargData.getData("catalog"));
                 var copy: ICatalog = { key: getUUID(), name: old.name, path: old.path, children: old.children, dir: old.dir };
-                var oldIndex = parent.children.findIndex(c => c.key ==dargData.getData("catalog"));
+                var oldIndex = parent.children.findIndex(c => c.key == dargData.getData("catalog"));
                 parent.children.splice(oldIndex, 1);
                 var index = parent.children.findIndex(c => c.key == catalog.key);
                 console.log("old", old);
@@ -894,9 +924,9 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
             if (parent == undefined) {
 
-                
-                console.log(getProject().catalogs,dargData.getData("catalog"));
-                var ol = getCatalog(getProject().catalogs,dargData.getData("catalog").key);
+
+                console.log(getProject().catalogs, dargData.getData("catalog"));
+                var ol = getCatalog(getProject().catalogs, dargData.getData("catalog").key);
                 console.log(ol);
                 var olds: ICatalog = ol.caltalog;
 
@@ -979,26 +1009,26 @@ function renderComponentsExplorer(content: HTMLElement) {
 
         })
         setComponentsTemplate(components)
-        content.innerHTML="";
+        content.innerHTML = "";
         var base = renderComponentGroup(content, "sidebar_component_base", "基础");
         var layout = renderComponentGroup(content, "sidebar_component_layout", "布局");
         var container = renderComponentGroup(content, "sidebar_component_container", "容器");
         var chart = renderComponentGroup(content, "sidebar_component_chart", "图表");
         var flow = renderComponentGroup(content, "sidebar_component_flow", "流程");
-  
-        renderComponents(components, base, layout, container, chart,flow);
+
+        renderComponents(components, base, layout, container, chart, flow);
 
         //自定义按钮
-        var custom =document.createElement("div");
-        custom.className="custom_component";
-        custom.style.lineHeight="1.5";
-        custom.style.textAlign="center";
-        custom.style.fontSize="10px";
-        custom.innerText="更多组件";
+        var custom = document.createElement("div");
+        custom.className = "custom_component";
+        custom.style.lineHeight = "1.5";
+        custom.style.textAlign = "center";
+        custom.style.fontSize = "10px";
+        custom.innerText = "更多组件";
 
         content.appendChild(custom);
 
-        custom.onclick=()=>{
+        custom.onclick = () => {
 
             showCustomComponent();
 
@@ -1075,6 +1105,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
         taps.forEach((tap: IContextMenuItem) => {
             var tapDiv = document.createElement("div");
             tapDiv.className = "tool_tap";
+            tapDiv.title=tap.label;
             var tapIcon = document.createElement("i");
             tapIcon.className = tap.icon;
             tapDiv.appendChild(tapIcon);
@@ -1111,8 +1142,8 @@ function renderComponentGroup(content: HTMLElement, key: string, label: string) 
 }
 //只渲染默认组件，多余组件不展示再sidebar中
 
-function renderComponents(components: Array<IComponent>, base: HTMLElement, layout: HTMLElement, container: HTMLElement, chart: HTMLElement,flow:HTMLElement) {
-    var componentsdisplay=getConfig().componentsEnable;
+function renderComponents(components: Array<IComponent>, base: HTMLElement, layout: HTMLElement, container: HTMLElement, chart: HTMLElement, flow: HTMLElement) {
+    var componentsdisplay = getConfig().componentsEnable;
     components.forEach(component => {
 
         //只渲染默认组件
@@ -1138,7 +1169,7 @@ function renderComponents(components: Array<IComponent>, base: HTMLElement, layo
                 container.appendChild(componentDiv);
             } else if (component.group == "chart") {
                 chart.appendChild(componentDiv);
-            }else if (component.group == "flow") {
+            } else if (component.group == "flow") {
                 flow.appendChild(componentDiv);
             }
 
@@ -1166,6 +1197,19 @@ function renderComponents(components: Array<IComponent>, base: HTMLElement, layo
 
 
     })
+
+
+}
+
+function createPageByTemplate(caltalog?:ICatalog){
+
+    var rd = renderDialog();
+    var dialog=rd.content;
+    dialog.style.display = "flex";
+    dialog.style.alignItems = "center";
+    dialog.style.justifyContent = "center";
+
+
 
 
 }

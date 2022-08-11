@@ -300,16 +300,6 @@ button {
     color: #222;
 }
 
-.dark .blueView {
-    background: #000;
-    color: #eee;
-}
-
-.light .blueView {
-    background: #f1f1f1;
-    color: #222;
-}
-
 .dark .blueContext {
     color: #eee;
     border: 1px solid rgba(175, 175, 175, 0.2);
