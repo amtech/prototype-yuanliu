@@ -61,7 +61,7 @@ export function renderSidebar(content: HTMLElement) {
         }
     }
 
-]);
+    ]);
 
 
 
@@ -486,8 +486,8 @@ function renderIconExplorer(content: HTMLElement, filter: string) {
                         pi = element;
                     else
                         pi = document.createElement("div");
-                //    if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
-                        pi.setAttribute("icon_hover", "true");
+                    //    if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
+                    pi.setAttribute("icon_hover", "true");
                     pi.innerHTML = "<i class='" + icon_e + "'></i>"
                     pi.onclick = () => {
                         if (component.blue.event.click.on != undefined) {
@@ -606,37 +606,37 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
     }
     var menuItemsFolder: Array<IContextMenuItem> = [
         {
-        label: "新建页面", icon: "bi bi-file-earmark-plus",
-        onclick: (args) => {
-            console.log(args);
+            label: "新建页面", icon: "bi bi-file-earmark-plus",
+            onclick: (args) => {
+                console.log(args);
 
-            createPage("新建页面", catalog);
-        }
-    }, {
-        label: "根据模板新建页面", icon: "bi bi-node-plus",
-        onclick: (args) => {
-            console.log(args);
+                createPage("新建页面", catalog);
+            }
+        }, {
+            label: "根据模板新建页面", icon: "bi bi-node-plus",
+            onclick: (args) => {
+                console.log(args);
 
-            createPageByTemplate(catalog);
-        }
-    }, {
-        label: "新建文件夹", icon: "bi bi-folder-plus",
-        onclick: (args) => {
-            console.log(args);
+                createPageByTemplate(catalog);
+            }
+        }, {
+            label: "新建文件夹", icon: "bi bi-folder-plus",
+            onclick: (args) => {
+                console.log(args);
 
-            createFolder("新建文件夹", catalog);
-        }
-    }, {
-        label: "删除", icon: "bi bi-trash", onclick: (args: ICatalog) => {
-            console.log(args);
-            deletePage(args);
-        }
-    }, {
-        label: "重命名", icon: "bi bi-pencil", shorcut: "Enter", onclick: (args: ICatalog, ele: HTMLElement) => {
-            ele.setAttribute("data-edit", "true");
-            ele.getElementsByTagName("input").item(0).focus();
-        }
-    }];
+                createFolder("新建文件夹", catalog);
+            }
+        }, {
+            label: "删除", icon: "bi bi-trash", onclick: (args: ICatalog) => {
+                console.log(args);
+                deletePage(args);
+            }
+        }, {
+            label: "重命名", icon: "bi bi-pencil", shorcut: "Enter", onclick: (args: ICatalog, ele: HTMLElement) => {
+                ele.setAttribute("data-edit", "true");
+                ele.getElementsByTagName("input").item(0).focus();
+            }
+        }];
     var menuItemsPage: Array<IContextMenuItem> = [{
         label: "删除", icon: "bi bi-trash", onclick: (args: ICatalog) => {
             console.log(args);
@@ -1105,7 +1105,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
         taps.forEach((tap: IContextMenuItem) => {
             var tapDiv = document.createElement("div");
             tapDiv.className = "tool_tap";
-            tapDiv.title=tap.label;
+            tapDiv.title = tap.label;
             var tapIcon = document.createElement("i");
             tapIcon.className = tap.icon;
             tapDiv.appendChild(tapIcon);
@@ -1201,70 +1201,232 @@ function renderComponents(components: Array<IComponent>, base: HTMLElement, layo
 
 }
 
-const templatePages:Array<{
-    key:string,
-    label:string,
-    onPriview:()=>HTMLElement,
-}>=[
-    {
-        label:"列表",
-        key:"list",
-        onPriview:()=>{
-            var page = document.createElement("div");
-            page.className = "template_page";
-
-            var header = document.createElement("div");
-            header.style.height="20px";
-            header.style.backgroundColor="#f90";
-            header.style.borderRadius="5px";
-            header.style.opacity="0.5";
-            page.appendChild(header);
+const templatePages: Array<{
+    key: string,
+    label: string,
+    onPriview: () => HTMLElement,
+}> = [
+        {
+            label: "列表",
+            key: "list",
+            onPriview: () => {
+                var page = document.createElement("div");
 
 
-            var table = document.createElement("div");
-            table.style.height="100px";
-            table.style.marginTop="10px";
-            table.style.backgroundColor="#f09";
-            table.style.borderRadius="5px";
-            table.style.opacity="0.5";
-            page.appendChild(table);
-
-            var footer = document.createElement("div");
-            footer.style.height="20px";
-            footer.style.marginTop="10px";
-            footer.style.backgroundColor="#90f";
-            footer.style.borderRadius="5px";
-            footer.style.opacity="0.5";
-            page.appendChild(footer);
+                var header = document.createElement("div");
+                header.style.height = "20px";
 
 
-            return  page;
+                header.style.opacity = "0.5";
+                header.style.display = "flex";
+                page.appendChild(header);
+
+                var headerText = document.createElement("div");
+                headerText.style.flex = "1";
+                headerText.style.backgroundColor = "#f90";
+                headerText.style.borderRadius = "5px";
+                header.appendChild(headerText);
+
+                var flex = document.createElement("div");
+                flex.style.flex = "1";
+
+                header.appendChild(flex);
+
+                var headerTap = document.createElement("div");
+                headerTap.style.flex = "1";
+                headerTap.style.borderRadius = "5px";
+                headerTap.style.backgroundColor = "#9f0";
+                header.appendChild(headerTap);
+
+
+                var table = document.createElement("div");
+                table.style.height = "100px";
+                table.style.marginTop = "10px";
+                table.style.backgroundColor = "#f09";
+                table.style.borderRadius = "5px";
+                table.style.opacity = "0.5";
+                page.appendChild(table);
+
+                var footer = document.createElement("div");
+                footer.style.height = "20px";
+                footer.style.marginTop = "10px";
+
+                footer.style.display = "flex";
+                footer.style.opacity = "0.5";
+                page.appendChild(footer);
+
+                var flex1 = document.createElement("div");
+                flex1.style.flex = "1";
+                footer.appendChild(flex1);
+
+                var footerPages = document.createElement("div");
+                footerPages.style.flex = "1";
+                footerPages.style.borderRadius = "5px";
+                footerPages.style.backgroundColor = "#9f0";
+                footer.appendChild(footerPages);
+
+
+
+
+
+
+                return page;
+            }
+        },
+        {
+            label: "树形",
+            key: "tree",
+            onPriview: () => {
+
+                var content = document.createElement("div");
+                content.style.display = "flex";
+
+                var tree = document.createElement("div");
+                tree.style.flex = "1";
+                tree.style.backgroundColor = "#f90";
+                tree.style.borderRadius = "5px";
+                tree.style.marginRight = "10px";
+                tree.style.opacity = "0.5";
+                content.appendChild(tree);
+
+
+
+
+                var page = document.createElement("div");
+                page.style.flex = "3";
+                content.appendChild(page);
+
+                var header = document.createElement("div");
+                header.style.height = "20px";
+
+
+                header.style.opacity = "0.5";
+                header.style.display = "flex";
+                page.appendChild(header);
+
+                var headerText = document.createElement("div");
+                headerText.style.flex = "1";
+                headerText.style.backgroundColor = "#f90";
+                headerText.style.borderRadius = "5px";
+                header.appendChild(headerText);
+
+                var flex = document.createElement("div");
+                flex.style.flex = "1";
+
+                header.appendChild(flex);
+
+                var headerTap = document.createElement("div");
+                headerTap.style.flex = "1";
+                headerTap.style.borderRadius = "5px";
+                headerTap.style.backgroundColor = "#9f0";
+                header.appendChild(headerTap);
+
+
+                var table = document.createElement("div");
+                table.style.height = "100px";
+                table.style.marginTop = "10px";
+                table.style.backgroundColor = "#f09";
+                table.style.borderRadius = "5px";
+                table.style.opacity = "0.5";
+                page.appendChild(table);
+
+                var footer = document.createElement("div");
+                footer.style.height = "20px";
+                footer.style.marginTop = "10px";
+
+                footer.style.display = "flex";
+                footer.style.opacity = "0.5";
+                page.appendChild(footer);
+
+                var flex1 = document.createElement("div");
+                flex1.style.flex = "1";
+                footer.appendChild(flex1);
+
+                var footerPages = document.createElement("div");
+                footerPages.style.flex = "1";
+                footerPages.style.borderRadius = "5px";
+                footerPages.style.backgroundColor = "#9f0";
+                footer.appendChild(footerPages);
+                return content;
+            }
+        },
+        {
+            label: "Hub",
+            key: "hub",
+            onPriview: () => {
+
+
+
+                var page = document.createElement("div");
+              
+
+
+                var table = document.createElement("div");
+                table.style.height = "100px";
+               
+                table.style.backgroundColor = "#f09";
+                table.style.borderRadius = "5px";
+                table.style.opacity = "0.5";
+                page.appendChild(table);
+
+
+
+                var header = document.createElement("div");
+                header.style.height = "20px";
+
+                header.style.marginTop = "10px";
+                header.style.opacity = "0.5";
+                header.style.display = "flex";
+                page.appendChild(header);
+
+                var headerText = document.createElement("div");
+                headerText.style.flex = "1";
+                headerText.style.backgroundColor = "#f90";
+                headerText.style.borderRadius = "5px";
+                header.appendChild(headerText);
+
+                var flex = document.createElement("div");
+                flex.style.flex = "1";
+
+                header.appendChild(flex);
+
+                var headerTap = document.createElement("div");
+                headerTap.style.flex = "1";
+                headerTap.style.borderRadius = "5px";
+                headerTap.style.backgroundColor = "#9f0";
+                header.appendChild(headerTap);
+
+                var footer = document.createElement("div");
+                footer.style.height = "20px";
+                footer.style.marginTop = "10px";
+
+                footer.style.display = "flex";
+                footer.style.opacity = "0.5";
+                page.appendChild(footer);
+
+
+
+
+                var flex1 = document.createElement("div");
+                flex1.style.flex = "1";
+                footer.appendChild(flex1);
+
+
+
+                var footerPages = document.createElement("div");
+                footerPages.style.flex = "1";
+                footerPages.style.borderRadius = "5px";
+                footerPages.style.backgroundColor = "#9f0";
+                footer.appendChild(footerPages);
+                return page;
+            }
         }
-    },
-    {
-        label:"树形",
-        key:"tree",
-        onPriview:()=>{
-            var page = document.createElement("div");
-            page.className = "template_page";
-            return  page;
-        }
-    },
-    {
-        label:"Hub",
-        key:"hub",
-        onPriview:()=>{
-            var page = document.createElement("div");
-            page.className = "template_page";
-            return  page;
-        } 
-    }
-]
+    ]
 
-function createPageByTemplate(caltalog?:ICatalog){
+function createPageByTemplate(caltalog?: ICatalog) {
 
     var rd = renderDialog();
-    var dialog=rd.content;
+    var dialog = rd.content;
     dialog.style.display = "flex";
     dialog.style.alignItems = "center";
     dialog.style.justifyContent = "center";
@@ -1273,8 +1435,20 @@ function createPageByTemplate(caltalog?:ICatalog){
     content.className = "template_content";
     dialog.appendChild(content);
 
-    templatePages.forEach(page=>{
-        var pageDiv=page.onPriview();
+    templatePages.forEach(page => {
+        var pageDiv = document.createElement("div");
+        pageDiv.className = "template_page";
+        var context = page.onPriview();
+        pageDiv.appendChild(context);
+
+        var title = document.createElement("div");
+        title.className = "template_title";
+        title.innerText = page.label;
+        title.style.fontSize = "18px";
+        title.style.fontWeight = "bold";
+        title.style.lineHeight = "3";
+        title.style.opacity= "0.9";
+        pageDiv.appendChild(title);
 
         content.appendChild(pageDiv);
     });
