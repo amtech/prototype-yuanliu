@@ -1201,6 +1201,66 @@ function renderComponents(components: Array<IComponent>, base: HTMLElement, layo
 
 }
 
+const templatePages:Array<{
+    key:string,
+    label:string,
+    onPriview:()=>HTMLElement,
+}>=[
+    {
+        label:"列表",
+        key:"list",
+        onPriview:()=>{
+            var page = document.createElement("div");
+            page.className = "template_page";
+
+            var header = document.createElement("div");
+            header.style.height="20px";
+            header.style.backgroundColor="#f90";
+            header.style.borderRadius="5px";
+            header.style.opacity="0.5";
+            page.appendChild(header);
+
+
+            var table = document.createElement("div");
+            table.style.height="100px";
+            table.style.marginTop="10px";
+            table.style.backgroundColor="#f09";
+            table.style.borderRadius="5px";
+            table.style.opacity="0.5";
+            page.appendChild(table);
+
+            var footer = document.createElement("div");
+            footer.style.height="20px";
+            footer.style.marginTop="10px";
+            footer.style.backgroundColor="#90f";
+            footer.style.borderRadius="5px";
+            footer.style.opacity="0.5";
+            page.appendChild(footer);
+
+
+            return  page;
+        }
+    },
+    {
+        label:"树形",
+        key:"tree",
+        onPriview:()=>{
+            var page = document.createElement("div");
+            page.className = "template_page";
+            return  page;
+        }
+    },
+    {
+        label:"Hub",
+        key:"hub",
+        onPriview:()=>{
+            var page = document.createElement("div");
+            page.className = "template_page";
+            return  page;
+        } 
+    }
+]
+
 function createPageByTemplate(caltalog?:ICatalog){
 
     var rd = renderDialog();
@@ -1209,7 +1269,15 @@ function createPageByTemplate(caltalog?:ICatalog){
     dialog.style.alignItems = "center";
     dialog.style.justifyContent = "center";
 
+    var content = document.createElement("div");
+    content.className = "template_content";
+    dialog.appendChild(content);
 
+    templatePages.forEach(page=>{
+        var pageDiv=page.onPriview();
+
+        content.appendChild(pageDiv);
+    });
 
 
 }

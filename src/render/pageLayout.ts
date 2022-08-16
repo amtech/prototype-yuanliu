@@ -93,10 +93,15 @@ export function renderPageLayout() {
             depthWrite: false, // 不遮挡后面的模型
             // depthWrite: false // 关闭深度测试
         });
+      
         const cube = new THREE.Mesh(geometry, material);
      
         cube.position.set(layer[2]+layer[0]/2, layer[3]-layer[1]/2, layer[4]);
         scene.add(cube);
+
+        // const text=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(getTextCanvas("asdas",colors[count]))}));
+        // text.position.set(layer[2]+layer[0]/2, layer[3]-layer[1]/2, layer[4]);
+        // scene.add(text);
  
         count++
     });
@@ -182,4 +187,17 @@ function getComponentTop(component: HTMLElement) {
     }
     return top;
 
+}
+function getTextCanvas(text:string,color:string){
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = color;
+    ctx.font = "20px Arial";
+    var metrics = ctx.measureText(text);
+    canvas.width = metrics.width;
+    canvas.height = 20;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillText(text, 0, 20);
+    return canvas;
 }

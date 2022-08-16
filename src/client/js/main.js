@@ -626,7 +626,7 @@ function renderHub(content) {
     content.appendChild(catalog);
     var catalogTitle = document.createElement("div");
     catalogTitle.className = "hub_title";
-    catalogTitle.innerHTML = "Catalog";
+    catalogTitle.innerHTML = "目录";
     catalog.appendChild(catalogTitle);
     var catalogContent = document.createElement("div");
     catalog.appendChild(catalogContent);
@@ -640,7 +640,7 @@ function renderHub(content) {
     hub_blue.onclick = (e) => { e.stopPropagation() };
     var blueitle = document.createElement("div");
     blueitle.className = "hub_title";
-    blueitle.innerHTML = "Blueprint";
+    blueitle.innerHTML = "蓝图";
     hub_blue.appendChild(blueitle);
     var blueContent = document.createElement("div");
     blueContent.id = "hub_blue";
@@ -654,14 +654,48 @@ function renderHub(content) {
 
     var settingTitle = document.createElement("div");
     settingTitle.className = "hub_title";
-    settingTitle.innerHTML = "Setting";
+    settingTitle.innerHTML = "项目信息";
     setting.appendChild(settingTitle);
     var settingContent = document.createElement("div");
     setting.appendChild(settingContent);
 
     updateBlueView();
+    renderSetting(settingContent);
 }
 
+function renderSetting(settingContent) {
+
+    //logo
+    var logo = document.createElement("div");
+    logo.style.height = "100px";
+    logo.style.display = "flex";
+    logo.style.justifyContent = "center";
+    logo.style.alignItems = "center";
+    settingContent.appendChild(logo);
+    var cover = document.createElement("img");
+    cover.src = "images/cover.png";
+
+    cover.style.height = "100%";
+    logo.appendChild(cover);
+    //author
+    var author = document.createElement("div");
+    author.innerText = project_data.author;
+    author.style.textAlign = "center";
+    settingContent.appendChild(author);
+    //date
+    var date = document.createElement("div");
+    date.style.textAlign = "center";
+    date.innerText = project_data.updateDate;
+    settingContent.appendChild(date);
+    //info
+    var info = document.createElement("div");
+    info.innerText = project_data.description;
+    info.style.padding = "10px";
+    settingContent.appendChild(info);
+
+
+
+}
 export function updateBlueView() {
     var conent = document.getElementById("hub_blue");
     if (conent != undefined) {

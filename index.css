@@ -1413,3 +1413,18 @@ iframe {
 .custom_component:hover {
     text-decoration: underline;
 }
+
+.template_page {
+    width: 400px;
+    height: 300px;
+    display: inline-block;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+#main {
+    border-top-left-radius: 10px;
+    overflow: hidden;
+}
