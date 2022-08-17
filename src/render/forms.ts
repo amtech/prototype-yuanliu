@@ -197,13 +197,13 @@ export class FormPragraph {
 
         this.pragraph.style.minHeight = "60px";
         this.pragraph.style.padding = "5px";
-        this.pragraph.style.textIndent = "2em";
+   
         this.pragraph.style.backgroundColor = "transparent";
     
         this.pragraph.style.flex = "1";
-        this.pragraph.onblur = () => {
+        this.pragraph.onkeyup = () => {
             if(this.onChange!=undefined)
-             this.onChange((this.pragraph.innerHTML));
+             this.onChange((this.pragraph.innerText));
         };
         div.appendChild(this.pragraph);
     }

@@ -6,8 +6,10 @@ Copyright (c) taoyongwen. All rights reserved.
 import { switchFloatTab } from "./floatPanel";
 
 import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
-import { getNavItems, getProjectNavJson } from "./workbench";
+import { getNavItems, getProjectNavJson, setNavItems } from "./workbench";
 import * as dargData from "./DragData";
+import { getProject } from "./workspace";
+import { ipcRendererSend } from "../preload";
 
 var lastSelected: any;
 export interface INavItem {
@@ -30,14 +32,57 @@ export function renderNavTrees(content: HTMLElement, nav: INavItem[]) {
     content.innerHTML = "";
     content.oncontextmenu = (e: MouseEvent) => {
         // folderTitle.setAttribute("selected", "true");
-        var menuItems: Array<IContextMenuItem> = [{
+        var menuItems: Array<IContextMenuItem> = [
+            {
             label: "新建", icon: "bi bi-plus", onclick: () => {
                 getNavItems().push({
                     name: "新建菜单", path: "", icon: "bi bi-plus", isExtend: false, children: []
                 });
                 renderNavTrees(content, getNavItems());
             }
-        }];
+        },
+        {
+            label: "自动识别", icon: "bi bi-plus", onclick: () => {
+                //复制文件目录至菜单
+                setNavItems([]);
+                getProject().catalogs.forEach((catalog) => {
+                    if(catalog.children!=undefined&& catalog.children.length > 0) {
+                        var children:INavItem[]=[];
+
+                        catalog.children.forEach((child) => {
+
+                            children.push({
+                                name: child.name,
+                                path: child.key,
+                                icon: "bi bi-file-earmark-richtext",
+                                isExtend: false,
+                  
+                            });
+                        });
+
+
+                        getNavItems().push({
+                            name: catalog.name, path: catalog.key, icon: "bi bi-plus", isExtend: false, children: children
+                        });
+                    }else{
+                        getNavItems().push({
+                            name: catalog.name, path: catalog.key, icon: "bi bi-file-earmark-richtext", isExtend: false, children: []
+                        });
+                    }
+              
+
+                })
+
+                renderNavTrees(content, getNavItems());
+                requestIdleCallback(() => {
+
+                    ipcRendererSend("saveNav", JSON.stringify(getNavBar()));
+                });
+               
+            }
+        }
+    
+    ];
         showContextMenu(menuItems, e.clientX, e.clientY);
     }
     nav.forEach(item => {

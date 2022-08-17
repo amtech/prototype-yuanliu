@@ -3,16 +3,15 @@ Copyright (c) taoyongwen. All rights reserved.
 
 蓝图
 ***************************************************************************** */
+import { initComponent, onSelectComponent } from "../common/components";
 import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
 import { getUUID, IBlue, IBlueEvent, IBlueLink, IBlueMethod, IBluePoint, IBlueProperty, IComponent } from "../common/interfaceDefine";
 import { getBlueMethods } from "./blueprintMethods";
+import * as dargData from "./DragData";
 import * as paints from "./paints";
 import { getMousePosition } from "./shorcuts";
 import { getDataBase } from "./sidebar";
 import { findCurPageComponent, getCurPage } from "./workbench";
-import { initComponent, onSelectComponent } from "../common/components";
-import * as dargData from "./DragData";
-import { format } from "d3";
 /**
  * 更新蓝图界面
  */
@@ -232,11 +231,11 @@ export function renderBlueView(content: HTMLElement) {
             previewComponent.style.top = e.offsetY + "px";
         }
 
-        if(getCurPage()!=undefined&&dargData.getData("componentTemplate")==undefined){
+        if (getCurPage() != undefined && dargData.getData("componentTemplate") == undefined) {
             e.preventDefault();
         }
 
-       
+
     }
     blueContext.ondragenter = (e: any) => {
 
@@ -296,9 +295,9 @@ export function renderBlueView(content: HTMLElement) {
             dargData.clear();
         }
 
-        var catalog= dargData.getData("catalog");//e.dataTransfer.getData("catalog");
-        if (catalog != undefined ) {
-            
+        var catalog = dargData.getData("catalog");//e.dataTransfer.getData("catalog");
+        if (catalog != undefined) {
+
             var fi = getCurPage().blues.findIndex(b => b.component == catalog.key);
             if (fi >= 0) {
                 return;
@@ -309,12 +308,14 @@ export function renderBlueView(content: HTMLElement) {
                 { label: "打开", name: "open" }
             ];
             var properties: IBluePoint[] = [
-                {label:"页面",name:"key",type:"out"}
+                { label: "页面", name: "key", type: "out" }
             ];
             var events: IBluePoint[] = [];
 
-            var blue: IBlue = { type: "catalog", left: left, top: top, component: catalog.key, key: getUUID(), name: catalog.name, icon: "bi bi-file-earmark-richtext",
-             events: events, properties: properties, methods: methods };
+            var blue: IBlue = {
+                type: "catalog", left: left, top: top, component: catalog.key, key: getUUID(), name: catalog.name, icon: "bi bi-file-earmark-richtext",
+                events: events, properties: properties, methods: methods
+            };
             getCurPage().blues.push(blue);
 
             renderBlue(blueContext, blue);
@@ -412,35 +413,35 @@ function initBlueComponent(component: IComponent, top: number, left: number): IB
 
     if (component.blue != undefined) {
         if (component.blue.event != undefined) {
-            for(var key in component.blue.event){
-                var e:IBlueEvent=component.blue.event[key];
-                events.push({ label: e.label, name:key });
+            for (var key in component.blue.event) {
+                var e: IBlueEvent = component.blue.event[key];
+                events.push({ label: e.label, name: key });
             }
-           
+
         }
         if (component.blue.method != undefined) {
             for (var key in component.blue.method) {
                 var m: IBlueMethod = component.blue.method[key];
                 methods.push({ label: m.label, name: key });
             }
-           
+
         }
         if (component.blue.property != undefined) {
             for (var key in component.blue.property) {
                 var p: IBlueProperty = component.blue.property[key];
                 properties.push({ label: p.label, name: key });
             }
-         
-           
-        }
-        if(component.blue.properties!=undefined){
 
-            var list=component.blue.properties(component);
-            list.forEach(item=>{
+
+        }
+        if (component.blue.properties != undefined) {
+
+            var list = component.blue.properties(component);
+            list.forEach(item => {
                 var p: IBlueProperty = item;
                 properties.push({ label: p.label, name: item.key });
             })
-         
+
         }
     }
 
@@ -923,7 +924,7 @@ function getX(x: number): number {
 }
 function getY(y: number): number {
     console.log(y);
-    return y - document.getElementById("workbench").clientHeight - 32-40-30-7;
+    return y - document.getElementById("workbench").clientHeight - 32 - 40 - 30 - 7;
 }
 
 function renderBluePreview(conotent: HTMLElement, blue: IBlue): HTMLElement {

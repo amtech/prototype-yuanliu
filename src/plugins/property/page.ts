@@ -12,6 +12,7 @@ import * as forms from "../../render/forms";
 import { renderPageLayout } from "../../render/pageLayout";
 import { getCurPage, getCurPageContent, getCurViewContent, getProjectNavJson, getProjectTitleJson, reRenderPage } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
+import { saveSimplePage } from "../../render/toolbar";
 
 var formHeight:forms.FormNumber;
 var formWidth:forms.FormNumber;
@@ -26,6 +27,7 @@ var formBackgroundGradientPanelColor2:forms.FormColor;
 var formBackgroundGradientPanelType:forms.FormIcons;
 var formBackgroundGradientPanelAngle:forms.FormSolider;
 var formBackgroundGradientPanelPosition:forms.FormSolider;
+var formInfo:forms.FormPragraph;
 
 const panel: IPanel = {
   key: "page", name: "页面", hidden: true,sort:0,
@@ -132,6 +134,10 @@ const panel: IPanel = {
     formBackgroundGradientPanelPosition = new forms.FormSolider("位置", 100, 0);
     formBackgroundGradientPanelPosition.render(formBackgroundGradientPanel);
 
+
+    formInfo=new forms.FormPragraph("页面大纲");
+    formInfo.render(setting);
+
   }, 
   update: () => {
 
@@ -178,7 +184,7 @@ const panel: IPanel = {
     });
 
     formStyle.update(getCurPage().style, (style) => {
-             getCurPage().style = style;
+            getCurPage().style = style;
             var exStyles = eval("require(style).default()");
             console.log(exStyles);
             getCurPage().styles = exStyles;
@@ -186,6 +192,11 @@ const panel: IPanel = {
             pushHistory(getCurPage());
     });
 
+    formInfo.update(getCurPage().info, (info) => {
+      getCurPage().info = info;
+      
+      pushHistory(getCurPage());
+    });
    
     // var row1 = document.createElement("div");
     // setting.appendChild(row1);

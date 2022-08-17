@@ -624,6 +624,10 @@ i[data-rotate]::before {
     overflow: hidden;
 }
 
+.title_bar>div {
+    opacity: 0.85;
+}
+
 .nav_bar {
     min-width: 120px;
     display: inline-block;
@@ -663,6 +667,8 @@ i[data-rotate]::before {
 .nav_row {
     height: 32px;
     cursor: pointer;
+    opacity: 0.8;
+    padding-right: 10px;
 }
 
 .nav_row:hover {
@@ -1422,7 +1428,6 @@ iframe {
     margin: 10px;
     border-radius: 5px;
     position: relative;
-    background-color: #fff;
     cursor: pointer;
 }
 

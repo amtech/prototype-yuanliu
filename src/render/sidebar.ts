@@ -1437,7 +1437,7 @@ function createPageByTemplate(caltalog?: ICatalog) {
 
     templatePages.forEach(page => {
         var pageDiv = document.createElement("div");
-        pageDiv.className = "template_page";
+        pageDiv.className = "template_page background";
         var context = page.onPriview();
         pageDiv.appendChild(context);
 
