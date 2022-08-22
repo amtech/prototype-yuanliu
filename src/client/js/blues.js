@@ -365,7 +365,7 @@ function cal_property(link, to, toBlue, blues, links) {
     }
     //构建 链接 队列
     var linkQueue = [];
-    console.log("------构建连接队列-----", link.to);
+    console.log("------构建连接队列-----");
     link_Queue(link, blues, links, linkQueue);
     console.log("------开始计算队列 size-----", linkQueue.length);
     if (linkQueue.length == 0) {
@@ -378,18 +378,18 @@ function cal_property(link, to, toBlue, blues, links) {
 }
 
 function link_Queue(link, blues, links, linkQueue) {
-    console.log(">", link);
+    console.log("-->", link);
     var subLinks = links.filter(l => l.to.blue == link.to.blue && l.to.name == link.to.name);
     if (subLinks == undefined || subLinks.length == 0) {
         console.log(">return");
         return;
     }
     subLinks.forEach(subLink => {
-        console.log("f", subLink.key, link.key, subLink.from.type);
+
         if (subLink.key != link.key && subLink.from.type != "event") {
             linkQueue.push(subLink);
-            console.log("push", subLink.from);
             var fromBlue = blues.find(b => b.key == subLink.from.blue);
+            console.log("push", fromBlue.name);
             if (fromBlue.type == "method") {
                 //如果是方法,查找方法的输入
                 var ins = fromBlue.properties.filter(p => p.type == "in");
@@ -398,6 +398,7 @@ function link_Queue(link, blues, links, linkQueue) {
                 ins.forEach(it => {
                     var tmp = links.filter(l => l.to.blue == fromBlue.key && l.to.name == it.name);
                     tmp.forEach(t => {
+                        console.log("push", t.from.name);
                         inslinks.push(t);
                     });
                 });
@@ -416,13 +417,23 @@ function link_Queue(link, blues, links, linkQueue) {
 function link_Queue_cal(linkQueue, blues) {
     for (var i = linkQueue.length - 1; i >= 0; i--) {
         var subLink = linkQueue[i];
-        console.log(">", subLink);
+        console.log(i, "########计算链接######", subLink);
         //依次计算因子
         //from
         var from = subLink.from;
         var fromBlue = blues.find(b => b.key == from.blue);
         var value;
+
+
+        //to
+        var to = subLink.to;
+        var toBlue = blues.find(b => b.key == to.blue);
+
+
+        console.log(fromBlue.name, "-->", toBlue.name);
+
         console.log("fromBlue", fromBlue);
+        console.log("toBlue", toBlue);
         if (fromBlue.type == "component") {
             //组件
             var fromComponent = findCurPageComponent(fromBlue.component);
@@ -469,10 +480,8 @@ function link_Queue_cal(linkQueue, blues) {
             value = eval("window." + from.name);
         }
         console.log("获取值", fromBlue.name, value);
-        //to
-        var to = subLink.to;
-        var toBlue = blues.find(b => b.key == to.blue);
-        console.log("pppp", toBlue.properties);
+
+
         if (toBlue.type == "component") {
             //组件
             var toComponent = findCurPageComponent(toBlue.component);
@@ -498,12 +507,20 @@ function link_Queue_cal(linkQueue, blues) {
             }
         } else if (toBlue.type == "method" || toBlue.type == "hub") {
             //方法
-            var toBlueProperty = toBlue.properties[to.name];
+            console.log("方法", to.name);
+            var toBlueProperty = getBluePropertyByName(toBlue.properties, to.name);
+            console.log(toBlueProperty);
             toBlueProperty.value = value;
         }
-        console.log("pppp", toBlue.properties);
+
         console.log("<", subLink);
     }
+}
+
+function getBluePropertyByName(properties, name) {
+    return properties.find(p => p.name == name);
+
+
 }
 
 function cal_method(fromBlue) {
@@ -529,8 +546,15 @@ function cal_method(fromBlue) {
         console.log("判断", result);
         return result;
     } else if (fromBlue.name == "拼接字符串") {
-        var result = fromBlue.properties[0].value + fromBlue.properties[1].value;
+
+        var result = fromBlue.properties[0].value + "" + fromBlue.properties[1].value;
         fromBlue.properties[2].value = result.toString();
+        console.log("拼接字符串", result);
+        return result;
+    } else if (fromBlue.name == "替换字符串") {
+        console.log("替换字符串", fromBlue.properties[0].value);
+        var result = fromBlue.properties[0].value.replaceAll(fromBlue.properties[1].value, fromBlue.properties[2].value);
+        fromBlue.properties[3].value = result.toString();
         console.log("拼接字符串", result);
         return result;
     }

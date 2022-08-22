@@ -21,13 +21,7 @@ const component: IComponent = {
             div = document.createElement("div");
         div.innerHTML = "";
         var label = document.createElement("div");
-        //兼容j旧版本
-        if (component.property.label == undefined) {
-            component.property.label = component.property[0];
-        }
-        if (component.property.value == undefined) {
-            component.property.value = component.property[1];
-        }
+      
         //xin
         label.innerText = component.property.label.context + " ： ";
         div.appendChild(label);

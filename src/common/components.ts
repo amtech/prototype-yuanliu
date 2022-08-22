@@ -11,12 +11,13 @@ import { updateBlueView } from "../render/blueprint";
 import * as dargData from "../render/DragData";
 import { copyComponents } from "../render/pageTitle";
 import { getComponentStyle, setComponentStyle, activePropertyPanel } from "../render/propertypanel";
-import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
 import { clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine } from "../render/workbench";
 import { getProject } from "../render/workspace";
-import { checkContextMenu, IContextMenuItem, showComponentContextMenu, showContextMenu } from "./contextmenu";
+import { checkContextMenu, IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
 import { getUUID, IBlue, IComponent, IComponentProperty, IExtension } from "./interfaceDefine";
 import { pushHistory } from "../render/history";
+import { getShiftKeyDown } from "../render/shorcuts";
+import { getMousePosition } from "../render/shorcuts";
 export function getComponentTempateByType(type: string): IComponent {
     if (componentsTemplate == undefined || componentsTemplate.length == 0) {
         console.log("componentsTemplate is undefined");
@@ -801,16 +802,17 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     ////////////
     eventEle.oncontextmenu = (e: MouseEvent) => {
         // folderTitle.setAttribute("selected", "true");
-        var menuItems: Array<IContextMenuItem> = [{
-            label: "删除", icon: "bi bi-trash", shorcut: "Backspace", onclick: () => {
+        var menuItems: Array<IMenuItem> = [{
+            id: "delete",
+            label: "删除", icon: "bi bi-trash", accelerator: "Backspace",onclick: () => {
                 getSelectComponents().forEach((path: string) => {
                     var cmpt = findCurPageComponent(path);
                     deleteComponent(cmpt);
                 });
 
             }
-        }, {
-            label: "复制", icon: "bi bi-files", shorcut: "Command/control+c", onclick: () => {
+        }, {  id: "copy",
+            label: "复制", icon: "bi bi-files", accelerator: "Command/control+c", onclick: () => {
                 console.log("copy", getSelectComponents());
                 var _selectComponents: IComponent[] = [];
                 getSelectComponents().forEach((path: string) => {
@@ -823,24 +825,33 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                 clipboard.writeText("[selectComponents]" + JSON.stringify(__selectComponents_));
             }
         }, {
-            label: "粘贴", icon: "bi bi-clipboard", shorcut: "Command/control+v", onclick: () => {
+            id: "paste",
+            label: "粘贴", icon: "bi bi-clipboard", accelerator: "Command/control+v", onclick: () => {
                 clipboardPaste(body, component);
 
             }
-        }, {
-            label: "插入组件", icon: "bi bi-layout-wtf", shorcut: "i", onclick: () => {
+        },{
+           
+            type:"separator"
+        } 
+        ,{
+            id: "insert",
+       
+            label: "插入组件", icon: "bi bi-layout-wtf", accelerator: "i", 
+            onclick: () => {
                 setTimeout(() => {
                     shortcutInsertComponent(e.clientX, e.clientY, component);
                 }, 1);
             }
         }, {
-            label: "插入图片", icon: "bi bi-card-image", shorcut: "i", onclick: () => {
+            id: "insertimg",
+            label: "插入图片", icon: "bi bi-card-image", accelerator: "i", onclick: () => {
                 setTimeout(() => {
                     ipcRendererSend("insertImage");
                 }, 1);
             }
         }];
-        showContextMenu(menuItems, e.clientX, e.clientY);
+        openContextMenu(menuItems);
         e.stopPropagation();
     }
     ////////////

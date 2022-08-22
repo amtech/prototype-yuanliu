@@ -70,11 +70,12 @@ function renderChartData(content: HTMLElement) {
     var dataCatalogSelect = form.createDivSelect(dataTypeDiv, "数据类别", "", [], (value) => {
         dataType = value;
     }, [{
+        id: "self",
         label: "自定义", icon: "bi bi-pencil-square", onclick: () => {
             ipcRendererSend("editDataCatolog");
 
         }
-    }, { label: "刷新", icon: "bi bi-arrow-clockwise", onclick: () => { ipcRendererSend("readDataCatolog"); } }]);
+    }, {   id: "ref",label: "刷新", icon: "bi bi-arrow-clockwise", onclick: () => { ipcRendererSend("readDataCatolog"); } }]);
 
     ipcRendererSend("readDataCatolog");
 

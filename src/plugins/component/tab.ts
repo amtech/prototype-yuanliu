@@ -34,11 +34,7 @@ const component: IComponent = {
             taps = document.createElement("div");
         taps.innerHTML = "";
 
-        //兼容j旧版本
-        if (component.property.selected == undefined) {
-            component.property.selected = component.property[0];
-        }
-        //新的
+      
         var ops = JSON.parse(component.option);
         for (var i = 0; i < ops.length; i++) {
             var op = ops[i];

@@ -4,7 +4,7 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染工具栏
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
+import { IMenuItem } from "../common/contextmenu";
 import { IComponent, IPage } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
 import { getNavBar } from "./pageNav";
@@ -127,62 +127,10 @@ export function renderToolbar(content: HTMLElement) {
 
         if (arg)
             showMessageBox("构建成功", "info");
-        else showMessageBox("构建失败", "info");
+        else 
+        showMessageBox("构建失败", "info");
 
     });
-
-
-}
-
-const menulist: IContextMenuItem[] = [
-    {
-        label: "文件", icon: "bi bi-backspace-reverse", children: [
-            {
-                icon: "bi bi-backspace-reverse", label: "退出", onclick: () => {
-                    window.close();
-                }
-            }, {
-                label: "另存为", onclick: () => {
-                    ipcRendererSend("saveAs");
-                }
-            }
-        ]
-    },
-    {
-        label: "编辑", icon: "bi bi-backspace-reverse", children: [
-
-        ]
-    }, {
-        label: "工具", icon: "bi bi-backspace-reverse", children: [
-
-        ]
-    }, {
-        label: "帮助", icon: "bi bi-backspace-reverse", children: [
-
-        ]
-    }
-]
-
-
-function renderMenuBar(content: HTMLElement, menulist: IContextMenuItem[]) {
-
-    content.innerHTML = "";
-
-    menulist.forEach(tap => {
-        var tapDiv = document.createElement("div");
-        tapDiv.className = "menuitem";
-        tapDiv.innerText = tap.label;
-        tapDiv.onclick = (e) => {
-            e.stopPropagation();
-            //   checkContextMenu();
-            showContextMenu(tap.children, e.clientX, e.clientY);
-
-        };
-        content.appendChild(tapDiv);
-
-
-    });
-
 }
 export function saveSimplePage(page: IPage) {
 

@@ -138,8 +138,8 @@ export function editorTitleBar(context: HTMLElement, title_data: ITitle) {
         title_data.page={
             type:"title",
             key: "title",
-            width: 1000,
-            height: 600 ,
+            width: 1900,
+            height: 100 ,
             backgroundColor: "transparent",
             theme: "light",
             children: [],

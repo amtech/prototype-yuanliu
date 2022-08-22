@@ -37,7 +37,7 @@
         "@types/uuid": "^8.3.4",
         "ace-builds": "^1.4.14",
         "adm-zip": "^0.5.9",
-        "bootstrap-icons": "^1.8.1",
+        "bootstrap-icons": "^1.9.1",
         "d3": "^7.4.4",
         "echarts": "^5.3.2",
         "file-saver": "^2.0.5",

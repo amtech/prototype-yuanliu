@@ -43,17 +43,7 @@ const component: IComponent = {
         var thead = document.createElement("thead");
         var tbody = document.createElement("tbody");
         // console.log(component.property);
-        //兼容j旧版本
-        if (component.property.hasHead == undefined) {
-            component.property.hasHead = component.property[0];
-        }
-        if (component.property.hasMul == undefined) {
-            component.property.hasMul = component.property[1];
-            if (component.property.hasMul == undefined) {
-                component.property.hasMul = { label: "多选", type: "bool", context: "false" };
-            }
-        }
-        //新的
+     
         var showHead = component.property.hasHead.context == "true";
         var mul = component.property.hasMul.context == "true";
         var colNum = 0;

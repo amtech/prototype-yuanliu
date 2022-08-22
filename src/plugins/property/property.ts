@@ -3,20 +3,19 @@ Copyright (c) taoyongwen. All rights reserved.
 
 右侧默认 属性
 ***************************************************************************** */
-import { IContextMenuItem, showContextMenu } from "../../common/contextmenu";
+import { IMenuItem, openContextMenu } from "../../common/contextmenu";
 import { ICatalog, IComponent, IComponentProperty, IPanel } from "../../common/interfaceDefine";
-import { updateBlueView } from "../../render/blueprint";
 import { updateComponentsStyle } from "../../render/floatPanel";
 
 import { deleteComponent, onSelectComponent, updateComponent } from "../../common/components";
+import { set16ToRgb } from "../../dialog/picker";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
 import { FormColor, FormComponent, FormIcon, FormIcons, FormNumber, FormNumbers, FormSelect, FormSolider, FormText } from "../../render/forms";
+import { pushHistory } from "../../render/history";
+import { cal_gradient, getComponentStyle, setComponentStyle } from "../../render/propertypanel";
 import { renderExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
-import { cal_gradient, getComponentStyle, setComponentStyle } from "../../render/propertypanel";
-import { set16ToRgb } from "../../dialog/picker";
-import { pushHistory } from "../../render/history";
 
 const panel: IPanel = {
     key: "property", name: "属性", hidden: true, sort: 0,
@@ -1360,19 +1359,23 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
 
         folderTitle.oncontextmenu = (e: MouseEvent) => {
             // folderTitle.setAttribute("selected", "true");
-            var menuItems: Array<IContextMenuItem> = [{
+            var menuItems: Array<IMenuItem> = [{
+                id: "new",
                 label: "新建",
             }, {
+                id: "delete",
                 label: "删除", icon: "bi bi-trash", onclick: () => {
                     deleteComponent(component);
 
                 }
             }, {
+                id: "rename",
                 label: "重命名",
             }, {
+                id: "copy",
                 label: "复制",
             }];
-            showContextMenu(menuItems, e.clientX, e.clientY);
+            openContextMenu(menuItems);
         }
 
         component.children.forEach((child: IComponent) => {
@@ -1456,9 +1459,11 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
         }
         page.oncontextmenu = (e: MouseEvent) => {
             // page.setAttribute("selected", "true");
-            var menuItems: Array<IContextMenuItem> = [{
+            var menuItems: Array<IMenuItem> = [{
+                id: "new",
                 label: "新建",
             }, {
+                id: "delete",
                 label: "删除", icon: "bi bi-trash", onclick: () => {
 
                     deleteComponent(component);
@@ -1466,11 +1471,13 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
 
                 }
             }, {
+                id: "rename",
                 label: "重命名",
             }, {
+                id: "copy",
                 label: "复制",
             }];
-            showContextMenu(menuItems, e.clientX, e.clientY);
+            openContextMenu(menuItems);
         }
 
 

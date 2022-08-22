@@ -3,7 +3,7 @@ Copyright (c) taoyongwen. All rights reserved.
 
 ipc主窗口 与 子窗口通讯
 ***************************************************************************** */
-import { app, BrowserWindow, desktopCapturer, dialog, ipcMain, Menu, MenuItem, shell } from "electron";
+import { app, BrowserWindow, desktopCapturer, dialog, ipcMain, Menu, MenuItemConstructorOptions, shell } from "electron";
 
 import { building, exportHtml, exportReact, exportSql, exportVue, publicProject } from "../build/build";
 import { ICatalog, IProject } from "../common/interfaceDefine";
@@ -367,30 +367,16 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     });
 
-    ipcMain.on("show-context-menu_" + wId, (event, arg: { type: "tab" | "icon" | "otho" | "component", content: string }) => {
-        var temples: Array<any>;
-        if (arg.type == "tab") {
-            temples = ["关闭", "关闭其他", "关闭全部"
-            ];
-        } else if (arg.type == "component") {
-            temples = [
-                "关闭", "关闭其他", "关闭全部"
-            ];
-
-        }
+    ipcMain.on("show-context-menu_" + wId, (event, menuItems:Array<MenuItemConstructorOptions>) => {
+  
         //contextmenu
-        var menuItems: Array<any>=[];
-        temples.forEach((temp) => {
+       
+        menuItems.forEach(item => {
 
-            menuItems.push({
-               
-                label: temp,
-                click: () => { event.sender.send('context-menu-command', {type:arg.type,command:temp,content:arg.content}) },
-
-            });
-
-        })
-
+            
+            item.click= () => { event.sender.send('context-menu-command', item.id) };
+         
+        });
 
         const contextmenu: any = Menu.buildFromTemplate(menuItems)
         contextmenu.popup(BrowserWindow.fromWebContents(event.sender))

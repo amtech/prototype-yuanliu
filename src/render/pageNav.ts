@@ -5,7 +5,7 @@ Copyright (c) taoyongwen. All rights reserved.
 ***************************************************************************** */
 import { switchFloatTab } from "./floatPanel";
 
-import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
+import { IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getNavItems, getProjectNavJson, setNavItems } from "./workbench";
 import * as dargData from "./DragData";
 import { getProject } from "./workspace";
@@ -32,8 +32,9 @@ export function renderNavTrees(content: HTMLElement, nav: INavItem[]) {
     content.innerHTML = "";
     content.oncontextmenu = (e: MouseEvent) => {
         // folderTitle.setAttribute("selected", "true");
-        var menuItems: Array<IContextMenuItem> = [
+        var menuItems: Array<IMenuItem> = [
             {
+                id: "new",
             label: "新建", icon: "bi bi-plus", onclick: () => {
                 getNavItems().push({
                     name: "新建菜单", path: "", icon: "bi bi-plus", isExtend: false, children: []
@@ -42,6 +43,7 @@ export function renderNavTrees(content: HTMLElement, nav: INavItem[]) {
             }
         },
         {
+            id: "auto",
             label: "自动识别", icon: "bi bi-plus", onclick: () => {
                 //复制文件目录至菜单
                 setNavItems([]);
@@ -83,7 +85,7 @@ export function renderNavTrees(content: HTMLElement, nav: INavItem[]) {
         }
     
     ];
-        showContextMenu(menuItems, e.clientX, e.clientY);
+    openContextMenu(menuItems);
     }
     nav.forEach(item => {
         renderNavTree(content, item, 1);
@@ -150,16 +152,20 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
 
         folderTitle.oncontextmenu = (e: MouseEvent) => {
             // folderTitle.setAttribute("selected", "true");
-            var menuItems: Array<IContextMenuItem> = [{
+            var menuItems: Array<IMenuItem> = [{
                 label: "新建",
+                id: "new",
             }, {
+                id: "delete",
                 label: "删除", icon: "bi bi-trash"
             }, {
+                id: "rename",
                 label: "重命名",
             }, {
+                id: "copy",
                 label: "复制",
             }];
-            showContextMenu(menuItems, e.clientX, e.clientY);
+            openContextMenu(menuItems);
             e.stopPropagation();
         }
 
@@ -198,17 +204,21 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
         }
         page.oncontextmenu = (e: MouseEvent) => {
             //    page.setAttribute("selected", "true");
-            var menuItems: Array<IContextMenuItem> = [{
+            var menuItems: Array<IMenuItem> = [{
+                id: "new",
                 label: "新建",
             }, {
+                id: "delete",
                 label: "删除", icon: "bi bi-trash"
             }, {
+                id: "rename",
                 label: "重命名",
             }, {
+                id: "copy",
                 label: "复制",
             }];
 
-            showContextMenu(menuItems, e.clientX, e.clientY);
+            openContextMenu(menuItems);
             e.stopPropagation();
         }
 

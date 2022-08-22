@@ -4,8 +4,8 @@ Copyright (c) taoyongwen. All rights reserved.
 底部  指引标签
 ***************************************************************************** */
 import { getCurPage } from "../../render/workbench";
-import { showContextMenu } from "../../common/contextmenu";
-import { IContextMenuItem } from "../../common/contextmenu";
+import { openContextMenu } from "../../common/contextmenu";
+import { IMenuItem } from "../../common/contextmenu";
 import { getUUID, IComponent, IGuide, IPanel } from "../../common/interfaceDefine";
 import * as dargData from "../../render/DragData";
 const panel: IPanel = {
@@ -134,14 +134,15 @@ export default function load() {
   return panel;
 }
 
-const guidePanelContextMenu: IContextMenuItem[] = [
+const guidePanelContextMenu: IMenuItem[] = [
   {
-    label: "删除",onclick:(arg,ele)=>{
-      var index=getCurPage().guides.findIndex(b=>b.key==arg.key);
-      if(index>=0){
-        getCurPage().guides.splice(index,1);
-        ele.remove();
-      }
+    id: "delete",
+    label: "删除",onclick:()=>{
+      // var index=getCurPage().guides.findIndex(b=>b.key==arg.key);
+      // if(index>=0){
+      //   getCurPage().guides.splice(index,1);
+      //   ele.remove();
+      // }
 
     }
   }
@@ -177,7 +178,7 @@ function createGuide(context: HTMLElement, guide: IGuide) {
 
   }
   item.oncontextmenu = function (e) {
-    showContextMenu(guidePanelContextMenu, e.clientX, e.clientY,guide,item);
+    openContextMenu(guidePanelContextMenu);
   }
 
 }

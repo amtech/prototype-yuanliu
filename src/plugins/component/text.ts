@@ -16,10 +16,7 @@ const component: IComponent = {
             button = document.createElement("input");
         button.type = "text";
 
-        //兼容j旧版本
-        if (component.property.text == undefined) {
-            component.property.text = component.property[0];
-        }
+     
         //xin
         button.value = component.property.text.context;
         button.onChange = () => {

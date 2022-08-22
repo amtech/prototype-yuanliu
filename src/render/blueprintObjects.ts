@@ -5,7 +5,7 @@ Copyright (c) taoyongwen. All rights reserved.
 ***************************************************************************** */
 import { getUUID } from "../common/interfaceDefine";
 import { IBlue } from "../common/interfaceDefine";
-import { IContextMenuItem } from "../common/contextmenu";
+import { IMenuItem } from "../common/contextmenu";
 import { updateBlueView } from "./blueprint";
 export const blueObjects:IBlue[]=[
     {
@@ -32,7 +32,7 @@ export const blueObjects:IBlue[]=[
     },{
         component: "page", key: "blue_page_key", name: "页面", icon: "bi bi-file-earmark-richtext", type: "page",
         events: [{ label: "加载完成", name: "onload" }],
-        properties: [{ label: "页面名称", name: "name", type: "out" }], methods: []
+        properties: [{ label: "页面名称", name: "name", type: "out" },{ label: "页面位置", name: "path", type: "out" }], methods: []
     },{
         component: "hub", key: "blue_hub_key", name: "数据集", icon: "bi bi-signpost-split", type: "hub",
         events: [],
@@ -61,14 +61,15 @@ export const blueObjects:IBlue[]=[
         ]
     }
  ]
-export function getBlueMethods():IContextMenuItem[]{
-    var items:IContextMenuItem[]=[];
+export function getBlueMethods():IMenuItem[]{
+    var items:IMenuItem[]=[];
     blueObjects.forEach(blue=>{
         items.push( {
-            label: blue.name, shorcut: "", onclick: (args, ele, e) => {
-                blue.left= getX(e.clientX);blue.top= getY(e.clientY),
-                args.push(blue);
-                updateBlueView();
+            id: getUUID(),
+            label: blue.name, accelerator: "", onclick: () => {
+                // blue.left= getX(e.clientX);blue.top= getY(e.clientY),
+                // args.push(blue);
+                // updateBlueView();
             }
         });
     });

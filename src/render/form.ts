@@ -4,7 +4,7 @@ Copyright (c) taoyongwen. All rights reserved.
 界面 表单 元素
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { IContextMenuItem } from "../common/contextmenu";
+import { IMenuItem } from "../common/contextmenu";
 import { ipcRendererSend } from "../preload";
 import { renderColorPicker } from "../dialog/picker";
 
@@ -761,7 +761,7 @@ export function createDivSolider(content: HTMLElement, name: string, value: numb
 
 }
 
-export function createDivSelect(content: HTMLElement, name: string, value: any, options: { text: string, value: string }[], onChange: (value: any) => void, taps?: IContextMenuItem[]): HTMLSelectElement {
+export function createDivSelect(content: HTMLElement, name: string, value: any, options: { text: string, value: string }[], onChange: (value: any) => void, taps?: IMenuItem[]): HTMLSelectElement {
 
    var div = document.createElement("div");
    div.style.marginTop = "5px";
@@ -813,7 +813,7 @@ export function createDivSelect(content: HTMLElement, name: string, value: any, 
          div.appendChild(tapDiv);
 
          var icon = document.createElement("i");
-         icon.className = tap.icon;
+         icon.className = tap.icon+"";
          tapDiv.appendChild(icon);
          tapDiv.onclick = tap.onclick;
       });

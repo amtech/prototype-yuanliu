@@ -3,11 +3,11 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染Hub页面
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
+import { IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getUUID, IExtension } from "../common/interfaceDefine";
 import * as form from "../render/form";
 
-// import { IContextMenuItem, showContextMenu } from "../render/sidebar";
+// import { IMenuItem, showContextMenu } from "../render/sidebar";
 
 var lastSideNav: any;
 // It has the same sandbox as a Chrome extension.
@@ -640,8 +640,9 @@ function renderProject(project: any, body: HTMLElement) {
   moreTap.appendChild(moreTapIcon);
 
   moreTap.onclick = (e) => {
-    var contextMenu: IContextMenuItem[] = [
+    var contextMenu: IMenuItem[] = [
       {
+        id: "delete",
         label: "删除", icon: "bi bi-trash", onclick: () => {
           var index = projects.indexOf(project);
           if (index >= 0) {
@@ -652,7 +653,8 @@ function renderProject(project: any, body: HTMLElement) {
         }
 
       }, {
-        label: "编辑", icon: "bi bi-backspace-reverse", shorcut: "dbclick", onclick: () => {
+        id: "editor",
+        label: "编辑", icon: "bi bi-backspace-reverse", accelerator: "dbclick", onclick: () => {
           ipcRenderer.send("openProject_hub", project);
           document.getElementById("open_project_process").style.display="flex";
           setTimeout(() => {
@@ -668,6 +670,7 @@ function renderProject(project: any, body: HTMLElement) {
 
       // } 
       , {
+        id: "opencatalog",
         label: "打开目录", icon: "bi bi-folder2-open", onclick: () => {
           ipcRenderer.send("openPath_hub", project);
         }
@@ -675,7 +678,7 @@ function renderProject(project: any, body: HTMLElement) {
       }
     ];
     e.stopPropagation();
-    showContextMenu(contextMenu, e.clientX, e.clientY);
+    openContextMenu(contextMenu);
   }
 
 }

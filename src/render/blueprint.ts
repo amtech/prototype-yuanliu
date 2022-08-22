@@ -4,12 +4,11 @@ Copyright (c) taoyongwen. All rights reserved.
 蓝图
 ***************************************************************************** */
 import { initComponent, onSelectComponent } from "../common/components";
-import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
+import { getContextMenuArg, IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getUUID, IBlue, IBlueEvent, IBlueLink, IBlueMethod, IBluePoint, IBlueProperty, IComponent } from "../common/interfaceDefine";
 import { getBlueMethods } from "./blueprintMethods";
 import * as dargData from "./DragData";
 import * as paints from "./paints";
-import { getMousePosition } from "./shorcuts";
 import { getDataBase } from "./sidebar";
 import { findCurPageComponent, getCurPage } from "./workbench";
 /**
@@ -90,85 +89,92 @@ export function renderBlueView(content: HTMLElement) {
     }
 
     //icon contxtmenu
-    var viewContentMenu: IContextMenuItem[] = [
+    var viewContentMenu: IMenuItem[] = [
 
         {
-            label: "单变量", shorcut: "v", onclick: (args, ele, e) => {
+            id: "sim",
+            label: "单变量",onclick: () => {
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "单变量", icon: "bi bi-star", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "", key: getUUID(), name: "单变量", icon: "bi bi-star", left:10,top:10,
                     events: [], type: "variable", value: "0",
                     properties: [{ label: "输出", name: "result", type: "out" }], methods: []
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         }, {
-            label: "矩阵变量", shorcut: "v", onclick: (args, ele, e) => {
+            id: "ax",
+            label: "矩阵变量",  onclick: () => {
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "矩阵变量", icon: "bi bi-star", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "", key: getUUID(), name: "矩阵变量", icon: "bi bi-star", left:10,top:10,
                     events: [], type: "matrix", value: "[0,1,2]",
                     properties: [{ label: "输出", name: "result", type: "out" }], methods: []
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         }, {
-            label: ""
+            type: "separator"
         },
         {
-            label: "判断", shorcut: "i", onclick: (args, ele, e) => {
+            id: "if",
+            label: "判断", onclick: () => {
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "判断", icon: "bi bi-question", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "", key: getUUID(), name: "判断", icon: "bi bi-question", left:10,top:10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in1", type: "in" }, { label: "阈值", name: "in2", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: []
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         },
         {
-            label: "拼接字符串", shorcut: "l", onclick: (args, ele, e) => {
+            id: "cat",
+            label: "拼接字符串",onclick: () => {
 
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "拼接字符串", icon: "bi bi-lg", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "", key: getUUID(), name: "拼接字符串", icon: "bi bi-lg", left:10,top:10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in", type: "in" }, { label: "输入", name: "threshold", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: [],
 
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         },
         {
-            label: "加法", shorcut: "p", onclick: (args, ele, e) => {
+            id: "plu",
+            label: "加法",  onclick: () => {
 
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "加法", icon: "bi bi-lg", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "", key: getUUID(), name: "加法", icon: "bi bi-lg", left:10,top:10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in", type: "in" }, { label: "输入", name: "threshold", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: [],
 
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         },
         {
-            label: "乘法", shorcut: "m", onclick: (args, ele, e) => {
+            id: "mul",
+            label: "乘法", onclick: () => {
 
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "乘法", icon: "bi bi-x", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "", key: getUUID(), name: "乘法", icon: "bi bi-x", left:10,top:10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in", type: "in" }, { label: "输入", name: "threshold", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: []
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         }, {
-            label: ""
+            type: "separator"
         }, {
-            label: "窗口", shorcut: "w", onclick: (args, ele, e) => {
+            id: "wind",
+            label: "窗口", onclick: () => {
                 var b: IBlue = {
-                    component: "window", key: getUUID(), name: "window", icon: "bi bi-window", left: getX(e.clientX), top: getY(e.clientY),
+                    component: "window", key: getUUID(), name: "window", icon: "bi bi-window", left:10,top:10,
                     events: [], type: "window",
                     properties: [{ label: "高度", name: "innerHeight", type: "out" },
                     { label: "宽度", name: "innerWidth", type: "out" },
@@ -176,43 +182,51 @@ export function renderBlueView(content: HTMLElement) {
                     { label: "scrollLeft", name: "scrollLeft", type: "out" }
                     ], methods: []
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         }, {
-            label: "项目", shorcut: "f", onclick: (args, ele, e) => {
-                var b: IBlue = {
-                    component: "project", key: "blue_project_key", name: "项目", icon: "bi bi-star", top: 10, left: 10, type: "project",
-                    events: [],
-                    properties: [{ label: "项目名称", name: "name", type: "out" }], methods: []
-                };
-                args.push(b);
-                updateBlueView();
+            id: "pro",
+            label: "项目", onclick: () => {
+                // var b: IBlue = {
+                //     component: "project", key: "blue_project_key", name: "项目", icon: "bi bi-star", top: 10, left: 10, type: "project",
+                //     events: [],
+                //     properties: [{ label: "项目名称", name: "name", type: "out" }], methods: []
+                // };
+                // args.push(b);
+                // updateBlueView();
             }
         }, {
-            label: "页面", shorcut: "s", onclick: (args, ele, e) => {
+            id: "page",
+            label: "页面",  onclick: () => {
                 var b: IBlue = {
                     component: "page", key: "blue_page_key", name: "页面", icon: "bi bi-stars", top: 100, left: 10, type: "page",
                     events: [{ label: "加载完成", name: "onload" }],
                     properties: [{ label: "页面名称", name: "name", type: "out" }], methods: []
                 };
-                args.push(b);
+                getCurPage().blues.push(b);
                 updateBlueView();
             }
         }
     ];
 
-    blueContext.oncontextmenu = (e) => { showContextMenu(viewContentMenu, e.clientX, e.clientY, getCurPage().blues, undefined, "增加函数和对象"); e.stopPropagation(); };
+    blueContext.oncontextmenu = (e) => { 
+        openContextMenu(viewContentMenu);
+       // showContextMenu(viewContentMenu, e.clientX, e.clientY, getCurPage().blues, undefined, "增加函数和对象"); 
+        e.stopPropagation(); 
+    };
 
 
     blueContext.onkeydown = (e: KeyboardEvent) => {
 
         if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
             if (e.key == "i") {
-                showContextMenu(viewContentMenu, getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数和对象");
+                openContextMenu(viewContentMenu);
+               // showContextMenu(viewContentMenu, getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数和对象");
 
             } else if (e.key == "f") {
-                showContextMenu(getBlueMethods(), getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数");
+                openContextMenu(getBlueMethods());
+              //  showContextMenu(getBlueMethods(), getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数");
 
 
 
@@ -569,6 +583,10 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
     //move
     titleBar.onmousedown = (ed: any) => {
 
+        if(ed.button != 0){
+            return;
+        }
+
         var blueDiv = ed.path[1];
         var startY = ed.clientY;
         var startX = ed.clientX;
@@ -649,14 +667,18 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
     };
 
     //title contxtmenu
-    var titleContentMenu: IContextMenuItem[] = [
+    var titleContentMenu: IMenuItem[] = [
         {
-            label: "删除", onclick: (blueKey) => {
-                removeBlue(blueKey);
+            id: "delete",
+            label: "删除",accelerator:"Backspace", onclick: () => {
+               removeBlue(getContextMenuArg());
             }
         }
     ];
-    titleBar.oncontextmenu = (e: MouseEvent) => { showContextMenu(titleContentMenu, e.clientX, e.clientY, blue.key); e.stopPropagation(); };
+    titleBar.oncontextmenu = (e: MouseEvent) => { 
+            openContextMenu(titleContentMenu,blue.key);
+     //   showContextMenu(titleContentMenu, e.clientX, e.clientY, blue.key); e.stopPropagation();
+     };
 
 
     return div;
@@ -764,10 +786,11 @@ function getDivClientLeft(div: HTMLElement): number {
 }
 function onIconLink(icon: HTMLElement, blue: IBlue, prop: string, type: "method" | "event" | "property", blues: IBlue[] = getCurPage().blues) {
     //icon contxtmenu
-    var titleContentMenu: IContextMenuItem[] = [
+    var titleContentMenu: IMenuItem[] = [
         {
-            label: "删除链接", onclick: (args) => {
-
+            id: "delete",
+            label: "删除链接", onclick: () => {
+                var args=getContextMenuArg();
                 var cBlueKey = args.blue;
                 var cProp = args.prop;
                 var cType = args.type;
@@ -782,7 +805,8 @@ function onIconLink(icon: HTMLElement, blue: IBlue, prop: string, type: "method"
         }
     ];
     icon.oncontextmenu = (e: MouseEvent) => {
-        showContextMenu(titleContentMenu, e.clientX, e.clientY, { blue: blue.key, prop: prop, type: type });
+        openContextMenu(titleContentMenu,{ blue: blue.key, prop: prop, type: type });
+      //  showContextMenu(titleContentMenu, e.clientX, e.clientY, { blue: blue.key, prop: prop, type: type });
         e.stopPropagation();
     }
     //link
@@ -825,7 +849,12 @@ function onIconLink(icon: HTMLElement, blue: IBlue, prop: string, type: "method"
             e.stopPropagation();
             return;
         }
-
+        //排除 属性输出和输出相连
+        // if (data.type == "property" && type == "property") {
+        //     console.log(data);
+        //     e.stopPropagation();
+        //     return;
+        // }
         var linkColor = "#09f";
         if (type == "property") {
             linkColor = "#09f";

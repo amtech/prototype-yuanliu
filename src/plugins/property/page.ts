@@ -58,14 +58,16 @@ const panel: IPanel = {
 
     var row = document.createElement("div");
     setting.appendChild(row);
+
+    var w = form.createDivRow(row);
+    formWidth=new forms.FormNumber("宽度");
+    formWidth.render(w);
     
     var h = form.createDivRow(row, true);
     formHeight=new forms.FormNumber("高度");
     formHeight.render(h);
 
-    var w = form.createDivRow(row);
-    formWidth=new forms.FormNumber("高度");
-    formWidth.render(w);
+   
 
    
 

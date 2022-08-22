@@ -15,13 +15,12 @@
             ,
         ]
  *  */
-import project_data from "./projectData.js";
-import pages_data from "./pagesData.js";
-import title_data from "./titleData.js";
-import dataCatalog from "./dataCatalog.js";
-import nav_data from "./navData.js";
-import { loadBlueprint, renderBlueView, find_catalog_by_key } from "./blues.js";
+import { find_catalog_by_key, loadBlueprint, renderBlueView } from "./blues.js";
 import { getComponentTempateByType } from "./component.js";
+import nav_data from "./navData.js";
+import pages_data from "./pagesData.js";
+import project_data from "./projectData.js";
+import title_data from "./titleData.js";
 
 
 window.onload = () => {
@@ -214,11 +213,17 @@ function renderTitle() {
 
     if (title_data.page != undefined)
         renderComponents(title_bar, title_data.page.children);
-    setTimeout(() => {
+    requestIdleCallback(() => {
         if (title_data.page != undefined) {
             loadBlueprint(title_data.page.blues, title_data.page.blueLinks);
         }
-    }, 1000);
+
+    });
+    // setTimeout(() => {
+    //     if (title_data.page != undefined) {
+    //         loadBlueprint(title_data.page.blues, title_data.page.blueLinks);
+    //     }
+    // }, 100);
 
 }
 var curpage;
@@ -692,6 +697,19 @@ function renderSetting(settingContent) {
     info.innerText = project_data.description;
     info.style.padding = "10px";
     settingContent.appendChild(info);
+
+    var pageTitle = document.createElement("div");
+    pageTitle.innerText = "页面信息";
+    pageTitle.style.padding = "10px";
+    settingContent.appendChild(pageTitle);
+
+    //info
+    var pageinfo = document.createElement("div");
+    pageinfo.innerText = getCurPage().info;
+    pageinfo.style.padding = "10px";
+    pageinfo.style.maxWidth = "400px";
+    settingContent.appendChild(pageinfo);
+
 
 
 

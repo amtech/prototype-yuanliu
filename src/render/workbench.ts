@@ -9,14 +9,14 @@ import { BrowserWindow, clipboard, ipcRenderer, Menu, MenuItem } from "electron"
 import { regeditTheme } from "../echarts/theme";
 
 import { copyComponent, deleteComponent, getComponentsTemplate, getComponentTempateByType, getPathKey, initComponent, renderComponent, renderComponentPreview, renderComponents, renderStorePreview } from "../common/components";
-import { checkContextMenu, IContextMenuItem, showContextMenu } from "../common/contextmenu";
+import { checkContextMenu, IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getUUID, IComponent, IPage, ITitle } from "../common/interfaceDefine";
 import { ipcContextMenu, ipcRendererSend } from "../preload";
 import { updateBlueView } from "./blueprint";
 import * as dargData from "./DragData";
 import { INavItem, renderNavTrees } from "./pageNav";
 import { renderTitleBar } from "./pageTitle";
-import { getKeyCode, getMousePosition } from "./shorcuts";
+import { getKeyCode, getMousePosition } from "../render/shorcuts";
 import { activePropertyPanel } from "./propertypanel";
 import { pushHistory } from "./history";
 import { isDark } from "../dialog/picker";
@@ -187,15 +187,7 @@ export function reRenderPage() {
         console.log(e);
     }
 }
-export function onTabContextMenu(command:string,content:string){
-    if(command=="关闭"){
-        console.log("关闭");
-       var p= pages.find(p => p.key==content);
-       closePage(p);
-    }
 
-
-}
 function closePage(spage: IPage) {
 
     var index = pages.findIndex(p => p.path == spage.path);
@@ -317,7 +309,24 @@ export function renderPage(page: IPage) {
 
         //contextmenu
         pageTab.oncontextmenu = (event:any) => {
-            ipcContextMenu({type:"tab",content:page.key});
+            var menuList:IMenuItem[]=[
+                {
+                    label:"关闭",id:"close",accelerator:"Command+w",onclick:()=>{
+                        closePage(page);
+                    }
+                },
+                {
+                    label:"关闭全部",id:"closeall",onclick:()=>{
+                        //closePage(page);
+                    }
+                },
+                {
+                    label:"关闭其他",id:"closeother",onclick:()=>{
+                      //  closePage(page);
+                    }
+                }
+            ];
+            openContextMenu(menuList);
         }
 
 
@@ -597,7 +606,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         }
     }
     //渲染 页面 选择效果
-    page_view.onmousedown = (e: any) => {
+    page_view.onmousedown = (e:any) => {
+        if(e.button!=0){
+                return;
+        }
         checkContextMenu();
         if (e.target.className == "page_view" || e.target.className == "component" || e.target.className == "page" || e.target.className == "grid") {
             e.stopPropagation();
@@ -654,6 +666,7 @@ function renderTitleBody(title_bar: HTMLElement, titleJson: any, pageHeight: num
     renderTitleBar(title_bar, titleJson);
 
 }
+var zoomType:"50"|"100"|"150"="100";
 export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: number, pageHeight: number) {
     page.innerHTML = "";
     page.className = "page";
@@ -671,25 +684,61 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
     //渲染 右键菜单
     page.oncontextmenu = (e: MouseEvent) => {
         // folderTitle.setAttribute("selected", "true");
-        var menuItems: Array<IContextMenuItem> = [{
-            label: "粘贴", icon: "bi bi-clipboard", shorcut: "Command/control+v", onclick: () => {
+        var menuItems: Array<IMenuItem> = [{
+            id: "paste",
+            label: "粘贴", icon: "bi bi-clipboard", accelerator: "Command+v", onclick: () => {
                 clipboardPaste(page);
 
             }
         }, {
-            label: "插入组件", icon: "bi bi-layout-wtf", shorcut: "i", onclick: () => {
+            id: "insert",
+            label: "插入组件", icon: "bi bi-layout-wtf", accelerator: "i", onclick: () => {
                 setTimeout(() => {
                     shortcutInsertComponent(e.clientX, e.clientY);
                 }, 1);
             }
         }, {
-            label: "插入图片", icon: "bi bi-card-image", shorcut: "i", onclick: () => {
+            id: "insertImg",
+            label: "插入图片", icon: "bi bi-card-image", accelerator: "i", onclick: () => {
                 setTimeout(() => {
                     ipcRendererSend("insertImage");
                 }, 1);
             }
+        },{
+            type:"separator"
+        },{
+            id:"zoom50",
+            label:"50%",
+            type:"radio",
+            checked:zoomType=="50",
+            onclick:()=>{
+                zoomType="50";
+             
+                // page_parent.style.transform = "scale(" + scale + ")";
+                // page_sacle.innerText = scale + "";
+            }
+
+        },{
+            id:"zoom100",
+            label:"100%",
+            type:"radio",
+            checked:zoomType=="100",
+            onclick:()=>{
+                zoomType="100";
+                // page.style.transform="scale(1)";
+            }
+        },{
+            id:"zoom150",
+            label:"150%",
+            type:"radio",
+            checked:zoomType=="150",
+            onclick:()=>{
+                zoomType="150";
+                // page.style.transform="scale(1.5)";
+            }
+
         }];
-        showContextMenu(menuItems, e.clientX, e.clientY);
+        openContextMenu(menuItems);
         e.stopPropagation();
     }
     //设置 快捷键
@@ -828,6 +877,7 @@ export function getSelectComponents(): Array<string> {
 export function setSelectComponents(data: Array<string>) {
     selectComponents = data;
 }
+
 /**
  * 渲染 插入组件 的右键菜单
  * @param x 
@@ -837,7 +887,7 @@ export function setSelectComponents(data: Array<string>) {
  * @returns 
  */
 export function shortcutInsertComponent(x: number, y: number, component?: IComponent, position?: number) {
-    console.log("shortcutInsertComponent", component.type, component.drop, position);
+   
     if (component != undefined) {
         if (component.type != "grid" && component.type != "row") {
             if (component.drop != "component") {
@@ -850,11 +900,14 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
     //
     console.log("shortcutInsertComponent>>>>");
     var showComponents = ["button", "label", "text", "grid", "row", "flex", "space", "dialog", "chart_line", "chart_bar", "chart_pie"];
-    var contextMenus: IContextMenuItem[] = [];
-    getComponentsTemplate().forEach((t) => {
-        if (showComponents.indexOf(t.type) > -1) {
-            var item: IContextMenuItem = {
-                label: t.label, icon: t.icon, onclick: (arg) => {
+    var contextMenus: IMenuItem[] = [];
+
+    showComponents.forEach((key: string) => {
+        var t=getComponentsTemplate().find(t=>t.type==key);
+        if(t!=undefined){
+            var item: IMenuItem = {
+                id: getUUID(),
+                label: t.label, icon: t.icon, onclick: () => {
                     var ct = initComponent(t);
                     if (component == undefined) {
                         getCurPage().children.push(ct);
@@ -890,14 +943,22 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                 }
             }
             contextMenus.push(item);
+            if(t.key=="dialog" ||t.key=="text"){
+                contextMenus.push({
+                    type:"separator"
+                })
+            }
         }
+
     });
+
 
     var label = "插入组件";
     if (position != undefined) {
         label = "前/上插入"
     }
-    showContextMenu(contextMenus, x, y, component, undefined, label);
+    openContextMenu(contextMenus);
+  
 }
 
 var nav_items: INavItem[] = [];

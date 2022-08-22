@@ -14,10 +14,7 @@ const component: IComponent = {
             label = element;
         else
             label = document.createElement("div");
-        //兼容j旧版本
-        if (component.property.text == undefined) {
-            component.property.text = component.property[0];
-        }
+      
         //新的
         label.innerText = component.property.text.context;
         label.setAttribute("hover", "true");

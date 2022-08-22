@@ -4,12 +4,12 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染侧边栏
 ***************************************************************************** */
 import { clipboard, ipcRenderer } from "electron";
-import { renderDialog } from "../dialog/export";
 import { setComponentsTemplate } from "../common/components";
-import { IContextMenuItem, showContextMenu } from "../common/contextmenu";
+import { getContextMenuArg, getContextMenuElement, IMenuItem, openContextMenu } from "../common/contextmenu";
 import { icons } from "../common/icons";
 import { getUUID, ICatalog, IComponent, IDatabase } from "../common/interfaceDefine";
 import { logj } from "../common/log";
+import { renderDialog } from "../dialog/export";
 import { ipcRendererSend } from "../preload";
 import { blueMethods } from "./blueprintMethods";
 import { blueObjects } from "./blueprintObjects";
@@ -46,16 +46,19 @@ export function renderSidebar(content: HTMLElement) {
 
     //目录
     fileExplorer = renderExplorer("sidebar_catalog", sidebar, "[sidebarcataloglabel]", false, [{
+        id: "newfile",
         label: "新建文件夹", icon: "bi bi-folder-plus", onclick: () => {
             createFolder("新建文件夹");
         }
     },
     {
+        id: "newpage",
         label: "新建页面", icon: "bi bi-file-earmark-plus", onclick: () => {
             createPage("新建页面");
         }
     },
     {
+        id: "newpaebytemp",
         label: "按模板新建页面", icon: "bi bi-node-plus", onclick: () => {
             createPageByTemplate();
         }
@@ -604,52 +607,63 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
     if (catalog == undefined) {
         return;
     }
-    var menuItemsFolder: Array<IContextMenuItem> = [
+    var menuItemsFolder: Array<IMenuItem> = [
         {
+            id: "newpage",
             label: "新建页面", icon: "bi bi-file-earmark-plus",
-            onclick: (args) => {
-                console.log(args);
+            onclick: () => {
+        
 
-                createPage("新建页面", catalog);
+                createPage("新建页面", getContextMenuArg());
             }
         }, {
+            id: "newpagebytemp",
             label: "根据模板新建页面", icon: "bi bi-node-plus",
-            onclick: (args) => {
-                console.log(args);
+            onclick: () => {
+         
 
-                createPageByTemplate(catalog);
+                createPageByTemplate(getContextMenuArg());
             }
         }, {
+            id: "newfolder",
             label: "新建文件夹", icon: "bi bi-folder-plus",
-            onclick: (args) => {
-                console.log(args);
+            onclick: () => {
+              
 
-                createFolder("新建文件夹", catalog);
+                createFolder("新建文件夹", getContextMenuArg());
             }
         }, {
-            label: "删除", icon: "bi bi-trash", onclick: (args: ICatalog) => {
-                console.log(args);
-                deletePage(args);
+            id: "delete",
+            label: "删除", icon: "bi bi-trash", onclick: () => {
+               
+                deletePage(getContextMenuArg());
             }
         }, {
-            label: "重命名", icon: "bi bi-pencil", shorcut: "Enter", onclick: (args: ICatalog, ele: HTMLElement) => {
-                ele.setAttribute("data-edit", "true");
-                ele.getElementsByTagName("input").item(0).focus();
+            id: "rename",
+            label: "重命名", icon: "bi bi-pencil", accelerator: "Enter", onclick: () => {
+                var ele=getContextMenuElement();
+               ele.setAttribute("data-edit", "true");
+               ele.getElementsByTagName("input").item(0).focus();
             }
         }];
-    var menuItemsPage: Array<IContextMenuItem> = [{
-        label: "删除", icon: "bi bi-trash", onclick: (args: ICatalog) => {
-            console.log(args);
-            deletePage(args);
+    var menuItemsPage: Array<IMenuItem> = [{
+        id: "delete",
+        label: "删除", icon: "bi bi-trash", onclick: () => {
+    
+           deletePage(getContextMenuArg());
         }
     }, {
-        label: "重命名", icon: "bi bi-pencil", shorcut: "Enter", onclick: (args: ICatalog, ele: HTMLElement) => {
-            ele.setAttribute("data-edit", "true");
-            ele.getElementsByTagName("input").item(0).focus();
+        id: "rename",
+        label: "重命名", icon: "bi bi-pencil", accelerator: "Enter",
+         onclick: () => {
+           getContextMenuElement().setAttribute("data-edit", "true");
+           getContextMenuElement().getElementsByTagName("input").item(0).focus();
         }
     }, {
-        label: "复制", icon: "bi bi-files", onclick: (args: ICatalog) => {
-            copyFile(args.path, args.name, args.name + "_copy");
+        id: "copy",
+        label: "复制", icon: "bi bi-files", onclick: () => {
+            var args=getContextMenuArg();
+             copyFile(args.path, args.name, args.name + "_copy");
         }
     }];
 
@@ -732,7 +746,8 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         folderTitle.oncontextmenu = (e: MouseEvent) => {
             // folderTitle.setAttribute("selected", "true");
 
-            showContextMenu(menuItemsFolder, e.clientX, e.clientY, catalog, folderTitle);
+        //    showContextMenu(menuItemsFolder, e.clientX, e.clientY, catalog, folderTitle);
+            openContextMenu(menuItemsFolder,catalog, folderTitle);
         }
         nameInput.onblur = () => {
             if (nameInput.value.length <= 0) return;
@@ -758,7 +773,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         folderTitle.ondragstart = (e) => {
             //TODO
             //   e.dataTransfer.setData("catalog", catalog.name);
-            dargData.setData("catalog", catalog.name);
+            dargData.setData("catalog", catalog);
             e.stopPropagation();
         }
         folderTitle.ondragover = (e) => {
@@ -774,12 +789,16 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         folderTitle.ondrop = (e) => {
 
             folderTitle.removeAttribute("data-insert");
+            console.log( dargData.getData("catalog").key);
             e.stopPropagation();
-            if (parent == undefined) {
+            var dropParent=getCatalogParent(getProject().catalogs, dargData.getData("catalog").key);
+            if (dropParent == undefined) {
+                console.log("dropParent is undefined");
+                var old = getProject().catalogs.find(c => c.key == dargData.getData("catalog").key);
+                console.log(old);
 
-                var old = getProject().catalogs.find(c => c.key == dargData.getData("catalog"));
                 var copy: ICatalog = { key: getUUID(), name: old.name, path: old.path, children: old.children, dir: old.dir };
-                var oldIndex = getProject().catalogs.findIndex(c => c.key == dargData.getData("catalog"));
+                var oldIndex = getProject().catalogs.findIndex(c => c.key == dargData.getData("catalog").key);
                 getProject().catalogs.splice(oldIndex, 1);
                 var index = getProject().catalogs.findIndex(c => c.key == catalog.key);
                 getProject().catalogs.splice(index + 1, 0, copy);
@@ -793,18 +812,18 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
 
             } else {
-
-                var old = parent.children.find(c => c.key == dargData.getData("catalog"));
+                console.log("dropParent not undefined");
+                var old = dropParent.children.find(c => c.key == dargData.getData("catalog").key);
                 var copy: ICatalog = { key: getUUID(), name: old.name, path: old.path, children: old.children, dir: old.dir };
-                var oldIndex = parent.children.findIndex(c => c.key == dargData.getData("catalog"));
-                parent.children.splice(oldIndex, 1);
-                var index = parent.children.findIndex(c => c.key == catalog.key);
+                var oldIndex = dropParent.children.findIndex(c => c.key == dargData.getData("catalog").key);
+                dropParent.children.splice(oldIndex, 1);
+                var index = dropParent.children.findIndex(c => c.key == catalog.key);
                 console.log("old", old);
-                parent.children.splice(index + 1, 0, copy);
+                dropParent.children.splice(index + 1, 0, copy);
 
-                var vs: any = document.getElementById(parent.key).getElementsByClassName("explorer_folder_view").item(0);
+                var vs: any = document.getElementById(dropParent.key).getElementsByClassName("explorer_folder_view").item(0);
                 vs.innerHTML = "";
-                renderCatalog(vs, parent.children, 1);
+                renderCatalog(vs, dropParent.children, 1);
 
                 ipcRendererSend("saveProject", getProject());
 
@@ -865,8 +884,8 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         }
         page.oncontextmenu = (e: MouseEvent) => {
             //    page.setAttribute("selected", "true");
-
-            showContextMenu(menuItemsPage, e.clientX, e.clientY, catalog, page);
+            openContextMenu(menuItemsPage,catalog,page);
+          //  showContextMenu(menuItemsPage, e.clientX, e.clientY, catalog, page);
         }
         page.tabIndex = 1;
         page.onkeydown = (e: KeyboardEvent) => {
@@ -917,15 +936,16 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
             page.removeAttribute("data-insert");
             e.stopPropagation();
         }
+        //移动位置
         page.ondrop = (e) => {
 
             page.removeAttribute("data-insert");
             e.stopPropagation();
+            var dropParent=getCatalogParent(getProject().catalogs, dargData.getData("catalog").key);
+            if (dropParent == undefined) {
 
-            if (parent == undefined) {
-
-
-                console.log(getProject().catalogs, dargData.getData("catalog"));
+                console.log("ondrop parent is undefined");
+             
                 var ol = getCatalog(getProject().catalogs, dargData.getData("catalog").key);
                 console.log(ol);
                 var olds: ICatalog = ol.caltalog;
@@ -944,24 +964,23 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
                 ipcRendererSend("saveProject", getProject());
             } else {
-
-                var ol = getCatalog(parent.children, dargData.getData("catalog").key);
+                console.log("ondrop parent not  undefined");
+                var ol = getCatalog(dropParent.children, dargData.getData("catalog").key);
                 var olds: ICatalog = ol.caltalog;
 
                 var copy: ICatalog = { key: getUUID(), name: olds.name, path: olds.path, dir: olds.dir, children: olds.children };
 
                 var oldIndex = ol.index;
-                parent.children.splice(oldIndex, 1);
-                var index = parent.children.findIndex(c => c.key == catalog.key);
+                dropParent.children.splice(oldIndex, 1);
+                var index = dropParent.children.findIndex(c => c.key == catalog.key);
                 console.log("old", olds);
-                parent.children.splice(index + 1, 0, copy);
+                dropParent.children.splice(index + 1, 0, copy);
 
-                var vs: any = document.getElementById(parent.key).getElementsByClassName("explorer_folder_view").item(0);
+                var vs: any = document.getElementById(dropParent.key).getElementsByClassName("explorer_folder_view").item(0);
                 vs.innerHTML = "";
-                var level = getChartCount(parent.path, "/");
-                renderCatalog(vs, parent.children, level);
-
-
+                var level = getChartCount(dropParent.path, "/")+1;
+                console.log("level", level);
+                renderCatalog(vs, dropParent.children, level);
                 ipcRendererSend("saveProject", getProject());
 
             }
@@ -990,7 +1009,29 @@ function getCatalog(list: ICatalog[], key: string): { caltalog: ICatalog, index:
         }
     }
 }
-
+function getCatalogParent(list: ICatalog[], key: string):ICatalog {
+    if (list == undefined) {
+    
+        return;
+    }
+    var r = list.find(c => c.key == key);
+    if (r != undefined) {
+      
+        return undefined;
+    }
+    for(var i=0;i<list.length;i++){
+        var c = list[i];
+        var children=c.children;
+        if(children!=undefined){
+            var old = children.find(c => c.key == key);
+            if (old != undefined) {
+      
+                return c;
+            }
+        }
+    }
+    return undefined;
+}
 function renderComponentsExplorer(content: HTMLElement) {
     content.style.paddingBottom = "20px";
     ipcRenderer.on("_loadPluginsComponent", (event, args) => {
@@ -1043,7 +1084,7 @@ function renderComponentsExplorer(content: HTMLElement) {
 }
 
 var explorerHideMap = new Map<string, boolean>();
-export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IContextMenuItem[]): HTMLDivElement {
+export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[]): HTMLDivElement {
     var explorer = document.createElement("div");
     explorer.className = "explorer";
     explorer.id = key;
@@ -1102,12 +1143,12 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
         tapsDiv.style.paddingRight = "5px";
         tapsDiv.style.display = "flex";
         title.appendChild(tapsDiv);
-        taps.forEach((tap: IContextMenuItem) => {
+        taps.forEach((tap: IMenuItem) => {
             var tapDiv = document.createElement("div");
             tapDiv.className = "tool_tap";
             tapDiv.title = tap.label;
             var tapIcon = document.createElement("i");
-            tapIcon.className = tap.icon;
+            tapIcon.className = tap.icon+"";
             tapDiv.appendChild(tapIcon);
             tapIcon.onclick = tap.onclick;
             tapsDiv.appendChild(tapDiv);

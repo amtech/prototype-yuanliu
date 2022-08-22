@@ -48,18 +48,7 @@ const component: IComponent = {
         div.appendChild(point);
         setTimeout(() => {
             console.log(component.property);
-            //兼容j旧版本
-            if (component.property.default == undefined) {
-                component.property.default = component.property[2];
-            }
-            //兼容j旧版本
-            if (component.property.max == undefined) {
-                component.property.max = component.property[0];
-            }
-            //兼容j旧版本
-            if (component.property.min == undefined) {
-                component.property.min = component.property[1];
-            }
+           
 
             var v = parseFloat(comment.property.default.context);
             var m = parseFloat(comment.property.max.context);

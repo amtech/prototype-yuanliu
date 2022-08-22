@@ -8,7 +8,7 @@ import { ipcRendererSend } from "../preload";
 import { getUUID, ICatalog, IComponent } from "../common/interfaceDefine";
 import { renderColorPicker } from "../dialog/picker";
 import * as dargData from "./DragData";
-import { IContextMenuItem } from "../common/contextmenu";
+import { IMenuItem } from "../common/contextmenu";
 export class FormNumber {
 
     label: string;
