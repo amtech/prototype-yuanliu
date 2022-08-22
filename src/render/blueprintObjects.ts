@@ -3,10 +3,8 @@ Copyright (c) taoyongwen. All rights reserved.
 
 蓝图对象
 ***************************************************************************** */
-import { getUUID } from "../common/interfaceDefine";
-import { IBlue } from "../common/interfaceDefine";
 import { IMenuItem } from "../common/contextmenu";
-import { updateBlueView } from "./blueprint";
+import { getUUID, IBlue } from "../common/interfaceDefine";
 export const blueObjects:IBlue[]=[
     {
         component: "", key: getUUID(), name: "单变量", icon: "bi bi-123", 

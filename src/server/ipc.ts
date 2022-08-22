@@ -6,9 +6,10 @@ ipc主窗口 与 子窗口通讯
 import { app, BrowserWindow, desktopCapturer, dialog, ipcMain, Menu, MenuItemConstructorOptions, Notification, shell } from "electron";
 
 import { building, exportHtml, exportReact, exportSql, exportVue, publicProject } from "../build/build";
-import { ICatalog, IProject } from "../common/interfaceDefine";
+import { getUUID, ICatalog, IProject } from "../common/interfaceDefine";
 import { GitTools } from "../hub/gitTool";
 import * as storage from "./storage";
+
 import { touchBarColors, touchBarEditor } from "./touchBar";
 import { getNowDateTime, saveAs } from "./work";
 export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
@@ -146,7 +147,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
     });
     ipcMain.on("savePage_" + wId, (event: any, arg: any) => {
         storage.savePage(arg.page, arg.path, wProject);
-        var notification = new Notification({title:"保存成功"});
+        var notification = new Notification({ title: "保存成功" });
         notification.show();
         bw.webContents.send("_savePage", null);
     });
@@ -161,7 +162,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
         });
         updatePreviews.set(arg, "");
-    
+
 
     });
     ipcMain.on("readPageCatalog_" + wId, (event: any, arg: any) => {
@@ -177,7 +178,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
         if (arg.startsWith("sftp_")) {
             publicProject(wProject, arg.substring(5), bw);
-            var notification = new Notification({title:"导出成功"});
+            var notification = new Notification({ title: "导出成功" });
             notification.show();
             bw.webContents.send("_export", null);
         } else {
@@ -194,7 +195,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
                 }
 
             }
-            var notification = new Notification({title:"导出成功"});
+            var notification = new Notification({ title: "导出成功" });
             notification.show();
             bw.webContents.send("_export", null);
         }
@@ -372,15 +373,15 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     });
 
-    ipcMain.on("show-context-menu_" + wId, (event, menuItems:Array<MenuItemConstructorOptions>) => {
-  
+    ipcMain.on("show-context-menu_" + wId, (event, menuItems: Array<MenuItemConstructorOptions>) => {
+
         //contextmenu
-       
+
         menuItems.forEach(item => {
 
-            
-            item.click= () => { event.sender.send('context-menu-command', item.id) };
-         
+
+            item.click = () => { event.sender.send('context-menu-command', item.id) };
+
         });
 
         const contextmenu: any = Menu.buildFromTemplate(menuItems)
@@ -388,12 +389,44 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     })
 
-    ipcMain.on("show-notification_"+wId,(event,arg)=>{
+    ipcMain.on("show-notification_" + wId, (event, arg) => {
 
-        var notification = new Notification({title:arg});
+        var notification = new Notification({ title: arg });
         notification.show();
-    
 
+
+    });
+    ipcMain.on("importDataExcel_" + wId, (event, arg) => {
+
+
+        var list = dialog.showOpenDialogSync(bw, { properties: ['openFile'], filters: [{ name: "*", extensions: ["xls", "xlsx"] }] });//filters: [{ name: "*", extensions: ["prototyping"] }] }
+
+        if (list != undefined && list.length > 0) {
+
+            var xlsx=require("node-xlsx").default;
+            var file = list[0];
+            var database = storage.readDatabase(wProject);
+            var workBook = xlsx.readFile(file, { cellDates: true });
+            if (workBook != undefined) {
+
+                for (var sn in workBook.SheetNames) {
+                    var sheet = workBook.Sheets[sn];
+                    var data = xlsx.utils.sheet_to_json(sheet);
+                    var st: any = {
+                        key: getUUID,
+                        name: sn,
+                        columns: [],
+                        data: data
+                    }
+                    database.tables.push(st);
+                }
+                storage.saveDatabase(database, wProject);
+                bw.webContents.send("_readDatabase", database);
+
+
+
+            }
+        }
     });
 
 }

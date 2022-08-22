@@ -2,15 +2,22 @@ import { IBlueProperty, IComponent } from "../../common/interfaceDefine"
 
 const component: IComponent = {
     isTemplate: true, key: "field", label: "field", icon: "bi bi-input-cursor", type: "field",
-    style: "white-space: nowrap;display:flex;max-width:200px;cursor: pointer;font-size:13px;padding: 5px 10px 5px 10px;border-radius:5px;",
+
+    styles: {
+        root: "display:flex;align-items:center;",
+        label: "white-space: nowrap;cursor: pointer;max-width:200px;font-size:13px;padding: 5px 0px 5px 10px;border-radius:5px;",
+        text: "cursor: pointer;font-size:13px;padding: 5px 10px 5px 5px;border:1px solid rgba(157,157,115,0.5);border-radius:5px;"
+    },
     onPreview: () => {
         var div = document.createElement("div");
+        div.style.cssText = component.styles.root;
         var label = document.createElement("div");
+        label.style.cssText = component.styles.label;
         label.innerText = component.property.label.context;
         div.appendChild(label);
         var button = document.createElement("input");
-
-        button.value = "ABC";
+        button.style.cssText == component.styles.text;
+        button.value = " ";
         div.appendChild(button);
         return div;
     }, onRender: (component, element) => {
@@ -20,21 +27,51 @@ const component: IComponent = {
         else
             div = document.createElement("div");
         div.innerHTML = "";
+        if (component.styles != undefined)//兼容旧版本
+            div.style.cssText = component.styles.root;
         var label = document.createElement("div");
-      
+        label.ondblclick = () => {
+            var input = document.createElement("input");
+            input.type = "text";
+            input.value = component.property.label.context;
+            input.onkeydown = (ky) => {
+                ky.stopPropagation();
+            }
+            label.innerHTML = "";
+            label.appendChild(input);
+            input.onchange = () => {
+                component.property.label.context = input.value;
+            }
+            input.focus();
+            input.onclick = (oc) => {
+                oc.stopPropagation();
+            }
+            input.ondblclick = (oc) => {
+                oc.stopPropagation();
+            }
+            input.onblur = () => {
+                input.remove();
+                label.innerText = component.property.label.context + " ： ";
+            }
+
+        }
         //xin
         label.innerText = component.property.label.context + " ： ";
+        if (component.styles != undefined)//兼容旧版本
+            label.style.cssText = component.styles.label;
         div.appendChild(label);
-        var button = document.createElement("input");
-        button.type = "text";
-        button.value = component.property.value.context;
-        button.onchange = () => {
-            component.property.value.context = button.value;
-            if(component.blue.event.change.on!=undefined){
-                component.blue.event.change.on(button.value);
+        var text = document.createElement("input");
+        text.type = "text";
+        text.value = component.property.value.context;
+        if (component.styles != undefined)//兼容旧版本
+            text.style.cssText = component.styles.text;
+        text.onchange = () => {
+            component.property.value.context = text.value;
+            if (component.blue.event.change.on != undefined) {
+                component.blue.event.change.on(text.value);
             }
         }
-        div.appendChild(button);
+        div.appendChild(text);
         return { root: div, content: div };
     }, property: {
         label: {
@@ -45,15 +82,15 @@ const component: IComponent = {
         }
     }, blue: {
         event: {
-            change: {label: "改变"}
+            change: { label: "改变" }
         },
         property: {
             value: {
-                label: "值", get: (comp: IComponent, self:IBlueProperty) => {
+                label: "值", get: (comp: IComponent, self: IBlueProperty) => {
                     var div = document.getElementById(comp.key);
                     var input = div.getElementsByTagName("input")[0];
                     return input.value;
-                }, set: (comp: IComponent, self:IBlueProperty, args: any) => {
+                }, set: (comp: IComponent, self: IBlueProperty, args: any) => {
                     var div = document.getElementById(comp.key);
                     var input = div.getElementsByTagName("input")[0];
                     input.value = args;

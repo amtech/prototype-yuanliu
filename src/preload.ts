@@ -24,7 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
 export function ipcRendererSend(hannel: string, ...args: any[]): void {
   console.log("---SEND---", hannel + "_" + wId);
   if (hannel == "insertCover") {
-    ipcRenderer.send(  "insertImage_" + wId);
+    ipcRenderer.send("insertImage_" + wId);
   } else if (hannel == "insertImage") {
     ipcRenderer.send(hannel + "_" + wId, getCurPageKey());
   } else {
@@ -33,7 +33,7 @@ export function ipcRendererSend(hannel: string, ...args: any[]): void {
 
 }
 
-export function ipcContextMenu(arg:{type:"tab"|"icon"|"otho"|"component",content:string}): void {
-    ipcRenderer.send( "show-context-menu_" + wId, arg);
+export function ipcContextMenu(arg: { type: "tab" | "icon" | "otho" | "component", content: string }): void {
+  ipcRenderer.send("show-context-menu_" + wId, arg);
 
 }

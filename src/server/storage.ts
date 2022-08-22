@@ -202,8 +202,9 @@ export function copyFile(args: any, wProject: IProject): any {
     console.log(args);
     var pagesPath = getProjectFolderPath(wProject, "pages");
     //TODO
-    var path = args.path;
-    var file = path.join(pagesPath, path);
+    var p = args.path;
+    console.log(pagesPath);
+    var file = path.join(pagesPath, p);
     var newPath = file.replace(args.oldName, args.newName);
     fs.copyFileSync(file, newPath);
 

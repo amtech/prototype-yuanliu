@@ -4,10 +4,10 @@ Copyright (c) taoyongwen. All rights reserved.
 底部  数据标签
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
+import { IMenuItem, openContextMenu } from "../../common/contextmenu";
+import { getUUID, IDatabase, IPanel, ITable } from "../../common/interfaceDefine";
 import { ipcRendererSend } from "../../preload";
-import { getUUID, IColumn, IDatabase, IPanel, ITable } from "../../common/interfaceDefine";
 import * as form from "../../render/form";
-import { getProject } from "../../render/workspace";
 const panel: IPanel = {
     key: "data", name: "数据", hidden: true,sort:4,
     render: (content: HTMLElement) => {
@@ -80,6 +80,17 @@ function renderCatalog(content: HTMLElement) {
 
     }
 
+    var importIcon=document.createElement("i");
+    importIcon.className="bi bi-file-earmark-spreadsheet";
+    importIcon.title="导入excel表格";
+    importIcon.style.cursor="pointer";
+    importIcon.style.paddingLeft="5px";
+    importIcon.style.paddingRight="5px";
+    titleBar.appendChild(importIcon);
+    importIcon.onclick=()=>{
+        ipcRendererSend("importDataExcel","");
+    };
+
 
     var catalogDiv = document.createElement("div");
     catalogDiv.id = "database_tables";
@@ -139,6 +150,19 @@ function renderTable(table: ITable) {
     }
 
 
+
+    var cellContextMenus:IMenuItem[]=[
+        {
+            id:"deleteCol",
+            label:"删除列",
+            onclick:()=>{}
+        },{
+            id:"deleteRow",
+            label:"删除行",
+            onclick:()=>{}
+        }
+    ]
+
     var thead=document.createElement("thead");
     tb.appendChild(thead);
     var tbody=document.createElement("tbody");
@@ -186,6 +210,9 @@ function renderTable(table: ITable) {
                     table.data[rk][ck]=target.value;
                     saveDatabase();
                 }
+                input.oncontextmenu=(e)=>{
+                    openContextMenu(cellContextMenus);
+                }
             }
         }
 
@@ -228,6 +255,23 @@ function addTable(table: ITable) {
   
     }
     div.appendChild(item);
+
+
+    var tableContextMenus:IMenuItem[]=[
+        {
+            id:"deleteTable",
+            label:"删除表格",
+            onclick:()=>{
+                var index=database.tables.indexOf(table);
+                database.tables.splice(index,1);
+                saveDatabase();
+                ipcRendererSend("readDatabase");
+            }
+        }
+    ];
+    item.oncontextmenu=(e)=>{
+        openContextMenu(tableContextMenus);
+    }
 
 
     item.ondblclick = () => {
