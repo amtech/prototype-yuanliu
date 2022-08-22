@@ -320,8 +320,9 @@ function database_result(result, toB, links, blues) {
                         outComponents.push(outComponent);
                     console.log("outComponent", outComponent);
                     console.log("setdata", hubData[outLink.from.name], outLink.name, hubData);
-                    var outPro = outComponent.blue.property.find(p => p.name == outLink.to.name);
-                    outPro.set(outComponent, hubData[outLink.from.name]);
+                    var outPro = outComponent.blue.property[outLink.to.name];
+                    console.log("outPro", outPro);
+                    outPro.set(outComponent, outPro, hubData[outLink.from.name]);
                 }
             });
             outComponents.forEach(outComponent => {
@@ -478,6 +479,25 @@ function link_Queue_cal(linkQueue, blues) {
         } else if (fromBlue.type == "window") {
             console.log("window", fromBlue, from.name);
             value = eval("window." + from.name);
+        } else if (fromBlue.type == "date") {
+            console.log("date", fromBlue, from.name);
+            var today = new Date();
+            switch (from.name) {
+                case "yyyy":
+                    value = today.getFullYear();
+                    break;
+                case "yyyymm":
+                    value = today.getFullYear() + "-" + (today.getMonth() + 1);
+                    break;
+                case "yyyymmdd":
+                    value = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDay();
+                    break;
+                case "yyyymmddhh":
+                    value = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDay() + " " + today.getHours();
+                    break;
+
+            }
+
         }
         console.log("获取值", fromBlue.name, value);
 

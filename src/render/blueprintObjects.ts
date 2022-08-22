@@ -59,6 +59,17 @@ export const blueObjects:IBlue[]=[
         ], methods: [
             { label: "打开", name: "open" }
         ]
+    },{
+        component: "date", key: "blue_hub_get_date", name: "当前日期", icon: "bi bi-calendar3", type: "date",
+        events: [],
+        properties: [
+            {label:"年份",name:"yyyy"},
+            {label:"年月",name:"yyyymm"},
+            {label:"年月日",name:"yyyymmdd"},
+            {label:"年月日时",name:"yyyymmddhh"},
+        ], methods: [
+           
+        ]
     }
  ]
 export function getBlueMethods():IMenuItem[]{

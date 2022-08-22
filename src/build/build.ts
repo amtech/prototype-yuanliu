@@ -12,6 +12,7 @@ import * as storage from "../server/storage";
 import { emptyFolder } from "../server/storage";
 import * as react from "./react";
 import { zhToEn } from "../common/dict";
+import { Notification } from "electron/main";
 
 
 export function packge(dist: string,terminal:(log:any)=>void) {
@@ -177,6 +178,8 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
         terminal("打包项目");
         packge(dist,terminal);
         terminal("构建完成");
+        var notification = new Notification({title:"构建完成"});
+        notification.show();
         return true;
     } catch (e) {
         console.log(e);

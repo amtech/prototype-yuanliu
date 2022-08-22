@@ -23,6 +23,14 @@ import { isDark } from "../dialog/picker";
 import { getProject } from "./workspace";
 import { saveSimplePage } from "./toolbar";
 
+
+// var hoverComponentRoot: HTMLElement;
+// export function setHoverComponentRoot(componentRoot: HTMLElement) {
+//     hoverComponentRoot = componentRoot;
+// }
+// export function getHoverComponentRoot() {
+//     return hoverComponentRoot;
+// }
 /**
  * 获取当前页面展示上下文div
  * @returns 

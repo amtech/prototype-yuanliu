@@ -26,6 +26,14 @@ Copyright (c) taoyongwen. All rights reserved.
     border-color: #999;
 }
 
+.light .workbench .component_canvas:hover {
+    outline: 1px dotted rgba(0, 0, 0, 0.5);
+}
+
+.dark .workbench .component_canvas:hover {
+    outline: 1px dotted rgba(255, 255, 255, 0.5);
+}
+
 .dark .background {
     background: #444;
 }
@@ -323,11 +331,19 @@ button {
 }
 
 .dark .component_canvas[selected=true] {
-    outline: 1px solid var(--theme-color);
+    outline: 1px dotted var(--theme-color);
 }
 
 .light .component_canvas[selected=true] {
-    outline: 1px solid var(--theme-color);
+    outline: 1px dotted var(--theme-color);
+}
+
+.dark .page[data-drag=true] .component_canvas {
+    outline: 1px dotted var(--theme-color);
+}
+
+.light .page[data-drag=true] .component_canvas {
+    outline: 1px dotted var(--theme-color);
 }
 
 .dark .component_canvas[dataDrag=true]::before {

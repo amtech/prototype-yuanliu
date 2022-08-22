@@ -382,22 +382,5 @@ function renderRightSilderBar(content: HTMLElement,h:number) {
  * @param type 
  */
 export function showMessageBox(message:string,type:"info"|"error"|"warning"|"question"|"none"){
- 
-    var mb=document.getElementById("messageBox");
-    if(mb==undefined){
-        mb=document.createElement("div");
-        mb.setAttribute("data-type",type);
-        mb.id="messageBox";
-        mb.className="messageBox";
-    
-        document.getElementById("app").appendChild(mb);
-        mb.onclick=(e:MouseEvent)=>{
-            mb.remove();
-        }
-        setTimeout(() => {
-            mb.remove();
-        }, 3000);
-    }
-    mb.innerHTML=message;
-
+    ipcRendererSend("show-notification_",message);
 }

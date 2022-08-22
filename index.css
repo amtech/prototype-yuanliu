@@ -1058,11 +1058,7 @@ iframe {
     pointer-events: none;
 } */
 
-.page[data-drag=true] .component_canvas {
-    outline: 1px solid var(--theme-color);
-}
-
-.workbench .component_canvas:hover {
+.workbench .component_canvas[data-hover=true] {
     outline: 1px solid var(--theme-color);
 }
 

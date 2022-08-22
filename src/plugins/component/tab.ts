@@ -72,6 +72,16 @@ const component: IComponent = {
             }
         },
         property: {
+            list:{
+                label: "选项",type:"in", get: (comp: IComponent, self:IBlueProperty) => {
+                    var ip: any = document.getElementById(comp.key);
+                    return ip.value;
+                }, set: (comp: IComponent, self:IBlueProperty, args:any) => {
+                    comp.option = JSON.stringify(args, null, 2);
+                    comp.onRender(comp, document.getElementById(comp.key));
+                    
+                }  
+            },
             selected: {
                 label: "选择", get: (comp: IComponent, self: IBlueProperty) => {
                     return comp.property.selected.context;

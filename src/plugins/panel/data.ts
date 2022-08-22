@@ -72,7 +72,7 @@ function renderCatalog(content: HTMLElement) {
         var table: ITable = {
             columns: [
                 
-            ], name: "tableName", key: getUUID(), data: [["A","B","C","D"],[1,2,3,4]]
+            ], name: "tableName", key: getUUID(), data: [["Key","Value"],["key","value"]]
         };
         addTable(table);
         database.tables.push(table);

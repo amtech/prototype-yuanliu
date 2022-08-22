@@ -3,7 +3,7 @@ Copyright (c) taoyongwen. All rights reserved.
 
 ipc主窗口 与 子窗口通讯
 ***************************************************************************** */
-import { app, BrowserWindow, desktopCapturer, dialog, ipcMain, Menu, MenuItemConstructorOptions, shell } from "electron";
+import { app, BrowserWindow, desktopCapturer, dialog, ipcMain, Menu, MenuItemConstructorOptions, Notification, shell } from "electron";
 
 import { building, exportHtml, exportReact, exportSql, exportVue, publicProject } from "../build/build";
 import { ICatalog, IProject } from "../common/interfaceDefine";
@@ -146,8 +146,8 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
     });
     ipcMain.on("savePage_" + wId, (event: any, arg: any) => {
         storage.savePage(arg.page, arg.path, wProject);
-        // dialog.showMessageBox(bw, { message: "保存成功" });
-
+        var notification = new Notification({title:"保存成功"});
+        notification.show();
         bw.webContents.send("_savePage", null);
     });
     ipcMain.on("startPreview_" + wId, (event: any, arg: any) => {
@@ -161,6 +161,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
         });
         updatePreviews.set(arg, "");
+    
 
     });
     ipcMain.on("readPageCatalog_" + wId, (event: any, arg: any) => {
@@ -176,6 +177,8 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
         if (arg.startsWith("sftp_")) {
             publicProject(wProject, arg.substring(5), bw);
+            var notification = new Notification({title:"导出成功"});
+            notification.show();
             bw.webContents.send("_export", null);
         } else {
             var list = dialog.showOpenDialogSync(bw, { properties: ['openDirectory'] });
@@ -191,6 +194,8 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
                 }
 
             }
+            var notification = new Notification({title:"导出成功"});
+            notification.show();
             bw.webContents.send("_export", null);
         }
 
@@ -383,6 +388,13 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     })
 
+    ipcMain.on("show-notification_"+wId,(event,arg)=>{
+
+        var notification = new Notification({title:arg});
+        notification.show();
+    
+
+    });
 
 }
 

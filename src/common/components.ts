@@ -9,15 +9,14 @@ import { updateFloatPanel } from "../render/floatPanel";
 import { ipcRendererSend } from "../preload";
 import { updateBlueView } from "../render/blueprint";
 import * as dargData from "../render/DragData";
+import { pushHistory } from "../render/history";
 import { copyComponents } from "../render/pageTitle";
-import { getComponentStyle, setComponentStyle, activePropertyPanel } from "../render/propertypanel";
+import { activePropertyPanel, getComponentStyle, setComponentStyle } from "../render/propertypanel";
+import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
 import { clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine } from "../render/workbench";
 import { getProject } from "../render/workspace";
 import { checkContextMenu, IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
-import { getUUID, IBlue, IComponent, IComponentProperty, IExtension } from "./interfaceDefine";
-import { pushHistory } from "../render/history";
-import { getShiftKeyDown } from "../render/shorcuts";
-import { getMousePosition } from "../render/shorcuts";
+import { getUUID, IComponent, IComponentProperty, IExtension } from "./interfaceDefine";
 export function getComponentTempateByType(type: string): IComponent {
     if (componentsTemplate == undefined || componentsTemplate.length == 0) {
         console.log("componentsTemplate is undefined");
@@ -503,6 +502,21 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             renderComponents(body, component.children, component);
         }, 0);
     }
+    // root.onmouseover =(e)=>{
+    //     var old=getHoverComponentRoot();
+    //     if(old!=undefined){
+    //         old.removeAttribute("data-hover");
+    //     }
+    //     root.setAttribute("data-hover", "true");
+    //     setHoverComponentRoot(root);
+    //     e.stopPropagation();
+
+
+    // }
+    // root.onmouseleave =(e)=>{
+    //     root.removeAttribute("data-hover");
+    //     e.stopPropagation();
+    // }
 
     //单击选择组件
     eventEle.onclick = (e: any) => {
