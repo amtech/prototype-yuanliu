@@ -98,6 +98,32 @@ Copyright (c) taoyongwen. All rights reserved.
     color: #222;
 }
 
+.dark .component_canvas[data-hot=true]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.light .component_canvas[data-hot=true]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.dark .component_canvas[data-hot=true]:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.light .component_canvas[data-hot=true]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 .dark textarea {
     background: rgba(0, 0, 0, 0.4);
     color: #eee;
