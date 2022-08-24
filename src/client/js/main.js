@@ -188,12 +188,12 @@ function renderNavTree(content, nav, level) {
                 console.log(c);
                 var p = pages_data.find(p => p.path == c.path);
 
-                document.location.hash = p.key;
-
-
                 logj(p, "main", 190);
-                if (p != undefined)
+                if (p != undefined) {
+                    document.location.hash = p.key;
                     renderPage(p);
+                }
+
 
             }
         }
@@ -226,13 +226,15 @@ function renderTitle() {
     // }, 100);
 
 }
-var curpage;
+var curpages = [];
 
-export function getCurPage() {
-    return curpage;
+export function getCurPage(index) {
+    if (index == undefined)
+        return curpages[0];
+    return curpages[index];
 }
 
-export function renderPageByCatalogKey(key, content) {
+export function renderPageByCatalogKey(key, content, pageIndex) {
 
     var c = find_catalog_by_key(project_data.catalogs, key);
     if (c == undefined) {
@@ -241,10 +243,10 @@ export function renderPageByCatalogKey(key, content) {
         return;
     }
     var p = pages_data.find(p => p.path == c.path);
-    renderPage(p, content);
+    renderPage(p, content, pageIndex);
 }
 
-export function renderPage(pageJson, content, isLaunch) {
+export function renderPage(pageJson, content, isLaunch, pageIndex) {
     if (pageJson == undefined) {
         return;
     }
@@ -252,9 +254,8 @@ export function renderPage(pageJson, content, isLaunch) {
         document.getElementById("app").style.background = pageJson.backgroundColor;
     }
 
-
-
-    curpage = pageJson;
+    curpages = [];
+    curpages.push(pageJson);
 
     if (isLaunch != undefined && isLaunch) {
         if (title_bar != undefined)

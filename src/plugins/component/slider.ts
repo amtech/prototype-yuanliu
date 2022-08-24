@@ -9,15 +9,15 @@ const component: IComponent = {
         point: "cursor:ew-resize;transition: left 0.5s;position:absolute;height:15px;width:15px;border-radius:20px;left:20px;background-color:var(--theme-color);"
 
     },
-    onPreview: (comment) => {
+    onPreview: (component) => {
         var div = document.createElement("div");
 
         var line = document.createElement("div");
-        line.style.cssText = comment.styles.line;
+        line.style.cssText = component.styles.line;
         line.setAttribute("data-styles", "line");
         var point = document.createElement("div");
         point.setAttribute("data-styles", "point");
-        point.style.cssText = comment.styles.point;
+        point.style.cssText = component.styles.point;
         div.appendChild(line);
         div.appendChild(point);
         setTimeout(() => {
@@ -31,28 +31,28 @@ const component: IComponent = {
         }, 10);
 
         return div;
-    }, onRender: (comment, element) => {
+    }, onRender: (component, element) => {
         var div: any;
         if (element != undefined) div = element;
         else div = document.createElement("div");
         div.innerHTML = "";
         var line = document.createElement("div");
-        line.style.cssText = comment.styles.line;
+        line.style.cssText = component.styles.line;
         line.setAttribute("data-styles", "line");
         var point = document.createElement("div");
         point.setAttribute("data-styles", "point");
         point.draggable = false;
 
-        point.style.cssText = comment.styles.point;
+        point.style.cssText = component.styles.point;
         div.appendChild(line);
         div.appendChild(point);
         setTimeout(() => {
             console.log(component.property);
            
 
-            var v = parseFloat(comment.property.default.context);
-            var m = parseFloat(comment.property.max.context);
-            var n = parseFloat(comment.property.min.context);
+            var v = parseFloat(component.property.default.context);
+            var m = parseFloat(component.property.max.context);
+            var n = parseFloat(component.property.min.context);
             var s = (v - n) / (m - n);
             var l = s * div.clientWidth;
             point.style.left = l + "px";
@@ -79,9 +79,9 @@ const component: IComponent = {
                         left = div.clientWidth;
                     }
                     point.style.left = left + "px";
-                    comment.property.default.context = (left / div.clientWidth * (parseFloat(comment.property.max.context) - parseFloat(comment.property.min.context))).toFixed(0);
-                    if (comment.blue.event.change.on != undefined) {
-                        comment.blue.event.change.on(comment.property.default.context);
+                    component.property.default.context = (left / div.clientWidth * (parseFloat(component.property.max.context) - parseFloat(component.property.min.context))).toFixed(0);
+                    if (component.blue.event.change.on != undefined) {
+                        component.blue.event.change.on(component.property.default.context);
                     }
 
                 }

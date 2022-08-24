@@ -395,6 +395,6 @@ export interface IExtension {
 export interface IStyle {
 
 }
-export function renderPageByKey(a:any,b:any){
+export function renderPageByCatalogKey(a:any,b:any){
 
 }

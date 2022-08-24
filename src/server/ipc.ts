@@ -398,33 +398,27 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
     });
     ipcMain.on("importDataExcel_" + wId, (event, arg) => {
 
-
         var list = dialog.showOpenDialogSync(bw, { properties: ['openFile'], filters: [{ name: "*", extensions: ["xls", "xlsx"] }] });//filters: [{ name: "*", extensions: ["prototyping"] }] }
-
         if (list != undefined && list.length > 0) {
-
-            var xlsx=require("node-xlsx").default;
             var file = list[0];
             var database = storage.readDatabase(wProject);
-            var workBook = xlsx.readFile(file, { cellDates: true });
+            const xlsx=require("node-xlsx");
+            var workBook = xlsx.parse(file);
             if (workBook != undefined) {
-
-                for (var sn in workBook.SheetNames) {
-                    var sheet = workBook.Sheets[sn];
-                    var data = xlsx.utils.sheet_to_json(sheet);
-                    var st: any = {
-                        key: getUUID,
-                        name: sn,
-                        columns: [],
-                        data: data
+             
+                workBook.forEach((sheet:any)=>{
+                    if(sheet.data.length>1){
+                        var st: any = {
+                            key: getUUID,
+                            name: sheet.name,
+                            columns: [],
+                            data: sheet.data
+                        }
+                        database.tables.push(st);
                     }
-                    database.tables.push(st);
-                }
+                })          
                 storage.saveDatabase(database, wProject);
                 bw.webContents.send("_readDatabase", database);
-
-
-
             }
         }
     });

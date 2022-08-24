@@ -1,4 +1,4 @@
-import { IBlueProperty, IComponent, renderPageByKey } from "../../common/interfaceDefine"
+import { IBlueProperty, IComponent, renderPageByCatalogKey } from "../../common/interfaceDefine"
 
 const component: IComponent = {
     isTemplate: true, key: "iframe", label: "iframe", icon: "bi bi-window", type: "iframe", group: "container",
@@ -14,7 +14,9 @@ const component: IComponent = {
             if (component.property.catalog.context != undefined && component.property.catalog.context.length > 0) {
                 
                     
-                renderPageByKey( component.property.catalog.context,iframe);
+                setTimeout(() => {
+                    renderPageByCatalogKey( component.property.catalog.context,iframe);
+                }, 2000);
             
             }
 

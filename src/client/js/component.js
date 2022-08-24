@@ -1,5 +1,5 @@
 import componentsTemplate from "./components.js";
-import { getCurPage, renderComponent, renderPageByKey } from "./main.js";
+import { getCurPage, renderComponent, renderPageByCatalogKey } from "./main.js";
 import dataCatalog from "./dataCatalog.js";
 import title_data from "./titleData.js";
 import map_data from "./map.js";
@@ -38,10 +38,14 @@ export function findCurPageComponent(path) {
             rs = page.children.find(c => c.key == keys[0]);
 
         } else {
+            console.log(page);
             var parent = page;
             keys.forEach(key => {
-                if (parent != undefined)
+                if (parent != undefined) {
+                    console.log(parent.children, key);
                     parent = parent.children.find((c) => c.key == key);
+
+                }
             })
             rs = parent;
         }
@@ -52,6 +56,7 @@ export function findCurPageComponent(path) {
 
     return findCurTitleComponent(path);
 }
+
 
 function findCurTitleComponent(path) {
     console.log("findCurTitleComponent", title_data);
@@ -94,7 +99,16 @@ function findComponent(list, key) {
 
 export function cal_catolog(catolog) {
     var data = dataCatalog;
-    return data[catolog];
+
+    var item = data[catolog];
+    if (Object.prototype.toString.call(data) === '[object Object]') {
+
+        return item.x;
+    } else if (Object.prototype.toString.call(data) === '[object Array]') {
+
+        return item;
+    }
+
 }
 //cal_data('月份','n','list'','0','100','2')
 export function cal_data(dataType, arrayType, outType, mins, maxs, floats) {
@@ -104,52 +118,70 @@ export function cal_data(dataType, arrayType, outType, mins, maxs, floats) {
     var float = parseInt(floats);
     if (dataCatalog != undefined && dataType.length > 0 && arrayType.length > 0 && outType.length > 0) {
 
-        var xlist = dataCatalog[dataType];
-        var ylist = [];
-        var slist = [];
-        var sum = 0;
-        var blist = [];
-        var sub;
-        for (var i = 0; i < xlist.length; i++) {
-            var v = Math.random() * (max - min) + min;
-            v = parseFloat(v.toFixed(float));
-            sum += v;
-            if (sub == undefined) {
-                sub = v;
-            } else {
-                sub -= v;
+        var data = dataCatalog[dataType];
+        if (Object.prototype.toString.call(data) === '[object Object]') {
+
+            var xlist = data.x;
+            var ylist = [];
+            var ySum = 0;
+            for (var i = 0; i < data.y.length; i++) {
+                ySum += data.y[i];
             }
-            ylist.push(v);
-            slist.push(sum);
-            blist.push(sub);
-        }
-
-        if (outType == "list") {
-
-            if (arrayType == "n") {
-                return ylist;
-            } else if (arrayType == "p") {
-                return slist;
-            } else if (arrayType == "s") {
-                return blist;
+            for (var i = 0; i < data.y.length; i++) {
+                var v = min + (max - min) * data.y[i] / ySum;
+                v = parseFloat(v.toFixed(float));
+                ylist.push(v);
             }
-        } else if (outType == "objlist") {
+            return ylist;
+        } else if (Object.prototype.toString.call(data) === '[object Array]') {
 
-            var list = [];
+            var xlist = dataCatalog[dataType];
+            var ylist = [];
+            var slist = [];
+            var sum = 0;
+            var blist = [];
+            var sub;
             for (var i = 0; i < xlist.length; i++) {
-                var text = xlist[i];
-                var value = 0;
-                if (arrayType == "n") {
-                    value = ylist[i];
-                } else if (arrayType == "p") {
-                    value = slist[i];
-                } else if (arrayType == "s") {
-                    value = blist[i];
+                var v = Math.random() * (max - min) + min;
+                v = parseFloat(v.toFixed(float));
+                sum += v;
+                if (sub == undefined) {
+                    sub = v;
+                } else {
+                    sub -= v;
                 }
-                list.push({ name: text, value: value });
+                ylist.push(v);
+                slist.push(parseFloat(sum.toFixed(float)));
+                blist.push(parseFloat(sub.toFixed(float)));
             }
-            return list;
 
+            if (outType == "list") {
+
+                if (arrayType == "n") {
+                    return ylist;
+                } else if (arrayType == "p") {
+                    return slist;
+                } else if (arrayType == "s") {
+                    return blist;
+                }
+            } else if (outType == "objlist") {
+
+                var list = [];
+                for (var i = 0; i < xlist.length; i++) {
+                    var text = xlist[i];
+                    var value = 0;
+                    if (arrayType == "n") {
+                        value = ylist[i];
+                    } else if (arrayType == "p") {
+                        value = slist[i];
+                    } else if (arrayType == "s") {
+                        value = blist[i];
+                    }
+                    list.push({ name: text, value: value });
+                }
+                return list;
+
+            }
         }
         return undefined;
 

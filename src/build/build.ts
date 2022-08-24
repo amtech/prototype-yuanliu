@@ -219,7 +219,7 @@ function buildComponents(wProject: IProject,terminal?:(log:any)=>void) {
         terminal("构建组件");
     }
     var rs = "import { loadChart,cal_catolog,cal_data,updateComponent } from './component.js';"+
-    "import { renderPageByKey } from './main.js';"+
+    "import { renderPageByCatalogKey } from './main.js';"+
     "export default [";
     storage.loadPluginsComponent().forEach(cpt => {
 
@@ -237,7 +237,7 @@ function buildComponents(wProject: IProject,terminal?:(log:any)=>void) {
         //    console.log(code);
         code = code.replace(/\(0, components_1\.updateComponent\)/g, "updateComponent");
 
-        code = code.replace(/\(0, interfaceDefine_1\.renderPageByKey\)/g, "renderPageByKey");
+        code = code.replace(/\(0, interfaceDefine_1\.renderPageByCatalogKey\)/g, "renderPageByCatalogKey");
 
         if (code.endsWith(";")) {
             code = code.substring(0, code.length - 1);
