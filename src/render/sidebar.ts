@@ -233,10 +233,10 @@ function getChartCount(text: string, char: string): number {
  * @param catalog 
  */
 
-function createPage(name: string, catalog?: ICatalog) {
+function createPage(name: string, catalog?: ICatalog,template?:string) {
     if (catalog == undefined) {
         //level =0
-        var page: ICatalog = { name: name, path: "/" + name + ".json", dir: "/", sort: 0, key: getUUID() };
+        var page: ICatalog = { name: name, path: "/" + name + ".json", dir: "/", sort: 0, key: getUUID(),template:template };
         if (getProject().catalogs == undefined) {
             getProject().catalogs = [];
         }
@@ -249,7 +249,7 @@ function createPage(name: string, catalog?: ICatalog) {
             catalog.children = [];
         }
         //children
-        var page: ICatalog = { key: getUUID(), name: name, path: catalog.path + "/" + name + ".json", dir: catalog.path, sort: catalog.children.length };
+        var page: ICatalog = { key: getUUID(), name: name, path: catalog.path + "/" + name + ".json", dir: catalog.path, sort: catalog.children.length ,template:template};
         // if(catalog.path=="/"){
         //     page.path = "/" + catalog.name;
         // }
@@ -1463,7 +1463,10 @@ const templatePages: Array<{
             }
         }
     ]
-
+/**
+ * 按照模板新建
+ * @param caltalog 
+ */
 function createPageByTemplate(caltalog?: ICatalog) {
 
     var rd = renderDialog();
@@ -1492,6 +1495,12 @@ function createPageByTemplate(caltalog?: ICatalog) {
         pageDiv.appendChild(title);
 
         content.appendChild(pageDiv);
+
+        pageDiv.onclick=()=>{
+
+            createPage(page.label,caltalog,page.key);
+            rd.root.remove();
+        }
     });
 
 

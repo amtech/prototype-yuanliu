@@ -46,14 +46,14 @@ export function readConfig(): any {
     if (!fs.existsSync(titlePath)) {
         return {
             theme: "dark",//dark,light 主题 
-            componentsEnable:[//组件开关
-                "button","canvas","chart_bar","chart_candlestick",
-                "chart_line","chart_map","chart_pie","chart_radar","chart_scatter",
-                "custom","dialog","field","flex",
-                "grid","iframe","label","layers","paragraph",
-                "row","select","slider","space",
-                "tab","table","text","images",
-                "flow_base","flow_level","flow_cycle","flow_pyramid","fixed","tree"
+            componentsEnable: [//组件开关
+                "button", "canvas", "chart_bar", "chart_candlestick",
+                "chart_line", "chart_map", "chart_pie", "chart_radar", "chart_scatter",
+                "custom", "dialog", "field", "flex",
+                "grid", "iframe", "label", "layers", "paragraph",
+                "row", "select", "slider", "space",
+                "tab", "table", "text", "images",
+                "flow_base", "flow_level", "flow_cycle", "flow_pyramid", "fixed", "tree"
             ]
         }
     }
@@ -117,7 +117,7 @@ export function readNav(wProject: IProject): any {
 
 }
 export function saveNavBar(nav: string, wProject: IProject): any {
- 
+
     //title
     var navPath = path.join(getProjectFolderPath(wProject), "nav.json");
     return fs.writeFileSync(navPath, nav);
@@ -297,6 +297,25 @@ export function newFile(args: ICatalog, wProject: IProject): any {
             blueLinks: [],
             guides: []
         };
+        //加载模板
+        if (args.template != undefined) {
+            var templatePagePath = path.join(getAppFolderPath("templates"), "pages", args.template + ".json");
+            if (fs.existsSync(templatePagePath)) {
+                var templatePage = JSON.parse(fs.readFileSync(templatePagePath).toString());
+                if (templatePage.children != undefined) {
+                    page.children = templatePage.children;
+                    page.blues = templatePage.blues;
+                    page.blueLinks = templatePage.blueLinks;
+                    page.theme = templatePage.theme;
+                    page.backgroundColor = templatePage.backgroundColor;
+                    
+                }
+
+            }
+
+
+        }
+        //写入文件
         fs.writeFileSync(file, JSON.stringify(page, null, 2));
 
     }
@@ -358,8 +377,8 @@ export function readProject(wProject: IProject): any {
     var navPath = path.join(getProjectFolderPath(wProject), "project.json");
     var project = JSON.parse(fs.readFileSync(navPath).toString());
     project.work = getProjectFolderPath(wProject);
-    project.path=wProject.path;
-    project.type=wProject.type;
+    project.path = wProject.path;
+    project.type = wProject.type;
     return project;
 
 }
@@ -384,24 +403,26 @@ export function getProjectFolderPath(project: any, folder?: "pages" | "images"):
     }
     return undefined;
 }
-export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" | "markdown"): string {
+export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" | "markdown" | "templates"): string {
 
     var appPath = app.getAppPath();
-    if (path.basename(appPath) =="dist") {
+    if (path.basename(appPath) == "dist") {
         if (folder == undefined) {
             return path.dirname(appPath);
         } else {
             var root = path.dirname(appPath);
             if (folder == "plugins") {
-                return path.join(appPath , "plugins");
+                return path.join(appPath, "plugins");
             } else if (folder == "src") {
-                return  path.join(root ,"src");
+                return path.join(root, "src");
             } else if (folder == "markdown") {
-                return path.join(root ,"markdown");
+                return path.join(root, "markdown");
             } else if (folder == "map") {
-                return path.join(root ,"src" , "map");
+                return path.join(root, "src", "map");
             } else if (folder == "client") {
-                return path.join(root ,"src" , "client");
+                return path.join(root, "src", "client");
+            } else if (folder == "templates") {
+                return path.join(root, "templates");
             }
         }
     } else {
@@ -409,15 +430,17 @@ export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" |
             return appPath;
         } else
             if (folder == "plugins") {
-                return  path.join(appPath,"dist","plugins");//appPath + "/dist/plugins";
+                return path.join(appPath, "dist", "plugins");//appPath + "/dist/plugins";
             } else if (folder == "src") {
-                return path.join(appPath , "src");
+                return path.join(appPath, "src");
             } else if (folder == "markdown") {
-                return path.join(appPath ,"markdown");
+                return path.join(appPath, "markdown");
             } else if (folder == "map") {
-                return path.join(appPath , "src" ,"map");
+                return path.join(appPath, "src", "map");
             } else if (folder == "client") {
-                return path.join(appPath ,"src", "client");
+                return path.join(appPath, "src", "client");
+            } else if (folder == "templates") {
+                return path.join(appPath, "templates");
             }
     }
 
@@ -440,12 +463,12 @@ export function loadMapCatalog(): string[] {
     return result;
 }
 export function loadMap(map: string): any {
-    var file =path.join(getAppFolderPath("map"), map);
+    var file = path.join(getAppFolderPath("map"), map);
     return JSON.parse(fs.readFileSync(file).toString());
 }
 
 export function loadPluginsProperty(): string[] {
-    var componentsFolder =path.join( getAppFolderPath("plugins") , "property");
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "property");
     //  console.log("loadPluginsComponent",componentsFolder);
     var result: string[] = [];
     if (fs.existsSync(componentsFolder)) {
@@ -460,7 +483,7 @@ export function loadPluginsProperty(): string[] {
     return result;
 }
 export function loadPluginsPanel(): string[] {
-    var componentsFolder = path.join(getAppFolderPath("plugins") , "panel");
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "panel");
     //  console.log("loadPluginsComponent",componentsFolder);
     var result: string[] = [];
     if (fs.existsSync(componentsFolder)) {
@@ -475,7 +498,7 @@ export function loadPluginsPanel(): string[] {
     return result;
 }
 export function loadPluginsComponent(): string[] {
-    var componentsFolder =path.join( getAppFolderPath("plugins"), "component");
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "component");
     //  console.log("loadPluginsComponent",componentsFolder);
     var result: string[] = [];
     if (fs.existsSync(componentsFolder)) {
@@ -490,7 +513,7 @@ export function loadPluginsComponent(): string[] {
     return result;
 }
 export function loadPluginsStyle(): string[] {
-    var componentsFolder =path.join( getAppFolderPath("plugins") ,"styles");
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "styles");
     //  console.log("loadPluginsComponent",componentsFolder);
     var result: string[] = [];
     if (fs.existsSync(componentsFolder)) {
@@ -506,7 +529,7 @@ export function loadPluginsStyle(): string[] {
 }
 
 export function loadHtml(src: string): string {
-    var file =path.join( getAppFolderPath("markdown"),  src);
+    var file = path.join(getAppFolderPath("markdown"), src);
     console.log("markdown", file);
     if (fs.existsSync(file)) {
         return fs.readFileSync(file).toString();
@@ -515,7 +538,7 @@ export function loadHtml(src: string): string {
 
 }
 export function saveImage(iPath: string, wProject: IProject, pageKey: string): string {
-   
+
     var newName = getUUID() + path.extname(iPath);
     var imageFodler = getProjectFolderPath(wProject, 'images');
     if (!fs.existsSync(imageFodler)) {
@@ -523,17 +546,17 @@ export function saveImage(iPath: string, wProject: IProject, pageKey: string): s
     }
     if (pageKey == undefined) {
         newName = "cover" + path.extname(iPath);
-        var newPath =path.join(imageFodler,newName);
+        var newPath = path.join(imageFodler, newName);
         fs.copyFileSync(iPath, newPath);
         return newName;
     } else {
-        var imagePageFolder =path.join( imageFodler , pageKey);
+        var imagePageFolder = path.join(imageFodler, pageKey);
         if (!fs.existsSync(imagePageFolder)) {
             fs.mkdirSync(imagePageFolder);
         }
-        var newPath = path.join(imagePageFolder,newName);
+        var newPath = path.join(imagePageFolder, newName);
         fs.copyFileSync(iPath, newPath);
-        return path.join(pageKey , newName);
+        return path.join(pageKey, newName);
     }
 
 }
@@ -541,13 +564,13 @@ export function saveImage(iPath: string, wProject: IProject, pageKey: string): s
 export function readDatabase(wProject: IProject) {
 
     //navPath
-    var dPath = path.join(getProjectFolderPath(wProject) ,"database.json");
+    var dPath = path.join(getProjectFolderPath(wProject), "database.json");
     return JSON.parse(fs.readFileSync(dPath).toString());
 
 }
 export function saveDatabase(database: IDatabase, wProject: IProject) {
 
-    var dPath = path.join(getProjectFolderPath(wProject) ,"database.json");
+    var dPath = path.join(getProjectFolderPath(wProject), "database.json");
     return fs.writeFileSync(dPath, JSON.stringify(database, null, 2));
 
 }

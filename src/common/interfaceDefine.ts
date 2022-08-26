@@ -244,6 +244,7 @@ export interface ICatalog {
     children?: ICatalog[];
     // page?:IPage;
     sort?: number;
+    template?:string;
 }
 /**
  * 对话框
