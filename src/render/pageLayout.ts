@@ -76,7 +76,7 @@ export function renderPageLayout() {
         const h = Math.round(component.clientHeight * rate);
 
 
-        layers.push([w, h, Math.round(left - width / 2), Math.round(height / 2 - top), z])
+        layers.push([w, h, Math.round(left - width*0.8), Math.round(height / 2 - top), z])
 
 
     }

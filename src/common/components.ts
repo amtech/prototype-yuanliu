@@ -325,6 +325,7 @@ export function copyComponent(cmpt: any, parentPath?: string) {
 /**
  * 安装组件
  * 以icon,image为主
+ * 给组件绑定 
  * @param component 
  */
 export function installComponent(component: IComponent) {

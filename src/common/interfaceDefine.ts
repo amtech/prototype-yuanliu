@@ -432,6 +432,11 @@ export interface IExtension {
 export interface IStyle {
 
 }
+/**
+ * 根据目录KEY,渲染页面，此处定义，在client中实现
+ * @param a 
+ * @param b 
+ */
 export function renderPageByCatalogKey(a:any,b:any){
 
 }
