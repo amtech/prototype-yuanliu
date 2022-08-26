@@ -477,7 +477,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
     }
 
-
+    //渲染子组件
     var eventEle = root;
     if (component.type == "dialog") {
         requestIdleCallback(() => {
@@ -491,6 +491,28 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             content.appendChild(root);
         }
     }
+    //渲染看操作按钮,hover时触发。
+    // var soliderBottom=document.createElement("div");
+    // soliderBottom.className="component_tap solider_bottom";
+
+    // var soliderBottomIcon=document.createElement("i");
+    // soliderBottomIcon.className="bi bi-chevron-bar-expand";
+    // soliderBottom.appendChild(soliderBottomIcon);
+
+    // root.appendChild(soliderBottom);
+
+
+    // var soliderRight=document.createElement("div");
+    // soliderRight.className="component_tap solider_right";
+
+    // var soliderRightIcon=document.createElement("i");
+    // soliderRightIcon.className="bi bi-chevron-bar-expand";
+    // soliderRightIcon.style.transform="rotate(90deg)";
+    // soliderRight.appendChild(soliderRightIcon);
+
+    // root.appendChild(soliderRight);
+
+
     //可移动
     if (component.isFixed) {
         eventEle.style.position = "fixed";

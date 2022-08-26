@@ -1448,3 +1448,43 @@ iframe {
 .template_page:hover {
     box-shadow: 0px 0px 4px var(--theme-color);
 }
+
+.component_tap {
+    position: absolute;
+    display: none;
+}
+
+.component_canvas:hover .component_tap {
+    display: flex;
+}
+
+
+/* .solider_bottom {
+    height: 20px;
+    width: 20px;
+    border-radius: 20px;
+    color: #fff;
+    background-color: var(--theme-color);
+    bottom: -16px;
+    left: 49%;
+    cursor: row-resize;
+    font-size: 12px;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999999999;
+}
+
+.solider_right {
+    height: 20px;
+    width: 20px;
+    border-radius: 20px;
+    color: #fff;
+    background-color: var(--theme-color);
+    right: -16px;
+    top: 49%;
+    cursor: col-resize;
+    font-size: 12px;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999999999;
+} */

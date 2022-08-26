@@ -30,27 +30,63 @@ export interface IProject {
 export interface IComponent {
     key: string;
     label: string;
+    /**
+     * 是否隐藏
+     */
     hidden?: boolean;
     toogle?: (element: HTMLElement, hidden: boolean) => void;
+    /**
+     * 组件icon
+     */
     icon: string;
+    /**
+     * 组件icon 是否旋转90
+     */
     rotate?: boolean;
+    /**
+     * 组件类型
+     */
     type?: string;
+    /**
+     * 组件选项内容，图表、选项卡组件等有
+     */
     option?: string;
+    /**
+     * 组件排序号
+     */
     sort?: number;
     /**
-     * 可接受拖拽的组价类型
+     * 可接受拖拽的组件类型
      */
     drop?: "component" | "catalog";
     /**
      * 拖拽后调用
      */
     onDrop?: (component: IComponent, data: any) => void;
+    /**
+     * 子组件
+     */
     children?: Array<IComponent>;
+    /**
+     * 组件样式定义
+     */
     style?: string;
     styles?: any;
+    /**
+     * 是否是flex布局
+     */
     flex?: boolean;
+    /**
+     * 组件路径
+     */
     path?: string;
+    /**
+     * 是否为组件模板
+     */
     isTemplate?: boolean;
+    /**
+     * 组件背景类型 0：无，1：纯色，2：渐变，3：图片
+     */
     background?: number;
     /**
      *组件布局 是否是fxied
