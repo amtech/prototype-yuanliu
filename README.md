@@ -15,6 +15,10 @@
 ![源流起始页](./HubScreenshot.png)
 ### 主页面
 ![源流主界面](./MainHubScreenshot.png)
+### 蓝图页面
+![源流蓝图界面](./Bluepoint.png)
+### 导出页面
+![源流导出界面](./Export.png)
 
 ## 打包源码
 Package your Electron app into OS-specific bundles (.app, .exe, etc.) via JavaScript or the command line.\
