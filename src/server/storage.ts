@@ -3,12 +3,14 @@ Copyright (c) taoyongwen. All rights reserved.
 
 存储
 ***************************************************************************** */
-import { app, screen, shell } from "electron";
+import { app, dialog, screen, shell } from "electron";
 import * as fs from "fs";
 import * as path from "path";
 import { dataCatolog } from "../common/data";
 import { getUUID, ICatalog, IDatabase, IPage, IProject } from "../common/interfaceDefine";
-import { getNowDateTime } from "./work";
+import { getNowDateTime, initWork } from "./work";
+const admZip = require("adm-zip");
+
 export function readProjects(): any {
     checkAppData();
     var projectsPath = path.join(appData, "projects.json");
@@ -308,7 +310,7 @@ export function newFile(args: ICatalog, wProject: IProject): any {
                     page.blueLinks = templatePage.blueLinks;
                     page.theme = templatePage.theme;
                     page.backgroundColor = templatePage.backgroundColor;
-                    
+
                 }
 
             }
@@ -373,13 +375,26 @@ export function emptyFolder(p: string) {
     }
 }
 export function readProject(wProject: IProject): any {
+    //判断是否存在，不存在则尝试打开路径上的文件
+    var projectPath = getProjectFolderPath(wProject);
+    if (!fs.existsSync(projectPath)) {
+        var zip = new admZip(wProject.path);
+        zip.extractAllTo(path.join(app.getPath("home"), ".prototyping", "work"), true);
+    }   
     //readProject
-    var navPath = path.join(getProjectFolderPath(wProject), "project.json");
-    var project = JSON.parse(fs.readFileSync(navPath).toString());
-    project.work = getProjectFolderPath(wProject);
-    project.path = wProject.path;
-    project.type = wProject.type;
-    return project;
+    try {
+        var navPath = path.join(getProjectFolderPath(wProject), "project.json");
+        var project = JSON.parse(fs.readFileSync(navPath).toString());
+        project.work = getProjectFolderPath(wProject);
+        project.path = wProject.path;
+        project.type = wProject.type;
+        return project;
+    } catch (error) {
+        dialog.showErrorBox("项目不存在","没有发现项目："+projectPath);
+    }
+    return undefined;
+   
+
 
 }
 export function saveProject(wProject: IProject): any {
