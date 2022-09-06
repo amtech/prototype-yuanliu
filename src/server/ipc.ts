@@ -275,8 +275,12 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     });
     ipcMain.on("loadMap_" + wId, (event: any, arg: any) => {
-        var result = storage.loadMap(arg);
-        bw.webContents.send("_loadMap", result);
+        try {
+            var result = storage.loadMap(arg);
+            bw.webContents.send("_loadMap", result);
+        } catch (error) {
+            console.log(error);
+        }
 
     });
     ipcMain.on("isSave_" + wId, (event: any, arg: any) => {
