@@ -3,7 +3,7 @@ Copyright (c) taoyongwen. All rights reserved.
 
 hub 通讯
 ***************************************************************************** */
-import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions, shell } from "electron";
 import * as fs from "fs";
 import { startPreview } from "../server/ipc";
 import * as storage from "../server/storage";
@@ -112,5 +112,20 @@ export function loadHubIpc(bw: BrowserWindow) {
         app.exit();
     });
 
+    ipcMain.on("show-context-menu", (event, menuItems: Array<MenuItemConstructorOptions>) => {
+
+        //contextmenu
+
+        menuItems.forEach(item => {
+
+
+            item.click = () => { event.sender.send('context-menu-command', item.id) };
+
+        });
+
+        const contextmenu: any = Menu.buildFromTemplate(menuItems)
+        contextmenu.popup(BrowserWindow.fromWebContents(event.sender))
+
+    })
 }
 

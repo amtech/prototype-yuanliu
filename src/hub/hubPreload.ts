@@ -3,7 +3,7 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染Hub页面
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { IMenuItem, openContextMenu } from "../common/contextmenu";
+import { IMenuItem, onContextMenuHub, openContextMenu, openContextMenuHub } from "../common/contextmenu";
 import { getUUID, IExtension } from "../common/interfaceDefine";
 import * as form from "../render/form";
 
@@ -25,6 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
     renderHub();
 
   });
+  onContextMenuHub();
   ipcRenderer.send("readVersion_hub");
   ipcRenderer.on("_readVersion", (event: any, arg: any) => {
     document.getElementById("version").innerText = "version:" + arg;
@@ -678,7 +679,7 @@ function renderProject(project: any, body: HTMLElement) {
       }
     ];
     e.stopPropagation();
-    openContextMenu(contextMenu);
+    openContextMenuHub(contextMenu);
   }
 
 }

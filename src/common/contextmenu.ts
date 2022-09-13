@@ -169,3 +169,46 @@ export function onContextMenu(){
        }
     })
 }
+
+
+export function openContextMenuHub(menuItems: Array<IMenuItem>,arg?:any,element?:HTMLElement) {
+
+    _contextMenuArg=arg;
+    _contextMenuElement=element;
+    _menuItems=menuItems;
+    var list: Array<MenuItemConstructorOptions> = [];
+    menuItems.forEach((item: IMenuItem) => {
+      
+        list.push({
+           
+            enabled: item.enabled,
+            visible: item.visible,
+            checked: item.checked,
+            type: item.type,
+       
+            accelerator: item.accelerator,
+
+            role: item.role,
+            id: item.id,
+            label: item.label,
+      
+
+
+        });
+    });
+   
+    ipcRenderer.send("show-context-menu", list);
+
+
+
+}
+export function onContextMenuHub(){
+    ipcRenderer.on("context-menu-command",(event,id)=>{
+    
+       var item= _menuItems.find(item=>item.id==id);
+    
+       if(item.onclick!=undefined){
+           item.onclick();
+       }
+    })
+}
