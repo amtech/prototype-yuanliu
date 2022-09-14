@@ -1156,6 +1156,13 @@ iframe {
     font-size: 18px;
 }
 
+.page_tab[selected=true] {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    box-shadow: 0px -1px 2px #999;
+    margin-top: 2px;
+}
+
 .page_tab[changed=true] .bi-dot {
     display: block;
 }
@@ -1177,7 +1184,8 @@ iframe {
 }
 
 .page_tab span {
-    white-space: nowrap
+    white-space: nowrap;
+    min-width: 80px;
 }
 
 .titleBarTap {
