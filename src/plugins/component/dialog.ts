@@ -5,7 +5,7 @@ import { IComponent } from "../../common/interfaceDefine"
         style: "",
         styles:{
             root:"background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;position:absolute;top:0;left:0;right:0;bottom:0;z-index:200;",
-            main:"color:#000;background:#fff;min-height:400px;min-width:500px;position:relative;border-radius:5px;",
+            main:"min-height:400px;min-width:500px;position:relative;border-radius:5px;",
          
         },
         onPreview: (component) => {
