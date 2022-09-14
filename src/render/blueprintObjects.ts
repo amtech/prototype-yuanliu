@@ -30,7 +30,7 @@ export const blueObjects:IBlue[]=[
     },{
         component: "page", key: "blue_page_key", name: "页面", icon: "bi bi-file-earmark-richtext", type: "page",
         events: [{ label: "加载完成", name: "onload" }],
-        properties: [{ label: "页面名称", name: "name", type: "out" },{ label: "页面位置", name: "path", type: "out" }], methods: []
+        properties: [{ label: "页面名称", name: "name", type: "out" },{ label: "页面位置", name: "path", type: "out" },{ label: "页面目录", name: "dir", type: "out" }], methods: []
     },{
         component: "hub", key: "blue_hub_key", name: "数据集", icon: "bi bi-signpost-split", type: "hub",
         events: [],

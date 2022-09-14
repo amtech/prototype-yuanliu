@@ -18,7 +18,7 @@ const component: IComponent = {
             gird = document.createElement("div")
            
         }
-        console.log(comment.children );
+ 
         if (comment.children != undefined && comment.children.length > 0) {
             var edges: {
                 icon: string;

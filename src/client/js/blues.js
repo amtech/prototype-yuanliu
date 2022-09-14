@@ -466,8 +466,14 @@ function link_Queue_cal(linkQueue, blues) {
             value = eval(fromBlue.value);
         } else if (fromBlue.type == "page") {
             var page = getCurPage();
-            console.log("page", fromBlue, from.name);
-            value = page[from.name];
+            if (from.name == "dir") {
+                console.log("page", fromBlue, from.name);
+                value = page["path"].replace(".json", "");
+            } else {
+                console.log("page", fromBlue, from.name);
+                value = page[from.name];
+            }
+
         } else if (fromBlue.type == "catalog") {
             //目录
             console.log("目录", fromBlue);
