@@ -2,22 +2,51 @@ import { IComponent } from "../../common/interfaceDefine"
 
 const component: IComponent = {
     isTemplate: true, key: "button", label: "button", icon: "bi bi-badge-tm", type: "button",
-    style: "user-select: none;display:inline-block;cursor: pointer;font-size:13px;padding: 5px 20px 5px 20px;border: 1px solid var(--theme-color);border-radius: 5px;",
+    style: "user-select: none;display: inline-block; cursor:pointer;font-size:13px;padding: 5px 10px 5px 10px;border: 1px solid var(--theme-color);border-radius: 5px;",
+    drop:"component",
+    onDrop(component, data) {
+        if(data!=undefined){
+            if(data.type=="icon"){
+                component.property.icon.context=data.icon;
+                component.onRender(component,document.getElementById(component.key));
+            }
+        }
+        console.log(data);
+    },
     onPreview: () => {
         var button = document.createElement("input");
-        button.type = "button";
+        button.type = "button"; 
         button.value = "按钮";
         return button;
     }, onRender: (component, element, content, type) => {
-        var label: HTMLElement;
-        if (element != undefined)
-            label = element;
-        else
-            label = document.createElement("div");
+        var button:HTMLElement;
       
+        if (element != undefined)
+           {
+            button = element;
+            button.innerHTML="";    
+           }
+        
+        else
+            button = document.createElement("div");
+
+        var body=document.createElement("div");
+        body.style.display="flex";
+        body.style.alignItems="center";
+        button.appendChild(body);
+        
+        if(component.property.icon!=undefined&& component.property.icon.context.length>1){
+            var icon=document.createElement("i");
+            icon.className=component.property.icon.context;
+            icon.style.paddingRight="5px";
+            body.appendChild(icon);
+        }
+        
+        var label=document.createElement("div");
+        body.appendChild(label);
         //新的
         label.innerText = component.property.text.context;
-        label.setAttribute("hover", "true");
+        button.setAttribute("hover", "true");
         if (type != "product") {
             label.ondblclick = () => {
                 var input = document.createElement("input");
@@ -58,11 +87,14 @@ const component: IComponent = {
 
         }
 
-        return { root: label, content: label };
+        return { root: button, content: button };
     }, property: {
         text: {
             label: "文本", type: "text", context: "按钮"
-        }
+        },
+        icon: {
+            label: "图标", type: "text", context: ""
+        },
     },
     blue: {
         event: {

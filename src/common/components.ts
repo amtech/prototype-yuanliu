@@ -745,6 +745,14 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             if (dragComponent.key == component.key) {
                 return;
             }
+            if (component.drop == "component") {
+                if (component.onDrop != undefined) {
+                    component.onDrop(component, dargCatalog);
+                    return;
+                }
+            }
+
+
             //调整组件位置
             //     console.log("调整组件位置", dragComponent);
             eventEle.setAttribute("dataDrag", "false");
@@ -796,6 +804,11 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                 if (previewComponent != null) {
                     previewComponent.remove();
                     previewComponent = null;
+                }
+                //如果 组件 自定义了事件，直接返回
+                if (component.onDrop != undefined) {
+                    component.onDrop(component, dragComponentTemplate);
+                    return;
                 }
                 var componentT = dargData.getData("componentTemplate")
                 if (componentT != undefined) {
