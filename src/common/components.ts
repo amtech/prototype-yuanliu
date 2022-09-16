@@ -970,6 +970,16 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                 shortcutInsertComponent(getMousePosition().x, getMousePosition().y, component, component.sort);
             } else if (e.key == "v") {
                 showComponentsOutLine();
+            } else if (e.key == "y") {
+                //隐藏组件
+                component.hidden=true;
+                if (component.toogle != undefined) {
+                    component.toogle(document.getElementById(component.key), component.hidden);
+                } else {
+                    document.getElementById(component.key).style.display =  "none";
+                }
+
+
             }
             e.stopPropagation();
         }

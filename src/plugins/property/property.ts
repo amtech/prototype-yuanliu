@@ -7,14 +7,14 @@ import { IMenuItem, openContextMenu } from "../../common/contextmenu";
 import { ICatalog, IComponent, IComponentProperty, IPanel } from "../../common/interfaceDefine";
 import { updateComponentsStyle } from "../../render/floatPanel";
 
-import { deleteComponent, onSelectComponent, updateComponent } from "../../common/components";
+import { copyStyles, deleteComponent, onSelectComponent, updateComponent } from "../../common/components";
 import { set16ToRgb } from "../../dialog/picker";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
 import { FormColor, FormComponent, FormIcon, FormIcons, FormNumber, FormNumbers, FormSelect, FormSolider, FormText } from "../../render/forms";
 import { pushHistory } from "../../render/history";
 import { cal_gradient, getComponentStyle, setComponentStyle } from "../../render/propertypanel";
-import { renderExplorer } from "../../render/sidebar";
+import { isHiddenExplorer, renderExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
 
 const panel: IPanel = {
@@ -47,6 +47,8 @@ export default function load() {
 
 
 function renderPropertypanel(content: HTMLElement) {
+
+    console.log("renderPropertypanel");
 
     var propertyPanel = document.createElement("div");
     propertyPanel.className = "propertyPanel";
@@ -88,10 +90,12 @@ var base: HTMLElement;
 var style: HTMLElement;
 var font: HTMLElement;
 function updateLayersProperty() {
-    if (layers != undefined) layers.innerHTML = "";
-    renderLayersProperty(layers);
-    //更新蓝图
-    //updateBlueView();
+    //如果 层级块时 隐藏状态 的话，不更新,
+    if (!isHiddenExplorer("层级")) {
+        if (layers != undefined) layers.innerHTML = "";
+        renderLayersProperty(layers);
+    }
+
 }
 
 function renderComponentProperty(content: HTMLElement) {
@@ -145,7 +149,7 @@ function loadComponentsProperty(component: IComponent) {
     formBaseType.update(component.type);
     formBaseLabel.update(component.label, (value) => {
         component.label = value;
-      
+
     });
     updateBaseProperty(component);
 
@@ -156,8 +160,8 @@ function loadComponentsProperty(component: IComponent) {
 
     formWidth.update(getComponentStyle(component, "width", "px"), (value) => {
         if (value == "") value = "auto";
-        if(component.type=="grid"){
-            setComponentStyle(component,"flex","none");
+        if (component.type == "grid") {
+            setComponentStyle(component, "flex", "none");
 
         }
 
@@ -190,9 +194,9 @@ function loadComponentsProperty(component: IComponent) {
 
     });
 
-    var styleDisplay=getComponentStyle(component,"display");
-    if(styleDisplay=="flex"){
-        formFlex.style.display="block";
+    var styleDisplay = getComponentStyle(component, "display");
+    if (styleDisplay == "flex") {
+        formFlex.style.display = "block";
         var valign = 0;
         var valignText = getComponentStyle(component, "justify-content", "");
         if (valignText != undefined && valignText.trim() == "start") {
@@ -206,10 +210,10 @@ function loadComponentsProperty(component: IComponent) {
             setComponentStyle(component, "justify-content", ["start", "center", "end"][index]);
             pushHistory(getCurPage());
         })
-    
+
         var halign = 0;
         var halignText = getComponentStyle(component, "align-items", "");
-    
+
         if (halignText != undefined && halignText.trim() == "flex-start") {
             halign = 0;
         } else if (halignText != undefined && halignText.trim() == "center") {
@@ -217,17 +221,17 @@ function loadComponentsProperty(component: IComponent) {
         } else if (halignText != undefined && halignText.trim() == "flex-end") {
             halign = 2;
         }
-    
-    
+
+
         formAlignV.update(halign, (index) => {
             setComponentStyle(component, "align-items", ["flex-start", "center", "flex-end"][index]);
             pushHistory(getCurPage());
         })
 
-    }else{
-        formFlex.style.display="none";
+    } else {
+        formFlex.style.display = "none";
     }
-  
+
     //
 
 
@@ -696,7 +700,7 @@ function getStyleBorder(component: IComponent): {
                 }
                 console.log(s);
                 var mc = s.match(/(rgb[^;]*)|(#[^;]*)/);
-    
+
                 if (mc != undefined && mc.length > 0) {
                     color = mc[0];
                 }
@@ -706,9 +710,9 @@ function getStyleBorder(component: IComponent): {
                 }
                 mc = s.match(/(var\([^\)]+\))/);
                 if (mc != undefined && mc.length > 0) {
-                    color =mc[0] ;
+                    color = mc[0];
                 }
-                
+
 
             } else if (s.indexOf("border-top:") >= 0) {
                 bs[0] = true;
@@ -1042,6 +1046,7 @@ function renderShortcutsProperty(context: HTMLElement) {
     form.createDivTip(body, "p", "清除内边距");
     form.createDivTip(body, "t", "背景透明");
     form.createDivTip(body, "r", "设置背景");
+    form.createDivTip(body, "y", "隐藏组件");
     form.createDivTip(body, "l", "增加或删除边框");
     form.createDivTip(body, "b", "加粗");
     form.createDivTip(body, "Backspace", "删除");
@@ -1061,7 +1066,7 @@ var formAlignH: FormIcons;
 var formAlignV: FormIcons;
 var formPadding: FormNumbers;
 var formMargin: FormNumbers;
-var formFlex:HTMLElement;
+var formFlex: HTMLElement;
 function renderLayoutProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
@@ -1084,7 +1089,7 @@ function renderLayoutProperty(context: HTMLElement) {
 
 
 
-    formFlex=document.createElement("div");
+    formFlex = document.createElement("div");
     body.appendChild(formFlex);
     formAlignH = new FormIcons("水平对齐", ["bi bi-align-start", "bi bi-align-center",
         "bi bi-align-end"]);
@@ -1156,14 +1161,14 @@ function updateBaseProperty(component: IComponent) {
             if (typeof obj == "object" && obj.type != undefined) {
                 var property: IComponentProperty = component.property[key];
                 if (property.type == "text") {
-                    form.createDivInput(body, property.label, property.context, (text: string,callKey?:string) => {
+                    form.createDivInput(body, property.label, property.context, (text: string, callKey?: string) => {
                         console.log(callKey);
 
                         component.property[callKey].context = text;
 
                         updateComponent(component);
 
-                    },undefined,key);
+                    }, undefined, key);
                 } else if (property.type == "number") {
                     form.createDivNumber(body, property.label, property.context, (text: string) => {
                         property.context = text;
@@ -1214,7 +1219,7 @@ function updateBaseProperty(component: IComponent) {
 }
 
 function renderLayersProperty(context: HTMLElement) {
-
+    console.log("renderLayersProperty");
     var layers = getLayers();
     if (layers == undefined) return;
     // console.log("layers", layers);
@@ -1308,7 +1313,7 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
                 visiable.className = "bi bi-eye-slash";
                 component.hidden = true;
             }
-     
+
             if (component.toogle != undefined) {
                 component.toogle(document.getElementById(component.key), component.hidden);
             } else {
@@ -1430,7 +1435,7 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
                 visiable.className = "bi bi-eye-slash";
                 component.hidden = true;
             }
-       
+
 
             if (component.toogle != undefined) {
                 component.toogle(document.getElementById(component.key), component.hidden);

@@ -68,7 +68,16 @@ export const blueObjects:IBlue[]=[
         ], methods: [
            
         ]
+    },{
+        component: "loadding", key: "blue_hub_loadding", name: "正在加载", icon: "bi bi-hurricane", type: "loadding",
+        events: [],
+        methods: [
+            { label: "打开", name: "open" },
+            { label: "关闭", name: "close" }
+        ]
     }
+
+    
  ]
 export function getBlueMethods():IMenuItem[]{
     var items:IMenuItem[]=[];

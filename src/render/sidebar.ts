@@ -1082,7 +1082,13 @@ function renderComponentsExplorer(content: HTMLElement) {
 
 
 }
-
+export function isHiddenExplorer(key:string){
+   
+    if(!explorerHideMap.has(key)){
+        return true;
+    }
+    return  explorerHideMap.get(key);
+}
 var explorerHideMap = new Map<string, boolean>();
 export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[]): HTMLDivElement {
     var explorer = document.createElement("div");

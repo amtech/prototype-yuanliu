@@ -1497,12 +1497,16 @@ iframe {
     z-index: 999999999999;
 } */
 
-.component_list::after {
+.component_list::before {
     content: "隐藏的组件，点击后暂时显示";
     text-align: center;
     font-size: 12px;
     margin-left: 20px;
     line-height: 30px;
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    right: 0;
     color: rgba(157, 157, 157, 0.6);
 }
 
@@ -1513,4 +1517,18 @@ iframe {
     margin-left: 20px;
     line-height: 30px;
     color: rgba(157, 157, 157, 0.6);
+}
+
+.loadding {
+    animation: loadding 1s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes loadding {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(-360deg);
+    }
 }

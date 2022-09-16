@@ -105,7 +105,7 @@ const component: IComponent = {
             } else {
 
                 var tr = document.createElement("tr");
-                tr.setAttribute("hover","true");
+               // tr.setAttribute("hover","true");
                 if (mul) {
                     var td = document.createElement("td");
                     td.style.cssText = component.styles.td;

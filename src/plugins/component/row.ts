@@ -7,8 +7,13 @@ const   component:IComponent={
     onPreview: () => {
         var row = document.createElement("div");
         return row; 
-    }, onRender: () => {
-        var row = document.createElement("div");
+    }, onRender: (component, element) => {
+        var row:HTMLElement=null;
+        if(element!=undefined){
+            row=element;
+            row.innerHTML="";
+        }else
+            row = document.createElement("div");
 
 
         return {root:row,content:row};

@@ -23,7 +23,10 @@ import { IComponent } from "../../common/interfaceDefine"
         }, onRender: (component, element,content,type) => {
             var dialog: any;
             if (element != undefined)
+               {
                 dialog = element;
+                dialog.innerHTML="";
+               }
             else
                 dialog = document.createElement("div");
             //TODO

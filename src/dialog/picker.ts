@@ -38,6 +38,7 @@ export function renderColorPicker(ele: HTMLElement, color: string, onPicker: (co
     }
     //
     picker.className = "picker";
+    picker.style.overflow="hidden";
     picker.id = "picker";
     picker.style.top = pickerTop + "px";
     picker.style.left = pickerLeft + "px";
@@ -49,10 +50,10 @@ export function renderColorPicker(ele: HTMLElement, color: string, onPicker: (co
     title.style.background=color;
     picker.appendChild(title);
 
-    var titleIcon = document.createElement("i");
-    titleIcon.className = "bi bi-palette";
-    titleIcon.style.padding = "0px 10px";
-    title.appendChild(titleIcon);
+    // var titleIcon = document.createElement("i");
+    // titleIcon.className = "bi bi-palette";
+    // titleIcon.style.padding = "0px 10px";
+    // title.appendChild(titleIcon);
 
     var titleText = document.createElement("div");
     titleText.innerHTML = color;
@@ -60,14 +61,29 @@ export function renderColorPicker(ele: HTMLElement, color: string, onPicker: (co
     titleText.style.color = "white";
     titleText.style.overflow="hidden";
     titleText.style.whiteSpace="nowrap";
+    titleText.style.textIndent="2em";
     titleText.style.flex = "1";
 
     title.appendChild(titleText);
+
+    var themeIcon = document.createElement("i");
+    themeIcon.className = "bi bi-palette";
+    themeIcon.style.padding = "0px 10px";
+    themeIcon.style.cursor="pointer";
+    themeIcon.title="主题色";
+    title.appendChild(themeIcon);
+    themeIcon.onclick = () => {
+        pickerFocus.remove();
+        onPicker("var(--theme-color)");
+
+    }
+
 
     var meterIcon = document.createElement("i");
     meterIcon.className = "bi bi-eyedropper";
     meterIcon.style.padding = "0px 10px";
     meterIcon.style.cursor="pointer";
+    meterIcon.title="拾取颜色";
     title.appendChild(meterIcon);
     meterIcon.onclick = () => {
         capture();
@@ -77,6 +93,7 @@ export function renderColorPicker(ele: HTMLElement, color: string, onPicker: (co
     nullIcon.className = "bi bi-eraser";
     nullIcon.style.padding = "0px 10px";
     nullIcon.style.cursor="pointer";
+    nullIcon.title="清空颜色";
     title.appendChild(nullIcon);
     nullIcon.onclick = () => {
         pickerFocus.remove();

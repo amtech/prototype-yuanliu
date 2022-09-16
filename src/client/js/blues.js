@@ -1,4 +1,4 @@
-import { getCurPage, renderPage, logj, renderPageByCatalogKey, updateBlueView } from "./main.js";
+import { getCurPage, renderPage, logj, renderPageByCatalogKey, updateBlueView, renderComponents } from "./main.js";
 import { findCurPageComponent, updateComponent } from "./component.js";
 import project_data from "./projectData.js";
 import pages_data from "./pagesData.js";
@@ -83,15 +83,40 @@ function createAction(link, blues, links) {
                     var toComponent = findCurPageComponent(toBlue.component);
                     var toComponentDiv = document.getElementById(toComponent.key);
                     console.log('toggle', toComponentDiv.innerText);
-                    if (toComponentDiv.style.display == undefined || toComponentDiv.style.display == "none") {
+                    if (toComponent.hidden == undefined) {
+                        toComponent.hidden = false;
+                    }
+                    toComponent.hidden = !toComponent.hidden;
+                    if (toComponent.hidden) {
+                        toComponentDiv.innerHTML = "";
+                        toComponentDiv.style.display = "none";
+                    } else {
                         if (toComponent.type == "row" || toComponent.type == "dialog") {
                             toComponentDiv.style.display = "flex";
                         } else {
                             toComponentDiv.style.display = "block";
                         }
-                    } else {
-                        toComponentDiv.style.display = "none";
+                        var rs = toComponent.onRender(toComponent, toComponentDiv);
+                        console.log("rs", rs);
+                        setTimeout(() => {
+                            renderComponents(rs.content, toComponent.children, toComponent);
+                        }, 10);
+
                     }
+
+
+                    // if (toComponentDiv.style.display == undefined || toComponentDiv.style.display == "none") {
+                    //     if (toComponent.type == "row" || toComponent.type == "dialog") {
+                    //         toComponentDiv.style.display = "flex";
+                    //     } else {
+                    //         toComponentDiv.style.display = "block";
+
+                    //         toComponent.onRender(toComponent, toComponentDiv);
+
+                    //     }
+                    // } else {
+                    //     toComponentDiv.style.display = "none";
+                    // }
                 }
             } else if (toBlue.type == "catalog") {
                 //页面导航
@@ -140,6 +165,9 @@ function createAction(link, blues, links) {
                 //链接
 
                 dowloadExcel();
+            } else if (toBlue.type == "loadding") {
+                //显示加载动画
+                showLoadding();
             }
         }
     };
@@ -798,4 +826,46 @@ function renderProperty(body, align, prop, blue) {
         row.appendChild(label);
         body.appendChild(row);
     }
+}
+
+function showLoadding() {
+    var loadding = document.createElement("div");
+    loadding.id = "loadding";
+    loadding.style.position = "fixed";
+    loadding.style.top = "0";
+    loadding.style.bottom = "0";
+    loadding.style.left = "0";
+    loadding.style.right = "0";
+    loadding.style.display = "flex";
+    loadding.style.alignItems = "center";
+    loadding.style.justifyContent = "center";
+    loadding.style.background = "rgba(0,0,0,0.5)";
+    document.body.appendChild(loadding);
+
+
+    var cure = document.createElement("div");
+    cure.className = "loadding";
+    cure.style.height = "100px";
+    cure.style.width = "100px";
+    loadding.appendChild(cure);
+    cure.style.display = "flex";
+    cure.style.alignItems = "center";
+    cure.style.justifyContent = "center";
+
+    var i = document.createElement("i");
+    i.className = "bi bi-hurricane ";
+    i.style.color = "#fff";
+    i.style.fontSize = "40px";
+    cure.appendChild(i);
+
+    setTimeout(() => { hideLoadding(); }, 2000);
+}
+
+function hideLoadding() {
+    var loadding = document.getElementById("loadding");
+    if (loadding != undefined) {
+        loadding.remove();
+    }
+
+
 }

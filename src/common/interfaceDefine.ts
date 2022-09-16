@@ -321,7 +321,7 @@ export interface IBluePoint {
 export interface IBlue {
     component: string;
     key: string;
-    type: "link" | "hub" | "page" | "project" | "component" | "method" | "variable" | "window" | "disabled" | "catalog" | "matrix" | "database"|"upload"|"download"|"date";
+    type: "link" | "hub" | "page" | "project" | "component" | "method" | "variable" | "window" | "disabled" | "catalog" | "matrix" | "database"|"upload"|"download"|"date"|"loadding";
     name: string,
     icon?: string;
     events?: IBluePoint[];
