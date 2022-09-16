@@ -87,15 +87,25 @@ export function renderBlueView(content: HTMLElement) {
         mouseX = e.clientX;
         mouseY = e.clientY;
     }
+    //双击 增加 标题
+    blueContext.ondblclick = (e) => {
+        var title: IBlue = {
+            component: "", key: getUUID(), name: "双击添加标题", icon: "", left: e.offsetX, top: e.offsetY,
+            events: [], type: "title", value: "0",
+            properties: [], methods: []
+        };
+        getCurPage().blues.push(title);
+        updateBlueView();
+    }
 
     //icon contxtmenu
     var viewContentMenu: IMenuItem[] = [
 
         {
             id: "sim",
-            label: "单变量",onclick: () => {
+            label: "单变量", onclick: () => {
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "单变量", icon: "bi bi-star", left:10,top:10,
+                    component: "", key: getUUID(), name: "单变量", icon: "bi bi-star", left: 10, top: 10,
                     events: [], type: "variable", value: "0",
                     properties: [{ label: "输出", name: "result", type: "out" }], methods: []
                 };
@@ -104,9 +114,9 @@ export function renderBlueView(content: HTMLElement) {
             }
         }, {
             id: "ax",
-            label: "矩阵变量",  onclick: () => {
+            label: "矩阵变量", onclick: () => {
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "矩阵变量", icon: "bi bi-star", left:10,top:10,
+                    component: "", key: getUUID(), name: "矩阵变量", icon: "bi bi-star", left: 10, top: 10,
                     events: [], type: "matrix", value: "[0,1,2]",
                     properties: [{ label: "输出", name: "result", type: "out" }], methods: []
                 };
@@ -120,7 +130,7 @@ export function renderBlueView(content: HTMLElement) {
             id: "if",
             label: "判断", onclick: () => {
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "判断", icon: "bi bi-question", left:10,top:10,
+                    component: "", key: getUUID(), name: "判断", icon: "bi bi-question", left: 10, top: 10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in1", type: "in" }, { label: "阈值", name: "in2", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: []
                 };
@@ -130,10 +140,10 @@ export function renderBlueView(content: HTMLElement) {
         },
         {
             id: "cat",
-            label: "拼接字符串",onclick: () => {
+            label: "拼接字符串", onclick: () => {
 
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "拼接字符串", icon: "bi bi-lg", left:10,top:10,
+                    component: "", key: getUUID(), name: "拼接字符串", icon: "bi bi-lg", left: 10, top: 10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in", type: "in" }, { label: "输入", name: "threshold", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: [],
 
@@ -144,10 +154,10 @@ export function renderBlueView(content: HTMLElement) {
         },
         {
             id: "plu",
-            label: "加法",  onclick: () => {
+            label: "加法", onclick: () => {
 
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "加法", icon: "bi bi-lg", left:10,top:10,
+                    component: "", key: getUUID(), name: "加法", icon: "bi bi-lg", left: 10, top: 10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in", type: "in" }, { label: "输入", name: "threshold", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: [],
 
@@ -161,7 +171,7 @@ export function renderBlueView(content: HTMLElement) {
             label: "乘法", onclick: () => {
 
                 var b: IBlue = {
-                    component: "", key: getUUID(), name: "乘法", icon: "bi bi-x", left:10,top:10,
+                    component: "", key: getUUID(), name: "乘法", icon: "bi bi-x", left: 10, top: 10,
                     events: [], type: "method",
                     properties: [{ label: "输入", name: "in", type: "in" }, { label: "输入", name: "threshold", type: "in" }, { label: "输出", name: "result", type: "out" }], methods: []
                 };
@@ -174,7 +184,7 @@ export function renderBlueView(content: HTMLElement) {
             id: "wind",
             label: "窗口", onclick: () => {
                 var b: IBlue = {
-                    component: "window", key: getUUID(), name: "window", icon: "bi bi-window", left:10,top:10,
+                    component: "window", key: getUUID(), name: "window", icon: "bi bi-window", left: 10, top: 10,
                     events: [], type: "window",
                     properties: [{ label: "高度", name: "innerHeight", type: "out" },
                     { label: "宽度", name: "innerWidth", type: "out" },
@@ -198,7 +208,7 @@ export function renderBlueView(content: HTMLElement) {
             }
         }, {
             id: "page",
-            label: "页面",  onclick: () => {
+            label: "页面", onclick: () => {
                 var b: IBlue = {
                     component: "page", key: "blue_page_key", name: "页面", icon: "bi bi-stars", top: 100, left: 10, type: "page",
                     events: [{ label: "加载完成", name: "onload" }],
@@ -210,10 +220,10 @@ export function renderBlueView(content: HTMLElement) {
         }
     ];
 
-    blueContext.oncontextmenu = (e) => { 
+    blueContext.oncontextmenu = (e) => {
         openContextMenu(viewContentMenu);
-       // showContextMenu(viewContentMenu, e.clientX, e.clientY, getCurPage().blues, undefined, "增加函数和对象"); 
-        e.stopPropagation(); 
+        // showContextMenu(viewContentMenu, e.clientX, e.clientY, getCurPage().blues, undefined, "增加函数和对象"); 
+        e.stopPropagation();
     };
 
 
@@ -222,11 +232,11 @@ export function renderBlueView(content: HTMLElement) {
         if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
             if (e.key == "i") {
                 openContextMenu(viewContentMenu);
-               // showContextMenu(viewContentMenu, getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数和对象");
+                // showContextMenu(viewContentMenu, getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数和对象");
 
             } else if (e.key == "f") {
                 openContextMenu(getBlueMethods());
-              //  showContextMenu(getBlueMethods(), getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数");
+                //  showContextMenu(getBlueMethods(), getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数");
 
 
 
@@ -289,12 +299,12 @@ export function renderBlueView(content: HTMLElement) {
 
         if (cmt != undefined) {
 
-            console.log("cmt", cmt);
+            // console.log("cmt", cmt);
             if (cmt.isTemplate) {
                 return;
             }
             var component = initComponent(cmt);
-            console.log("blueContext", component);
+            // console.log("blueContext", component);
             var fi = getCurPage().blues.findIndex(b => b.component == component.path);
             if (fi >= 0) {
                 return;
@@ -338,7 +348,7 @@ export function renderBlueView(content: HTMLElement) {
         var blueObjJson = e.dataTransfer.getData("blueObject");
         if (blueObjJson != undefined && blueObjJson.length > 0) {
             var blueObj: IBlue = JSON.parse(blueObjJson);
-            console.log("blueObj", blueObj);
+            //  console.log("blueObj", blueObj);
             // var fi = getCurPage().blues.findIndex(b => b.name == blueObj.name);
             // if (fi >= 0) {
             //     return;
@@ -347,7 +357,7 @@ export function renderBlueView(content: HTMLElement) {
             var top = e.offsetY;
             var left = e.offsetX;
 
-            console.log(top, left);
+            //console.log(top, left);
 
             var methods: IBluePoint[] = [
                 { label: "打开", name: "open" }
@@ -367,7 +377,7 @@ export function renderBlueView(content: HTMLElement) {
         var blueMethodJson = e.dataTransfer.getData("blueMethod");
         if (blueMethodJson != undefined && blueMethodJson.length > 0) {
             var blueMethod: IBlue = JSON.parse(blueMethodJson);
-            console.log("blueMethod", blueMethod);
+            // console.log("blueMethod", blueMethod);
 
             var top = e.offsetY;
             var left = e.offsetX;
@@ -388,7 +398,7 @@ export function renderBlueView(content: HTMLElement) {
         var blueTableJson = e.dataTransfer.getData("blueDatabase");
         if (blueTableJson != undefined && blueTableJson.length > 0) {
             var blueTable: IBlue = JSON.parse(blueTableJson);
-            console.log("blueTable", blueTable);
+            //  console.log("blueTable", blueTable);
 
             var top = e.offsetY;
             var left = e.offsetX;
@@ -465,6 +475,7 @@ function initBlueComponent(component: IComponent, top: number, left: number): IB
 
 function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): HTMLElement {
 
+    // console.log("renderBlue",blue.name);
     var div: HTMLElement = document.createElement("div");
     if (element != undefined) {
         div = element;
@@ -491,10 +502,17 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
     titleBar.className = "blueTitleBar";
     div.appendChild(titleBar);
 
+    if (blue.type == "title") {
+        titleBar.style.paddingLeft = "10px";
+        titleBar.style.paddingRight = "10px";
+
+    }
+
     var titleIcon = document.createElement("i");
     titleIcon.style.pointerEvents = "none";
     titleIcon.className = blue.icon;
-    titleBar.appendChild(titleIcon);
+    if (blue.type != "title")
+        titleBar.appendChild(titleIcon);
 
     var titleName = document.createElement("div");
     titleName.style.pointerEvents = "none";
@@ -535,43 +553,43 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
 
     })
 
+    if (blue.events != undefined)
+        blue.events.forEach(event => {
+            var row = document.createElement("div");
+            row.className = "blueRow";
 
-    blue.events.forEach(event => {
-        var row = document.createElement("div");
-        row.className = "blueRow";
+            var label = document.createElement("div");
+            label.style.flex = "1";
+            label.style.textAlign = "right";
+            label.innerText = event.label;
+            row.appendChild(label);
 
-        var label = document.createElement("div");
-        label.style.flex = "1";
-        label.style.textAlign = "right";
-        label.innerText = event.label;
-        row.appendChild(label);
+            var icon = document.createElement("i");
+            icon.className = "bi bi-record-circle";
+            row.appendChild(icon);
+            icon.style.color = "#f90";
+            icon.setAttribute("data-blue", "")
+            bodyRight.appendChild(row);
 
-        var icon = document.createElement("i");
-        icon.className = "bi bi-record-circle";
-        row.appendChild(icon);
-        icon.style.color = "#f90";
-        icon.setAttribute("data-blue", "")
-        bodyRight.appendChild(row);
-
-        //link
-        onIconLink(icon, blue, event.name, "event");
-
-
-
-    })
+            //link
+            onIconLink(icon, blue, event.name, "event");
 
 
-    blue.properties.forEach(prop => {
-        if (prop.type == undefined) {
-            renderProperty(bodyLeft, "left", prop, blue);
-            renderProperty(bodyRight, "right", prop, blue);
-        } else if (prop.type == "out") {
-            renderProperty(bodyRight, "right", prop, blue);
-        } else if (prop.type == "in") {
-            renderProperty(bodyLeft, "left", prop, blue);
-        }
 
-    })
+        })
+
+    if (blue.properties != undefined)
+        blue.properties.forEach(prop => {
+            if (prop.type == undefined) {
+                renderProperty(bodyLeft, "left", prop, blue);
+                renderProperty(bodyRight, "right", prop, blue);
+            } else if (prop.type == "out") {
+                renderProperty(bodyRight, "right", prop, blue);
+            } else if (prop.type == "in") {
+                renderProperty(bodyLeft, "left", prop, blue);
+            }
+
+        })
 
     //click
     div.onclick = (e: MouseEvent) => {
@@ -579,11 +597,37 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
         if (blue.type == "component")
             onSelectComponent(blue.component);
     }
+    //双击编辑名字
+    titleBar.ondblclick = (e) => {
+        e.stopPropagation();
+        var input = document.createElement("input");
+        input.type = "text";
+        input.value = blue.name;
+        input.onkeydown = (ky) => {
+            ky.stopPropagation();
+        }
+        titleName.innerHTML = "";
+        titleName.appendChild(input);
+        input.onchange = () => {
+            blue.name = input.value;
+        }
+        input.focus();
+        input.onclick = (oc) => {
+            oc.stopPropagation();
+        }
+        input.ondblclick = (oc) => {
+            oc.stopPropagation();
+        }
+        input.onblur = () => {
+            input.remove();
+            titleName.innerHTML = blue.name;
+        }
 
+    }
     //move
     titleBar.onmousedown = (ed: any) => {
 
-        if(ed.button != 0){
+        if (ed.button != 0) {
             return;
         }
 
@@ -670,15 +714,15 @@ function renderBlue(conotent: HTMLElement, blue: IBlue, element?: HTMLElement): 
     var titleContentMenu: IMenuItem[] = [
         {
             id: "delete",
-            label: "删除",accelerator:"Backspace", onclick: () => {
-               removeBlue(getContextMenuArg());
+            label: "删除", accelerator: "Backspace", onclick: () => {
+                removeBlue(getContextMenuArg());
             }
         }
     ];
-    titleBar.oncontextmenu = (e: MouseEvent) => { 
-            openContextMenu(titleContentMenu,blue.key);
-     //   showContextMenu(titleContentMenu, e.clientX, e.clientY, blue.key); e.stopPropagation();
-     };
+    titleBar.oncontextmenu = (e: MouseEvent) => {
+        openContextMenu(titleContentMenu, blue.key);
+        //   showContextMenu(titleContentMenu, e.clientX, e.clientY, blue.key); e.stopPropagation();
+    };
 
 
     return div;
@@ -790,7 +834,7 @@ function onIconLink(icon: HTMLElement, blue: IBlue, prop: string, type: "method"
         {
             id: "delete",
             label: "删除链接", onclick: () => {
-                var args=getContextMenuArg();
+                var args = getContextMenuArg();
                 var cBlueKey = args.blue;
                 var cProp = args.prop;
                 var cType = args.type;
@@ -805,8 +849,8 @@ function onIconLink(icon: HTMLElement, blue: IBlue, prop: string, type: "method"
         }
     ];
     icon.oncontextmenu = (e: MouseEvent) => {
-        openContextMenu(titleContentMenu,{ blue: blue.key, prop: prop, type: type });
-      //  showContextMenu(titleContentMenu, e.clientX, e.clientY, { blue: blue.key, prop: prop, type: type });
+        openContextMenu(titleContentMenu, { blue: blue.key, prop: prop, type: type });
+        //  showContextMenu(titleContentMenu, e.clientX, e.clientY, { blue: blue.key, prop: prop, type: type });
         e.stopPropagation();
     }
     //link
@@ -952,7 +996,7 @@ function getX(x: number): number {
     return x - 280;
 }
 function getY(y: number): number {
-    console.log(y);
+    //  console.log(y);
     return y - document.getElementById("workbench").clientHeight - 32 - 40 - 30 - 7;
 }
 

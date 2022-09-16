@@ -314,7 +314,17 @@ function loadComponentsProperty(component: IComponent) {
         setComponentStyle(component, "margin-left", values[3] + "px");
         pushHistory(getCurPage());
     });
+    var overview=getComponentStyle(component,"overflow");
+    var overviewVal=0;
+    if(overview==undefined){
+        overview="visible";
+    }else{
+        overviewVal= ["visible","auto","hidden"].findIndex(p=>p==overview);
+    }
 
+    formOverFlow.update(overviewVal,(index)=>{
+        setComponentStyle(component,"overflow",["visible","auto","hidden"][index]);
+    })
     //font
     formFontFamily.update(getComponentStyle(component, "font-family", ""), (value) => {
         setComponentStyle(component, "font-family", value);
@@ -1066,7 +1076,9 @@ var formAlignH: FormIcons;
 var formAlignV: FormIcons;
 var formPadding: FormNumbers;
 var formMargin: FormNumbers;
+var formOverFlow: FormIcons;
 var formFlex: HTMLElement;
+
 function renderLayoutProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
@@ -1108,7 +1120,8 @@ function renderLayoutProperty(context: HTMLElement) {
     formMargin = new FormNumbers("外边距", 4);
     formMargin.render(body);
 
-
+    formOverFlow=new FormIcons("组件溢出",["bi bi-dash-circle","bi bi-dash-circle-dotted","bi bi-dash"]);
+    formOverFlow.render(body);
 
 
 

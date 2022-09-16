@@ -82,7 +82,7 @@ function createAction(link, blues, links) {
                 if (to.name == "toggle") {
                     var toComponent = findCurPageComponent(toBlue.component);
                     var toComponentDiv = document.getElementById(toComponent.key);
-                    console.log('toggle', toComponentDiv.innerText);
+                    console.log('toggle', toComponentDiv);
                     if (toComponent.hidden == undefined) {
                         toComponent.hidden = false;
                     }
@@ -97,10 +97,14 @@ function createAction(link, blues, links) {
                             toComponentDiv.style.display = "block";
                         }
                         var rs = toComponent.onRender(toComponent, toComponentDiv);
-                        console.log("rs", rs);
-                        setTimeout(() => {
-                            renderComponents(rs.content, toComponent.children, toComponent);
-                        }, 10);
+                        //  console.log("rs", rs);
+                        if (toComponent.children != undefined && toComponent.children.length > 0)
+                            requestIdleCallback(() => {
+                                renderComponents(rs.content, toComponent.children, toComponent);
+                            });
+                        // setTimeout(() => {
+                        //     renderComponents(rs.content, toComponent.children, toComponent);
+                        // }, 100);
 
                     }
 
@@ -679,10 +683,18 @@ function renderBlue(conotent, blue, element) {
     titleBar.style.display = "flex";
     titleBar.className = "blueTitleBar";
     div.appendChild(titleBar);
+
+    if (blue.type == "title") {
+        titleBar.style.paddingLeft = "10px";
+        titleBar.style.paddingRight = "10px";
+
+    }
+
     var titleIcon = document.createElement("i");
     titleIcon.style.pointerEvents = "none";
     titleIcon.className = blue.icon;
-    titleBar.appendChild(titleIcon);
+    if (blue.type != "title")
+        titleBar.appendChild(titleIcon);
 
     var titleName = document.createElement("div");
     titleName.style.pointerEvents = "none";
@@ -712,36 +724,38 @@ function renderBlue(conotent, blue, element) {
         row.appendChild(label);
         bodyLeft.appendChild(row);
     })
-    blue.events.forEach(event => {
+    if (blue.events != undefined)
+        blue.events.forEach(event => {
 
-        var row = document.createElement("div");
-        row.className = "blueRow";
+            var row = document.createElement("div");
+            row.className = "blueRow";
 
-        var label = document.createElement("div");
-        label.style.flex = "1";
-        label.style.textAlign = "right";
-        label.innerText = event.label;
-        row.appendChild(label);
+            var label = document.createElement("div");
+            label.style.flex = "1";
+            label.style.textAlign = "right";
+            label.innerText = event.label;
+            row.appendChild(label);
 
-        var icon = document.createElement("i");
-        icon.className = "bi bi-record-circle";
-        row.appendChild(icon);
-        icon.style.color = "#f90";
-        icon.setAttribute("data-blue", "")
-        bodyRight.appendChild(row);
+            var icon = document.createElement("i");
+            icon.className = "bi bi-record-circle";
+            row.appendChild(icon);
+            icon.style.color = "#f90";
+            icon.setAttribute("data-blue", "")
+            bodyRight.appendChild(row);
 
-    })
-    blue.properties.forEach(prop => {
-        if (prop.type == undefined) {
-            renderProperty(bodyLeft, "left", prop, blue);
-            renderProperty(bodyRight, "right", prop, blue);
-        } else if (prop.type == "out") {
-            renderProperty(bodyRight, "right", prop, blue);
-        } else if (prop.type == "in") {
-            renderProperty(bodyLeft, "left", prop, blue);
-        }
+        })
+    if (blue.properties != undefined)
+        blue.properties.forEach(prop => {
+            if (prop.type == undefined) {
+                renderProperty(bodyLeft, "left", prop, blue);
+                renderProperty(bodyRight, "right", prop, blue);
+            } else if (prop.type == "out") {
+                renderProperty(bodyRight, "right", prop, blue);
+            } else if (prop.type == "in") {
+                renderProperty(bodyLeft, "left", prop, blue);
+            }
 
-    })
+        })
     return div;
 }
 

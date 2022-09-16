@@ -504,8 +504,22 @@ function copyBlue(blue) {
 export function renderComponent(content, component, parent, index) {
 
     //  console.log("----renderComponent----")
-    var rs = component.onRender(component, undefined, content, "product");
-    var root = rs.root;
+    var root = null;
+    if (component.drop != undefined) {
+        root = document.createElement("div");
+        if (content != undefined)
+            content.appendChild(root);
+    }
+
+
+
+    var rs = component.onRender(component, root, content, "product");
+    if (component.drop == undefined) {
+        root = rs.root;
+        if (content != undefined)
+            content.appendChild(root);
+    }
+
     var body = rs.content;
     if (root == undefined) {
         logj("renderComponent is undefined", "main", 476);
@@ -530,8 +544,7 @@ export function renderComponent(content, component, parent, index) {
             root.style.display = "none";
         }
     }
-    if (content != undefined)
-        content.appendChild(root);
+
     //控制层级 layer
     if (component.type == "layers") {
         root.style.padding = "0px";

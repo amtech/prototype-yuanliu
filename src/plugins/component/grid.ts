@@ -7,8 +7,13 @@ import { IComponent } from "../../common/interfaceDefine"
     onPreview: () => {
         var gird = document.createElement("div");
         return gird;
-    }, onRender: (component:IComponent) => {
-        var gird = document.createElement("div");
+    }, onRender: (component:IComponent,element:HTMLElement) => {
+        var gird:HTMLElement= null;
+        if(element!=undefined){
+            gird=element;
+            gird.innerHTML="";
+        }else
+            gird = document.createElement("div");
 
         if(component.property!=undefined&&component.property.isHost!=undefined&&component.property.isHost.context=="true"){
 

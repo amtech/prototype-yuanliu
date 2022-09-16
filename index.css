@@ -764,6 +764,7 @@ i[data-rotate]::before {
     margin: 40px;
     position: relative;
     min-height: 100px;
+    min-width: 1000px;
 }
 
 .blue {
@@ -792,6 +793,27 @@ i[data-rotate]::before {
 
 .blue {
     border: 1px solid #098;
+}
+
+.blue[data-type=title] {
+    min-height: 0px;
+    min-width: 40px;
+    border: 0px;
+    font-size: 14px;
+}
+
+.blue[data-type=title] .blueBody {
+    display: none;
+}
+
+.blue[data-type=title] .blueTitleBar {
+    background-color: initial;
+    color: initial;
+    border: 0px;
+}
+
+i {
+    user-select: none;
 }
 
 .blue[data-type=project] .blueTitleBar {

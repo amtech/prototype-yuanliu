@@ -220,6 +220,7 @@ export function loadChart(chart, component, isMap) {
                 });
 
             }
+
             chart.innerHTML = "";
             var myChart = echarts.init(chart, theme, { renderer: "svg" });
             var option;

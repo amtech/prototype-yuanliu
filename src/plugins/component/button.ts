@@ -80,7 +80,7 @@ const component: IComponent = {
             }
         }
 
-        label.onclick = () => {
+        button.onclick = () => {
             if (component.blue.event.click.on != undefined) {
                 component.blue.event.click.on();
             }

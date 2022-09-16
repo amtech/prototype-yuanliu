@@ -181,7 +181,15 @@ export function renameFile(args: { catalog: ICatalog, oldName: string, newName: 
     try {
         var p = path.join(pagesPath, pt);
         if (fs.existsSync(p)) {
-            fs.renameSync(p, path.join(pagesPath, newPath));
+            //如果新的名字与就文件一样，直接使用旧文件
+            var newPath=path.join(pagesPath, newPath);
+            if(fs.existsSync(newPath)){
+                fs.unlinkSync(p);
+            }else{
+                fs.renameSync(p, path.join(pagesPath, newPath));
+            }
+
+           
         } else {
             catalog.path = newPath;
             newFile(catalog, wProject);

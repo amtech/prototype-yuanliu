@@ -4,7 +4,7 @@ const component: IComponent = {
     isTemplate: true, key: "table", label: "table", icon: "bi bi-table", type: "table",
 
     styles: {
-        root: "text-align:center;border-top: 1px dashed rgba(175,175,175,0.5);border-left: 1px dashed rgba(175,175,175,0.5);width:100%;",
+        root: "position:absolute;width:100%;text-align:center;border-top: 1px dashed rgba(175,175,175,0.5);border-left: 1px dashed rgba(175,175,175,0.5);",
         th: "padding: 5px;border-bottom: 1px dashed rgba(175,175,175,0.5);border-right: 1px dashed rgba(175,175,175,0.5);min-width:32px; font-size:14px;",
         td: "padding: 5px;border-bottom: 1px dashed rgba(175,175,175,0.5);border-right: 1px dashed rgba(175,175,175,0.5);min-width:32px; font-size:13px;",
     },
@@ -32,13 +32,16 @@ const component: IComponent = {
         table.style.opacity = "0.7";
         return table;
     }, onRender: (component, element) => {
-        var table: any;
+        var body: any;
         if (element != undefined)
-            table = element;
+            body = element;
         else
-            table = document.createElement("table");
-        table.innerHTML = "";
+            body = document.createElement("div");
 
+        body.innerHTML = "";
+        var table=document.createElement("table");
+        table.style.width="max-content";
+        body.appendChild(table);
         var data = JSON.parse(component.option);
         var thead = document.createElement("thead");
         var tbody = document.createElement("tbody");
@@ -182,7 +185,7 @@ const component: IComponent = {
 
         table.appendChild(thead);
         table.appendChild(tbody);
-        return { root: table, content: table };
+        return { root: body, content: body };
     }, property: {
         hasHead: { label: "表头", type: "bool", context: "true", },
         hasMul: { label: "多选", type: "bool", context: "false" }
