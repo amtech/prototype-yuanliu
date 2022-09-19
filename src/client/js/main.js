@@ -30,6 +30,19 @@ window.onload = () => {
     console.log("############prototyping start############");
     document.title = project_data.name;
     document.body.style.cssText = "--theme-color:" + project_data.themeColor;
+    var hash = document.location.hash;
+    var pagType;
+    if (hash.indexOf("type=simple") > 0) {
+
+        pagType = "simple";
+        title_data.display = false;
+        nav_data.display = false;
+    } else {
+        renderHubIcon();
+
+    }
+
+
     if (title_data.display) {
         renderTitle();
     }
@@ -38,13 +51,14 @@ window.onload = () => {
         renderNav();
     }
 
-    renderHubIcon();
 
     // setInterval(() => {
     //     req();
     // }, 50);
-    var hash = document.location.hash;
     logj(hash, "main", 47);
+    if (hash.indexOf("?") > 0) {
+        hash = hash.split("?")[0];
+    }
     if (hash != undefined && hash.length > 0) {
 
         var page = pages_data.find(p => p.key == hash.substring(1));

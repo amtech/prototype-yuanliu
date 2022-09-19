@@ -209,7 +209,10 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
                 label: "新建",
             }, {
                 id: "delete",
-                label: "删除", icon: "bi bi-trash"
+                label: "删除", icon: "bi bi-trash", onclick:()=>{
+
+                  
+                }
             }, {
                 id: "rename",
                 label: "重命名",

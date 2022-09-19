@@ -8,16 +8,28 @@ const component: IComponent = {
         var gird = document.createElement("div");
         return gird;
     }, onRender: (component, element, content, type) => {
-        var iframe = document.createElement("div");
-        console.log("Iframe ",type,component);
+        var root: HTMLElement;
+        if (element != undefined)
+            root = element;
+        else
+            root = document.createElement("div");
+        root.innerHTML = "";
+
+        var iframe = document.createElement("iframe");
+
+        iframe.style.width="100%";
+        iframe.style.height="100%";
+    
+        root.appendChild(iframe);
         if (type == "product") {
             if (component.property.catalog.context != undefined && component.property.catalog.context.length > 0) {
-                
-                    
+
+
                 setTimeout(() => {
-                    renderPageByCatalogKey( component.property.catalog.context,iframe);
-                }, 2000);
-            
+                    // renderPageByCatalogKey( component.property.catalog.context,iframe);
+                    iframe.src = "#" + component.property.catalog.context+"?type=simple";
+                }, 100);
+
             }
 
 
@@ -25,7 +37,7 @@ const component: IComponent = {
 
 
         }
-        return { root: iframe, content: iframe };
+        return { root: root, content: root };
     },
     option: "",
     property: {
