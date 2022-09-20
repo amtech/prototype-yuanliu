@@ -5,7 +5,7 @@ Copyright (c) taoyongwen. All rights reserved.
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
 import { onContextMenu } from "../common/contextmenu";
-import { getUUID, IComponent, IPage, IProject } from "../common/interfaceDefine";
+import { getUUID, ICatalog, IComponent, IPage, IProject } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
 import { renderFloatPanel } from "../render/floatPanel";
 
@@ -44,6 +44,7 @@ export function renderWorkSpace(app: HTMLElement) {
         config = arg;
         app.setAttribute("data-platform", process.platform);
         app.className = config.theme;
+        renderRecent();
     });
     ipcRendererSend("readConfig");
    
@@ -59,6 +60,7 @@ export function renderWorkSpace(app: HTMLElement) {
     })
 
     ipcRenderer.on("_openPage",(event,arg:IPage)=>{
+        hideRecent();
         if(arg==undefined){
             showMessageBox("页面不存在","info");
         }else{
@@ -182,6 +184,7 @@ function layout(app: HTMLElement){
     //工作台
     var workbench = document.createElement("div");
     workbench.id = "workbench";
+    workbench.style.position="relative";
     main.appendChild(workbench);
 
     workbench.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight) + "px";
@@ -202,6 +205,11 @@ function layout(app: HTMLElement){
     tabs.style.height=tabsHeight+"px";
     tabs.style.flex="1";
     row.appendChild(tabs);
+
+    tabs.ondblclick=()=>{
+        renderRecent();
+    }
+
     //工具栏
     var tools=document.createElement("div");
     tools.id="workbench_tools";
@@ -216,6 +224,15 @@ function layout(app: HTMLElement){
     pages.style.height=(window.innerHeight - toolBarHeight - floatPanelHeight-tabsHeight) + "px";
     workbench.appendChild(row);
     workbench.appendChild(pages);
+
+    //最近使用页面
+    var recent=document.createElement("div");
+    recent.className="project_recent background";
+    recent.id="project_recent";
+    recent.style.position="absolute";
+    workbench.appendChild(recent);
+
+
     //底部栏
     var floatPanel = document.createElement("div");
     floatPanel.id="floatPanel";
@@ -383,4 +400,114 @@ function renderRightSilderBar(content: HTMLElement,h:number) {
  */
 export function showMessageBox(message:string,type:"info"|"error"|"warning"|"question"|"none"){
     ipcRendererSend("show-notification_",message);
+}
+export function hideRecent(){
+      //最近使用页面
+      var recent=document.getElementById("project_recent");
+      recent.style.display="none";
+}
+export function renderRecent(){
+
+  //最近使用页面
+    var recent=document.getElementById("project_recent");
+    recent.style.display="block";
+    recent.innerHTML="";
+    var content=document.createElement("div");
+    content.style.width="300px";
+    recent.appendChild(content);
+
+    var title=document.createElement("div");
+    title.innerHTML="最近使用";
+    title.style.lineHeight ="30px";
+    title.style.fontSize="10px";
+    title.className="project_recent_title"
+    content.appendChild(title);
+
+    var list=document.createElement("div");
+    content.appendChild(list);
+
+    ipcRenderer.on("_readProjectRecentPage",(event,recentData)=>{
+        console.log("renderRecent",recentData);
+        if(recentData.length>0){
+            for(var i=recentData.length-1;i>=0;i--){
+
+                if(recentData.length-i>8){
+                    continue;
+                }
+                var pagePath=recentData[i];
+
+                var pg:any=getPageByPath(pagePath,getProject().catalogs);
+       
+                if(pg!=undefined){
+                    var page = document.createElement("div");
+                    page.className = "explorer_file explorer_row";
+                    page.id = pg.key;
+                    page.setAttribute("data-path",pg.path);
+                    page.setAttribute("data-name",pg.name);
+                    list.appendChild(page);
+            
+                    var indent = document.createElement("div");
+                    indent.className = "indent";
+                    indent.style.width = 12+ "px";
+                    page.appendChild(indent);
+            
+                    var icon = document.createElement("i");
+                    icon.className = "bi bi-file-earmark";
+                    page.appendChild(icon);
+                    icon.style.pointerEvents="none";
+            
+            
+                    var name = document.createElement("div");
+                    name.className = "name";
+                    // name.innerText = catalog.page.name;
+                    page.appendChild(name);
+                    name.style.pointerEvents="none";
+            
+                    var nameInput = document.createElement("input");
+                    nameInput.value = pg.name;
+                    nameInput.style.pointerEvents="none";
+                    name.appendChild(nameInput);
+            
+                    var nameLabel = document.createElement("div");
+                    nameLabel.innerText = pg.name;
+                    nameLabel.style.pointerEvents="none";
+                    name.appendChild(nameLabel);
+                    page.onclick = (e: MouseEvent) => {
+                        //open page
+                        //   renderPage(catalog.page);
+                        var cp:any=e.target;
+                        console.log(cp);
+                 
+                        ipcRendererSend("openPage", {
+                            path:cp.getAttribute("data-path"),name:cp.getAttribute("data-name")
+                        });
+                      
+            
+                    }
+                }
+                
+
+            }
+
+        }
+
+    })
+    ipcRendererSend("readProjectRecentPage",null);
+
+}
+export function getPageByPath(pagePath:string,catalogs: ICatalog[]){
+    for(var index in catalogs){
+        var cl=catalogs[index];
+        
+        if(cl.path==pagePath){
+            return cl;
+         
+        }else if( cl.children!=undefined&&cl.children.length>0){
+            var p:any= getPageByPath(pagePath,cl.children);
+            if(p!=undefined){
+                return p;   
+            }
+        }
+    }
+ 
 }

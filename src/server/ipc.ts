@@ -392,7 +392,12 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
         contextmenu.popup(BrowserWindow.fromWebContents(event.sender))
 
     })
+    ipcMain.on("readProjectRecentPage_" + wId, (event, arg) => {
 
+        var recent=storage.readProjectRecentPage(wProject);
+        bw.webContents.send("_readProjectRecentPage", recent);
+
+    });
     ipcMain.on("show-notification_" + wId, (event, arg) => {
 
         var notification = new Notification({ title: arg });

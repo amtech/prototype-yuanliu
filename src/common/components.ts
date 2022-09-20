@@ -406,7 +406,10 @@ export function onSelectComponent(componentPath: string) {
  */
 export function renderComponent(content: HTMLElement, component: IComponent, dropIndex?: number, index?: number, parent?: IComponent, self?: HTMLElement): HTMLElement {
 
-
+    //如果隐藏，不渲染。
+    // if (component.hidden) {
+    //     return;
+    // }
     //设置母版
     var noMaster = true;
     if (component.master != undefined && component.master.length > 0) {

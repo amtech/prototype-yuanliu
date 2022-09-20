@@ -516,6 +516,10 @@ function copyBlue(blue) {
 }
 
 export function renderComponent(content, component, parent, index) {
+    //如果隐藏，不渲染。
+    if (component.hidden) {
+        return;
+    }
 
     //  console.log("----renderComponent----")
     var root = null;

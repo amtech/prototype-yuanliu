@@ -7,7 +7,7 @@ preload
 
 import { ipcRenderer } from "electron";
 import { getCurPageKey } from "./render/workbench";
-import { renderWorkSpace } from "./render/workspace";
+import { hideRecent, renderWorkSpace } from "./render/workspace";
 //项目窗口ID
 var wId = 0;
 // It has the same sandbox as a Chrome extension.
@@ -23,6 +23,7 @@ window.addEventListener("DOMContentLoaded", () => {
 //多项目窗口下，通讯
 export function ipcRendererSend(hannel: string, ...args: any[]): void {
   console.log("---SEND---", hannel + "_" + wId);
+
   if (hannel == "insertCover") {
     ipcRenderer.send("insertImage_" + wId);
   } else if (hannel == "insertImage") {

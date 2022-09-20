@@ -20,7 +20,7 @@ import { getKeyCode, getMousePosition } from "../render/shorcuts";
 import { activePropertyPanel } from "./propertypanel";
 import { pushHistory } from "./history";
 import { isDark } from "../dialog/picker";
-import { getProject } from "./workspace";
+import { getProject, renderRecent } from "./workspace";
 import { saveSimplePage } from "./toolbar";
 
 
@@ -216,6 +216,7 @@ function closePage(spage: IPage) {
     }
     if (pages.length == 0) {
         activePropertyPanel("project");
+        renderRecent();
     }
 
 
@@ -294,7 +295,7 @@ export function renderPage(page: IPage) {
         workbenchtabs.appendChild(pageTab);
         //tab icon
         var icon = document.createElement("i");
-        icon.className = "bi bi-file-earmark-richtext";
+        icon.className = "bi bi-file-earmark";
         pageTab.appendChild(icon);
         //tab title
         var title = document.createElement("span");

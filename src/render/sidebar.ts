@@ -849,7 +849,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         page.appendChild(indent);
 
         var icon = document.createElement("i");
-        icon.className = "bi bi-file-earmark-richtext";
+        icon.className = "bi bi-file-earmark";
         page.appendChild(icon);
 
 

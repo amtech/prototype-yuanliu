@@ -6,6 +6,7 @@ Copyright (c) taoyongwen. All rights reserved.
 import { app, dialog, screen, shell } from "electron";
 import * as fs from "fs";
 import * as path from "path";
+
 import { dataCatolog } from "../common/data";
 import { getUUID, ICatalog, IDatabase, IPage, IProject } from "../common/interfaceDefine";
 import { getNowDateTime, initWork } from "./work";
@@ -151,6 +152,7 @@ export function savePage(page: string, folder: string, wProject: IProject): any 
                 }
             }
         }
+    
     } else {
         //page key 
         var tempKey = page.match(/"key"\:"[^"]+"/)[0];//"key":"index"
@@ -158,10 +160,42 @@ export function savePage(page: string, folder: string, wProject: IProject): any 
         //删除多余的文件
         var imagesPath = path.join(getProjectFolderPath(wProject, 'images'), key);
         emptyFolder(imagesPath);
+
     }
+    //记录最近保存过得页面
+    saveRecentPage(folder,wProject);
 
 
 
+}
+/**
+ * 记录最近保存过得页面,
+ * @param pageKey     
+ */
+function saveRecentPage(folder:string, wProject: IProject){
+
+    var pro=readProject(wProject);
+    var recent=pro.recent;
+    if(recent==undefined){
+        pro.recent=[folder];
+    }else{
+        var index=pro.recent.findIndex((s:any)=>s==folder);
+        if(index>=0){
+            pro.recent.splice(index,1);
+        }
+        pro.recent.push(folder);
+        
+    }
+    saveProject(pro);
+}
+/**
+ * 
+ * @param wProject 
+ * @returns 
+ */
+export function readProjectRecentPage(wProject: IProject){
+    var pro=readProject(wProject);
+    return pro.recent;
 }
 
 /**
