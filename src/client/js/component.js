@@ -98,13 +98,12 @@ function findComponent(list, key) {
 }
 
 export function cal_catolog(catolog) {
-    var data = dataCatalog;
 
-    var item = data[catolog];
-    if (Object.prototype.toString.call(data) === '[object Object]') {
+    var item = dataCatalog[catolog];
+    if (Object.prototype.toString.call(item) === '[object Object]') {
 
         return item.x;
-    } else if (Object.prototype.toString.call(data) === '[object Array]') {
+    } else if (Object.prototype.toString.call(item) === '[object Array]') {
 
         return item;
     }

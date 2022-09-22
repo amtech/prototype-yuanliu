@@ -13,7 +13,9 @@ import { renderPageLayout } from "../../render/pageLayout";
 import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, reRenderPage } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
 import { saveSimplePage } from "../../render/toolbar";
+import { getProject, renderExpand } from "../../render/workspace";
 
+var image:HTMLImageElement;
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
 var formTheme: forms.FormIcons;
@@ -55,6 +57,24 @@ const panel: IPanel = {
         renderPageLayout();
       });
     }
+
+
+    //image
+
+    var imageDiv=document.createElement("div");
+    imageDiv.style.textAlign="center";
+    imageDiv.style.paddingTop="20px";
+    imageDiv.style.paddingBottom="20px";
+ 
+    imageDiv.style.overflow="hidden";
+    setting.appendChild(imageDiv);
+
+    image=document.createElement("img");
+    image.style.maxWidth="200px";
+    image.style.maxHeight="200px";
+    image.style.boxShadow="0px 0px 5px rgb(157 157 157 / 50%)";
+    //image.src=getProject().work+"/images/cover.png";
+    imageDiv.appendChild(image);
 
 
     var row = document.createElement("div");
@@ -157,7 +177,7 @@ const panel: IPanel = {
       return;
     }
 
-
+    image.src=getProject().work+"/images/"+getCurPage().key+".jpeg";
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
       getCurPage().height = parseFloat(value);
@@ -404,7 +424,7 @@ const panel: IPanel = {
       });
 
       function renderLayersTree(layer: IComponent) {
-        if (layer.hidden) {
+        if (layer.hidden||layer.isExpand) {
           var component_item = document.createElement("div");
           component_item.style.margin = "10px";
           component_item.style.cursor = "pointer";
@@ -416,21 +436,29 @@ const panel: IPanel = {
           component_list.appendChild(component_item);
           hiddenMap.set(layer.key,layer.hidden);
           component_item.onclick = () => {
-            var hidden=hiddenMap.get(layer.key);
-            hidden=!hidden;
-            hiddenMap.set(layer.key,hidden);
-            if (layer.toogle != undefined) {
-              layer.toogle(document.getElementById(layer.key), hidden);
-            } else {
-              document.getElementById(layer.key).style.display = hidden? "none" : "block";
-            }
-            if(!hidden){
-              component_item_icon.style.color="var(--theme-color)";
+
+            if(layer.isExpand){
+              renderExpand(layer);
+
             }else{
+              var hidden=hiddenMap.get(layer.key);
+              hidden=!hidden;
+              hiddenMap.set(layer.key,hidden);
+              if (layer.toogle != undefined) {
+                  layer.toogle(document.getElementById(layer.key), hidden);
+              } else {
+                  document.getElementById(layer.key).style.display = hidden? "none" : "block";
+              }
+              if(!hidden){
+                  component_item_icon.style.color="var(--theme-color)";
+              }else{
+              
+                  component_item_icon.style.color="";
             
-                component_item_icon.style.color="";
-          
+              }
             }
+
+          
 
           }
 

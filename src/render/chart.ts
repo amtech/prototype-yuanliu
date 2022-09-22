@@ -79,13 +79,15 @@ export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boo
 //TODO  chart option  获取 数据
 
 function cal_catolog(catolog: string) {
-    var data = getDataCatalog();
 
-    var item = data[catolog];
-    if (Object.prototype.toString.call(data) === '[object Object]') {
+    var dataCatalog = getDataCatalog();
+
+    var item = dataCatalog[catolog];
+
+    if (Object.prototype.toString.call(item) === '[object Object]') {
 
         return item.x;
-    } else if (Object.prototype.toString.call(data) === '[object Array]') {
+    } else if (Object.prototype.toString.call(item) === '[object Array]') {
 
         return item;
     }

@@ -394,7 +394,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
     })
     ipcMain.on("readProjectRecentPage_" + wId, (event, arg) => {
 
-        var recent=storage.readProjectRecentPage(wProject);
+        var recent = storage.readProjectRecentPage(wProject);
         bw.webContents.send("_readProjectRecentPage", recent);
 
     });
@@ -405,18 +405,26 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
 
     });
+
+
+
+    ipcMain.on("savePageJpeg_" + wId, (event, arg) => {
+
+        storage.savePageJpeg(arg.key, arg.data, wProject);
+
+    });
     ipcMain.on("importDataExcel_" + wId, (event, arg) => {
 
         var list = dialog.showOpenDialogSync(bw, { properties: ['openFile'], filters: [{ name: "*", extensions: ["xls", "xlsx"] }] });//filters: [{ name: "*", extensions: ["prototyping"] }] }
         if (list != undefined && list.length > 0) {
             var file = list[0];
             var database = storage.readDatabase(wProject);
-            const xlsx=require("node-xlsx");
+            const xlsx = require("node-xlsx");
             var workBook = xlsx.parse(file);
             if (workBook != undefined) {
-             
-                workBook.forEach((sheet:any)=>{
-                    if(sheet.data.length>1){
+
+                workBook.forEach((sheet: any) => {
+                    if (sheet.data.length > 1) {
                         var st: any = {
                             key: getUUID,
                             name: sheet.name,
@@ -425,7 +433,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
                         }
                         database.tables.push(st);
                     }
-                })          
+                })
                 storage.saveDatabase(database, wProject);
                 bw.webContents.send("_readDatabase", database);
             }

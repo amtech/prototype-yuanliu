@@ -829,7 +829,16 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
             curPage.children.push(component);
             //右侧面板
             //  activePropertyPanel();
-            renderComponent(page, component);
+            //如果是扩展组件
+            if(component.isExpand){
+                var expand=document.getElementById("project_expand");
+                expand.innerHTML="";
+                expand.style.display="flex";
+                renderComponent(expand, component);
+            }else{
+                renderComponent(page, component);
+            }
+
 
             pushHistory(getCurPage());
         }

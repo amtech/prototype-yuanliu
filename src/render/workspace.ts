@@ -3,7 +3,8 @@ Copyright (c) taoyongwen. All rights reserved.
 
 渲染主窗口
 ***************************************************************************** */
-import { ipcRenderer } from "electron";
+import { IpcMain, ipcRenderer } from "electron";
+import { renderComponent } from "../common/components";
 import { onContextMenu } from "../common/contextmenu";
 import { getUUID, ICatalog, IComponent, IPage, IProject } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
@@ -227,12 +228,23 @@ function layout(app: HTMLElement){
 
     //最近使用页面
     var recent=document.createElement("div");
-    recent.className="project_recent background";
+    recent.className="project_recent";
     recent.id="project_recent";
-    recent.style.position="absolute";
+
     workbench.appendChild(recent);
 
-
+    //扩展页面
+    var expand=document.createElement("div");
+    expand.className="project_expand";
+    expand.id="project_expand";
+    expand.style.position="absolute";
+    workbench.appendChild(expand);
+    // expand.ondblclick=()=>{
+    //     expand.style.display="none";
+    // }
+    expand.oncontextmenu=()=>{
+        expand.style.display="none";
+    }
     //底部栏
     var floatPanel = document.createElement("div");
     floatPanel.id="floatPanel";
@@ -424,6 +436,7 @@ export function renderRecent(){
     content.appendChild(title);
 
     var list=document.createElement("div");
+    list.style.minWidth="800px";
     content.appendChild(list);
 
     ipcRenderer.on("_readProjectRecentPage",(event,recentData)=>{
@@ -431,7 +444,7 @@ export function renderRecent(){
         if(recentData.length>0){
             for(var i=recentData.length-1;i>=0;i--){
 
-                if(recentData.length-i>8){
+                if(recentData.length-i>9){
                     continue;
                 }
                 var pagePath=recentData[i];
@@ -440,38 +453,28 @@ export function renderRecent(){
        
                 if(pg!=undefined){
                     var page = document.createElement("div");
-                    page.className = "explorer_file explorer_row";
+                    page.className = "recent_card ground";
                     page.id = pg.key;
                     page.setAttribute("data-path",pg.path);
                     page.setAttribute("data-name",pg.name);
                     list.appendChild(page);
-            
-                    var indent = document.createElement("div");
-                    indent.className = "indent";
-                    indent.style.width = 12+ "px";
-                    page.appendChild(indent);
-            
-                    var icon = document.createElement("i");
-                    icon.className = "bi bi-file-earmark";
-                    page.appendChild(icon);
-                    icon.style.pointerEvents="none";
-            
-            
-                    var name = document.createElement("div");
-                    name.className = "name";
-                    // name.innerText = catalog.page.name;
-                    page.appendChild(name);
-                    name.style.pointerEvents="none";
-            
-                    var nameInput = document.createElement("input");
-                    nameInput.value = pg.name;
-                    nameInput.style.pointerEvents="none";
-                    name.appendChild(nameInput);
-            
-                    var nameLabel = document.createElement("div");
-                    nameLabel.innerText = pg.name;
-                    nameLabel.style.pointerEvents="none";
-                    name.appendChild(nameLabel);
+                    
+                    var imageDiv=document.createElement("div");
+                    imageDiv.style.height="100px";
+                    imageDiv.style.width="200px";
+                    page.appendChild(imageDiv);
+                    imageDiv.style.backgroundImage="url("+getProject().work+"/images/"+pg.key+".jpeg"+")";
+                    imageDiv.style.backgroundSize="cover";
+                    imageDiv.style.pointerEvents="none";
+
+                    var pageTitle=document.createElement("div");
+                    pageTitle.innerHTML=pg.name;
+                    pageTitle.style.lineHeight="30px";
+                    pageTitle.style.fontSize="13px";
+                    pageTitle.style.pointerEvents="none";
+                    page.appendChild(pageTitle);
+
+
                     page.onclick = (e: MouseEvent) => {
                         //open page
                         //   renderPage(catalog.page);
@@ -510,4 +513,16 @@ export function getPageByPath(pagePath:string,catalogs: ICatalog[]){
         }
     }
  
+}
+/**
+ * 渲染扩展组件
+ * @param component 
+ */
+export function renderExpand(component:IComponent){
+    var expand=document.getElementById("project_expand");
+    expand.innerHTML="";
+    expand.style.display="flex";
+    requestIdleCallback(()=>{
+        renderComponent(expand,component);
+    })
 }

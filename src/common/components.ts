@@ -169,6 +169,7 @@ export function initComponent(componentT: IComponent, clone?: boolean): ICompone
             styles: copyStyles(componentT.styles),
             toogle: componentT.toogle,
             hidden: componentT.hidden,
+            isExpand:componentT.isExpand,
             blue: copyBlue(componentT.blue),
             sort: 0,
             edge: componentT.edge,
@@ -295,7 +296,10 @@ export function renderComponents(content: HTMLElement, components: IComponent[],
                     if (parent != undefined && parent.type == "row") {
                         component.flex = true;
                     }
-                    renderComponent(content, component, undefined, index, parent);
+                    if(component.isExpand){
+                        //初始化时，不渲染 扩展内容
+                    }else
+                     renderComponent(content, component, undefined, index, parent);
                 } catch (error) {
                     console.log(error);
                 }
@@ -405,6 +409,7 @@ export function onSelectComponent(componentPath: string) {
  * @returns 
  */
 export function renderComponent(content: HTMLElement, component: IComponent, dropIndex?: number, index?: number, parent?: IComponent, self?: HTMLElement): HTMLElement {
+ 
 
     //如果隐藏，不渲染。
     // if (component.hidden) {

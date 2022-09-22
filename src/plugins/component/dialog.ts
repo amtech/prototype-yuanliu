@@ -34,13 +34,24 @@ import { IComponent } from "../../common/interfaceDefine"
                 component.styles.root=component.styles.root.replace("position:absolute;","position:fixed;")
             }
 
+            if(component.property.focus!=undefined){
+                if(component.property.focus.context=="true"){
+                    dialog.onclick=()=>{
+                        component.hidden=true;
+                        dialog.className="";
+                        dialog.style.display="none";
+                    }
+                }
+                
+            }
           
 
 
             var main=document.createElement("div");
             main.setAttribute("data-styles","main");
+            main.className="ground";
             main.style.cssText=component.styles.main;
-            
+        //    main.onclick=(e)=>{e.stopPropagation();}
             dialog.appendChild(main);
             
        
@@ -59,9 +70,10 @@ import { IComponent } from "../../common/interfaceDefine"
             // }
           
             return {root:dialog,content:main};
-        }, property: [
+        }, property: {
+            focus:{ label: "失去焦点-关闭", type: "bool", context: "false", },
         
-        ]
+        }
         , toogle: ( element,hidden) => {
            console.log("dialog toogle");
             //TODO

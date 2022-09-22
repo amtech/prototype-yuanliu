@@ -4,19 +4,16 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染工具栏
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { IMenuItem } from "../common/contextmenu";
 import { IComponent, IPage } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
-import { getNavBar } from "./pageNav";
 import { getTitleBar } from "./pageTitle";
 import { clearDelete, getCurPage, reRenderPage } from "./workbench";
 import { getProject, showMessageBox } from "./workspace";
 
-import { activePropertyPanel } from "./propertypanel";
-import { getNowDateTime } from "../server/work";
 import { renderExport } from "../dialog/export";
+import { activePropertyPanel } from "./propertypanel";
 export function updateToolbar() {
-    if (getProject().type=="git") {
+    if (getProject().type == "git") {
 
     } else {
         document.getElementById("tool_push").remove();
@@ -127,37 +124,54 @@ export function renderToolbar(content: HTMLElement) {
 
         if (arg)
             showMessageBox("构建成功", "info");
-        else 
-        showMessageBox("构建失败", "info");
+        else
+            showMessageBox("构建失败", "info");
 
     });
 }
 export function saveSimplePage(page: IPage) {
 
     console.log("SavePage")
-    console.log("page.type is "+page.type);
+    console.log("page.type is " + page.type);
     //判断是否是title
-    if(page.type=="title"){
+    if (page.type == "title") {
         if (page.children != undefined) {
             clearDelete(page.children);
-            page.change=false;
+            page.change = false;
         }
-        getTitleBar().page=page;
+        getTitleBar().page = page;
         console.log(getTitleBar());
         //标题
         ipcRendererSend("saveTitle", JSON.stringify(getTitleBar()));
-    }else{
+    } else {
         //普通页面
         if (page.children != undefined) {
             clearDelete(page.children);
-            page.change=false;
+            page.change = false;
             var tab = document.getElementById("page_tab_" + page.key);
             if (tab != undefined) {
-                tab.setAttribute("changed","false");
+                tab.setAttribute("changed", "false");
             }
             ipcRendererSend("savePage", {
                 page: JSON.stringify(page), path: page.path
             });
+
+            //页面截图 保存
+            const domToImage = require("dom-to-image");
+            var dom = document.getElementById("page_view_" + page.key);
+            requestIdleCallback(() => {
+
+                domToImage.toJpeg(dom.getElementsByClassName("page_parent").item(0), { quality: 0.1 })
+                    .then((jpeg: any) => {
+
+                        ipcRendererSend("savePageJpeg", { key: page.key, data: jpeg });
+
+                    })
+            });
+
+
+
+
         }
     }
 }

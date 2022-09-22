@@ -15,7 +15,7 @@
             ,
         ]
  *  */
-import { find_catalog_by_key, loadBlueprint, renderBlueView } from "./blues.js";
+import { clearExpands, find_catalog_by_key, loadBlueprint, renderBlueView } from "./blues.js";
 import { getComponentTempateByType } from "./component.js";
 import nav_data from "./navData.js";
 import pages_data from "./pagesData.js";
@@ -28,6 +28,7 @@ window.onload = () => {
     // console.log(project_data);
     // console.log("dataCatalog", dataCatalog);
     console.log("############prototyping start############");
+    document.getElementById("loadding").remove();
     document.title = project_data.name;
     document.body.style.cssText = "--theme-color:" + project_data.themeColor;
     var hash = document.location.hash;
@@ -55,7 +56,7 @@ window.onload = () => {
     // setInterval(() => {
     //     req();
     // }, 50);
-    logj(hash, "main", 47);
+
     if (hash.indexOf("?") > 0) {
         hash = hash.split("?")[0];
     }
@@ -202,7 +203,7 @@ function renderNavTree(content, nav, level) {
                 console.log(c);
                 var p = pages_data.find(p => p.path == c.path);
 
-                logj(p, "main", 190);
+
                 if (p != undefined) {
                     document.location.hash = p.key;
                     renderPage(p);
@@ -227,12 +228,12 @@ function renderTitle() {
 
     if (title_data.page != undefined)
         renderComponents(title_bar, title_data.page.children);
-    requestIdleCallback(() => {
-        if (title_data.page != undefined) {
-            loadBlueprint(title_data.page.blues, title_data.page.blueLinks);
-        }
+    // requestIdleCallback(() => {
+    if (title_data.page != undefined) {
+        loadBlueprint(title_data.page.blues, title_data.page.blueLinks);
+    }
 
-    });
+    //  });
     // setTimeout(() => {
     //     if (title_data.page != undefined) {
     //         loadBlueprint(title_data.page.blues, title_data.page.blueLinks);
@@ -264,6 +265,12 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     if (pageJson == undefined) {
         return;
     }
+    //清除之前的
+    clearExpands();
+
+    //开始新的
+
+
     if (pageJson.backgroundColor != "auto" && pageJson.backgroundColor != "transparent") {
         document.getElementById("app").style.background = pageJson.backgroundColor;
     }
@@ -300,7 +307,7 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
             nav_bar.style.color = "#000";
     }
 
-    logj("renderPage", "main", 242);
+
 
     var app = document.getElementById("pageView");
     if (content != undefined) {
@@ -327,7 +334,7 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
         if (pageJson.guides != undefined && pageJson.guides.length > 0)
             renderGuide(pageJson.guides);
         loadBlueprint(pageJson.blues, pageJson.blueLinks);
-    }, 1000);
+    }, 100);
 
 }
 var guidesIndex = 0;
@@ -356,7 +363,7 @@ function renderGuide(guides) {
     guideDiv.innerHTML = "";
     if (guidesIndex < guides.length) {
         var g = guides[guidesIndex];
-        logj(g, "main", 300);
+
 
         var guideText = document.createElement("div");
         guideText.className = "guideText";
@@ -473,6 +480,10 @@ export function renderComponents(content, components, parent) {
                             component.onPreview = template.onPreview;
                             component.onRender = template.onRender;
                             component.blue = copyBlue(template.blue);
+                            //如果是扩展组件，先默认不展示
+                            if (component.isExpand) {
+                                component.hidden = true;
+                            }
                         }
                     }
                 }
@@ -515,9 +526,15 @@ function copyBlue(blue) {
     return temp;
 }
 
-export function renderComponent(content, component, parent, index) {
-    //如果隐藏，不渲染。
+export function renderComponent(content, component, parent, index, self) {
+
+    //如果隐藏，不渲染里面的内容。
     if (component.hidden) {
+        var root = document.createElement("div");
+        root.id = component.key;
+        root.className = "component_canvas";
+        if (content != undefined)
+            content.appendChild(root);
         return;
     }
 
@@ -528,10 +545,14 @@ export function renderComponent(content, component, parent, index) {
         if (content != undefined)
             content.appendChild(root);
     }
+    if (self != undefined) {
+        root = self;
+    }
 
 
 
     var rs = component.onRender(component, root, content, "product");
+
     if (component.drop == undefined) {
         root = rs.root;
         if (content != undefined)
@@ -540,12 +561,13 @@ export function renderComponent(content, component, parent, index) {
 
     var body = rs.content;
     if (root == undefined) {
-        logj("renderComponent is undefined", "main", 476);
+
         return;
     }
+    root.id = component.key;
     root.className += "component_canvas";
     root.setAttribute("component_type", component.type);
-    root.id = component.key;
+
     root.setAttribute("component_group", component.group);
 
     if (root.style != undefined && root.style.cssText.length <= 0) {
@@ -572,7 +594,7 @@ export function renderComponent(content, component, parent, index) {
 
             var layer = parseInt(parent.property.layer.context);
 
-            logj("===layer :" + layer + "," + index, "main", 515);
+
             root = document.getElementById(component.key);
             root.style.margin = "0px";
             //层级
@@ -605,13 +627,13 @@ export function renderComponent(content, component, parent, index) {
 
             } else {
                 //展示其中的一个
-                logj("--layer one--" + index === layer, "main", 548);
+
                 if (index === layer) {
-                    logj("show", "main", 550);
+
                     root.style.display = "block";
                     root.style.position = "relative";
                 } else {
-                    logj("hide", "main", 554);
+
 
                     root.style.display = "none";
                 }
@@ -619,7 +641,7 @@ export function renderComponent(content, component, parent, index) {
         }
     }
     if (component.children != undefined && component.children.length > 0) {
-        logj("renderComponent children:" + component.children.length, "main", 565);
+
 
         setTimeout(() => {
             renderComponents(body, component.children, component);
@@ -831,12 +853,6 @@ function renderCatalogTree(content, nav, level) {
             updateBlueView();
         }
     }
-}
-
-export function logj(log, file, line) {
-
-    console.log(Date.now(), file, line, log);
-
 }
 
 

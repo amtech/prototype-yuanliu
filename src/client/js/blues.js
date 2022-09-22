@@ -1,4 +1,4 @@
-import { getCurPage, renderPage, logj, renderPageByCatalogKey, updateBlueView, renderComponents } from "./main.js";
+import { getCurPage, renderPage, renderPageByCatalogKey, updateBlueView, renderComponents, renderComponent } from "./main.js";
 import { findCurPageComponent, updateComponent } from "./component.js";
 import project_data from "./projectData.js";
 import pages_data from "./pagesData.js";
@@ -10,7 +10,7 @@ import database from "./database.js";
  * @param {*} links 
  */
 export function loadBlueprint(blues, links) {
-    console.log("loadBluelink");
+    console.log("loadBlueprint");
     links.forEach(link => {
         try {
             console.log("########loadLink#######");
@@ -41,10 +41,10 @@ function blue_page(link, from, fromBlue, blues, links) {
     console.log("blue_page");
     if (from.name == "onload") {
 
-        requestIdleCallback(() => {
-            var action = createAction(link, blues, links);
-            action();
-        });
+        //   requestIdleCallback(() => {
+        var action = createAction(link, blues, links);
+        action();
+        //   });
 
         // setTimeout(() => {
 
@@ -53,7 +53,17 @@ function blue_page(link, from, fromBlue, blues, links) {
         // }, 500);
     }
 }
+var expands = [];
+export function clearExpands() {
 
+    expands.forEach(key => {
+        var ele = document.getElementById(key);
+        if (ele != undefined) {
+            ele.remove();
+        }
+    })
+
+}
 //注册事件
 function createAction(link, blues, links) {
     var action = (args) => {
@@ -81,32 +91,89 @@ function createAction(link, blues, links) {
             if (toBlue.type == "component") {
                 if (to.name == "toggle") {
                     var toComponent = findCurPageComponent(toBlue.component);
-                    var toComponentDiv = document.getElementById(toComponent.key);
-                    console.log('toggle', toComponentDiv);
-                    if (toComponent.hidden == undefined) {
-                        toComponent.hidden = false;
-                    }
-                    toComponent.hidden = !toComponent.hidden;
-                    if (toComponent.hidden) {
-                        toComponentDiv.innerHTML = "";
-                        toComponentDiv.style.display = "none";
-                    } else {
-                        if (toComponent.type == "row" || toComponent.type == "dialog") {
-                            toComponentDiv.style.display = "flex";
-                        } else {
-                            toComponentDiv.style.display = "block";
+
+                    //如果是扩展组件
+                    if (toComponent.isExpand) {
+                        if (toComponent.hidden == undefined) {
+                            toComponent.hidden = true;
                         }
-                        var rs = toComponent.onRender(toComponent, toComponentDiv);
-                        //  console.log("rs", rs);
-                        if (toComponent.children != undefined && toComponent.children.length > 0)
-                            requestIdleCallback(() => {
-                                renderComponents(rs.content, toComponent.children, toComponent);
-                            });
-                        // setTimeout(() => {
-                        //     renderComponents(rs.content, toComponent.children, toComponent);
-                        // }, 100);
+                        toComponent.hidden = !toComponent.hidden;
+                        try {
+                            document.getElementById(toComponent.key).remove();
+                        } catch (ex) {
+
+                        }
+                        console.log(toComponent.hidden);
+                        if (!toComponent.hidden) {
+
+                            renderComponent(document.getElementById("app"), toComponent);
+                        }
+                        if (expands.findIndex(p => p == toComponent.key) < 0) {
+                            expands.push(toComponent.key);
+                        }
+
+                    } else {
+                        if (toComponent.hidden == undefined) {
+                            toComponent.hidden = false;
+                            if (toComponent.type == "dialog") {
+                                toComponent.hidden = true;
+                            }
+
+                        }
+                        toComponent.hidden = !toComponent.hidden;
+                        console.log(toComponent.hidden);
+                        var toComponentDiv = document.getElementById(toComponent.key);
+                        toComponentDiv.className = "";
+                        toComponentDiv.innerHTML = "";
+
+                        renderComponent(undefined, toComponent, undefined, 0, toComponentDiv);
+                        if (!toComponent.hidden) {
+                            if (toComponent.type == "dialog" || toComponent.type == "row")
+                                toComponentDiv.style.display = "flex";
+                            else
+                                toComponentDiv.style.display = "block";
+                            var paths = hasComponentPathEach(toComponent);
+                            //
+                            setTimeout(() => {
+                                //更新 隐藏部分的blue
+                                getCurPage().blueLinks.forEach(hiddenLink => {
+                                    var hideFrom = hiddenLink.from;
+
+                                    if (hideFrom.type == "event") {
+                                        var hideFromBlue = getCurPage().blues.find(b => b.key == hideFrom.blue);
+
+                                        if (paths.indexOf(hideFromBlue.component) >= 0) {
+
+
+                                            // console.log(getCurPage().children);
+                                            if (hideFromBlue.type == "page") {
+
+                                            } else if (hideFromBlue.type == "project") {
+
+                                            } else if (hideFromBlue.type == "window") {
+
+                                            } else {
+                                                blue_component(hiddenLink, hideFrom, hideFromBlue, getCurPage().blues, getCurPage().blueLinks);
+                                            }
+
+                                        }
+
+
+                                    }
+
+                                })
+
+                                // loadBlueprint(getCurPage().blues, getCurPage().blueLinks);
+
+                            }, 100);
+                        } else {
+                            toComponentDiv.style.display = "none";
+                        }
+
 
                     }
+
+
 
 
                     // if (toComponentDiv.style.display == undefined || toComponentDiv.style.display == "none") {
@@ -867,7 +934,7 @@ function showLoadding() {
     cure.style.justifyContent = "center";
 
     var i = document.createElement("i");
-    i.className = "bi bi-hurricane ";
+    i.className = "bi bi-droplet ";
     i.style.color = "#fff";
     i.style.fontSize = "40px";
     cure.appendChild(i);
@@ -882,4 +949,16 @@ function hideLoadding() {
     }
 
 
+}
+
+
+
+function hasComponentPathEach(comonent) {
+    var paths = comonent.path;
+    if (comonent.children != undefined && comonent.children.length > 0) {
+        comonent.children.forEach(child => {
+            paths += hasComponentPathEach(child);
+        })
+    }
+    return paths;
 }

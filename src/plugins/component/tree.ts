@@ -5,7 +5,8 @@ const component: IComponent = {
     type: "tree", 
     styles: {
         root: "min-height:100px;font-size:13px;",
-    },
+        node:"border-radius:5px;"
+        },
     option: "根节点",
     onPreview: () => {
         var root = document.createElement("div");
@@ -20,7 +21,9 @@ const component: IComponent = {
             //计算tab数量
             var count = item.split(" ").length/4;
             var grid = document.createElement("div");
+       
             var row = document.createElement("div");
+            row.style.cssText=component.styles["node"];
             row.style.display="flex";
             row.style.height="32px";
             row.style.alignItems="center";

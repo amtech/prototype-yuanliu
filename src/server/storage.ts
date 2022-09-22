@@ -631,3 +631,14 @@ export function saveDatabase(database: IDatabase, wProject: IProject) {
     return fs.writeFileSync(dPath, JSON.stringify(database, null, 2));
 
 }
+
+export function savePageJpeg(key:string,data:any,wProject: IProject){
+
+    var base64Data = data.replace(/^data:image\/\w+;base64,/, "");
+    var dataBuffer = Buffer.from(base64Data, 'base64');
+    var imagePath=path.join(getProjectFolderPath(wProject,"images"),key+".jpeg");
+    fs.writeFile(imagePath,dataBuffer,()=>{
+        console.log("save page image "+key);
+    });
+
+}

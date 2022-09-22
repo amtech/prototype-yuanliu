@@ -202,6 +202,10 @@ export interface IComponent {
     * 组件选中时，右侧需要展示的面板key
     */
     panel?:string;
+    /**
+     * 是否展示在扩展栏中
+     */
+    isExpand?:boolean;
 }
 export interface IBlueEvent {
     label: string;
