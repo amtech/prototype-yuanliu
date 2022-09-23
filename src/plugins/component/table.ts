@@ -112,7 +112,7 @@ const component: IComponent = {
                 if (mul) {
                     var td = document.createElement("td");
                     td.style.cssText = component.styles.td;
-                    td.style.width = "32px";
+                    td.style.maxWidth = "32px";
                     var check = document.createElement("input");
                     check.type = "checkbox";
                     check.setAttribute("data-row", i + "");
@@ -126,6 +126,7 @@ const component: IComponent = {
                 var rowColNums = 0;
                 row.forEach((col: any) => {
                     var td = document.createElement("td");
+                    td.style.cssText = component.styles.td;
                     if (typeof (col) == "object") {
                         td.innerHTML = col.v + "";
                         if (col.c != undefined) {

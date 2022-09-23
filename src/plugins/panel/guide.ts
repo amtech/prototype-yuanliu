@@ -133,16 +133,17 @@ const panel: IPanel = {
 export default function load() {
   return panel;
 }
-
+var selectKey:string;
+var selectDiv:HTMLElement;
 const guidePanelContextMenu: IMenuItem[] = [
   {
     id: "delete",
     label: "删除",onclick:()=>{
-      // var index=getCurPage().guides.findIndex(b=>b.key==arg.key);
-      // if(index>=0){
-      //   getCurPage().guides.splice(index,1);
-      //   ele.remove();
-      // }
+      var index=getCurPage().guides.findIndex(b=>b.key==selectKey);
+      if(index>=0){
+        getCurPage().guides.splice(index,1);
+        selectDiv.remove();
+      }
 
     }
   }
@@ -178,6 +179,8 @@ function createGuide(context: HTMLElement, guide: IGuide) {
 
   }
   item.oncontextmenu = function (e) {
+     selectKey=guide.key;
+    selectDiv=item;
     openContextMenu(guidePanelContextMenu);
   }
 

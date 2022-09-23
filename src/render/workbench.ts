@@ -466,10 +466,7 @@ export function pushLayer(component: IComponent): void {
 
     getCurPage().children.push(component);
 }
-export function setScale(s: number) {
-    scale = s;
-}
-var scale = 1;
+
 /**
  *  //渲染页面工作区
  * @param content 
@@ -482,7 +479,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     console.log("renderPage");
     var curPage = p;
     content.innerHTML = "";
-    scale = 1;
+    var scale = 1;
+    if(p.scale!=undefined){
+        scale=p.scale;
+    }
     var workbench = document.createElement("div");
     workbench.className = "workbench";
     content.appendChild(workbench);
@@ -501,22 +501,14 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     var view_control = document.createElement("div");
     view_control.className = "view_control";
     workbench.appendChild(view_control);
-    var page_sacle = document.createElement("div");
-    page_sacle.className = "page_sacle";
-    page_sacle.innerHTML = "1.00";
-    view_control.appendChild(page_sacle);
-    page_sacle.onclick = (e: Event) => {
-        var scale = 1;
-        page_parent.style.transform = "scale(" + scale + ")";
-        setScale(1);
-        page_sacle.innerText = "1.00";
-    }
+  
     var pageHeight = 800;
     var pageWidth = 1200;
     if (curPage.height != undefined) pageHeight = curPage.height;
     if (curPage.width != undefined) pageWidth = curPage.width;
     //
     var page_parent = document.createElement("div");
+    page_parent.id="page_parent_"+p.key;
     page_parent.className = "page_parent " + curPage.theme;
     page_view.appendChild(page_parent);
     page_parent.style.transform = "scale(" + scale + ")";
@@ -526,8 +518,17 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         if (getKeyCode() == "Control") {
             scale += ew.deltaY / 1000;
             scale = Math.round(scale * 100) / 100;
+            if(scale<0.1){
+                scale=0.1;
+                
+            }
+            if (scale>1.1){
+                scale=1.1;
+            }
             page_parent.style.transform = "scale(" + scale + ")";
-            page_sacle.innerText = scale + "";
+            getCurPage().scale=scale;
+              //右侧面板
+            activePropertyPanel("page");
         }
     }
     //渲染标题栏

@@ -28,6 +28,7 @@ window.onload = () => {
     // console.log(project_data);
     // console.log("dataCatalog", dataCatalog);
     console.log("############prototyping start############");
+
     document.getElementById("loadding").remove();
     document.title = project_data.name;
     document.body.style.cssText = "--theme-color:" + project_data.themeColor;

@@ -18,6 +18,7 @@ import { getProject, renderExpand } from "../../render/workspace";
 var image:HTMLImageElement;
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
+var formScale:forms.FormSolider;
 var formTheme: forms.FormIcons;
 var formStyle: forms.FormSelect;
 var formBackgroundType: forms.FormIcons;
@@ -80,7 +81,7 @@ const panel: IPanel = {
     var row = document.createElement("div");
     setting.appendChild(row);
 
-    var w = form.createDivRow(row);
+    var w = form.createDivRow(row,true);
     formWidth = new forms.FormNumber("宽度");
     formWidth.render(w);
 
@@ -89,6 +90,8 @@ const panel: IPanel = {
     formHeight.render(h);
 
 
+    formScale=new forms.FormSolider("缩放",110,10,"%");
+    formScale.render(setting);
 
 
 
@@ -200,6 +203,23 @@ const panel: IPanel = {
       }
       pushHistory(getCurPage());
     });
+    var scale=100;
+    if(getCurPage().scale!=undefined){
+      scale=getCurPage().scale*100;
+      scale = Math.round(scale * 100) / 100;
+    }
+
+    formScale.update(scale,(value)=>{
+      var s=value/100;
+      s = Math.round(s * 100) / 100;
+
+      getCurPage().scale=s;
+      var div=document.getElementById("page_parent_"+getCurPage().key);
+      if(div!=undefined){
+        div.style.transform = "scale(" + s + ")";
+      }
+    })
+
     formTheme.update(getCurPage().theme == "light" ? 0 : 1, (value) => {
       var val: "light" | "dark" = "light";
       if (value == 0) {

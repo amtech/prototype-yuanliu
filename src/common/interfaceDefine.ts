@@ -252,6 +252,7 @@ export interface IPage {
     style?: string;
     styles?: any;
     change?:boolean;
+    scale?:number;
 
 }
 /**

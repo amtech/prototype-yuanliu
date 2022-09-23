@@ -540,17 +540,22 @@ export class FormSolider {
     point: HTMLElement;
     max: number; min: number;
     bg: HTMLElement;
+    unit?:string;
 
-    constructor(name: string, max: number, min: number) {
+    constructor(name: string, max: number, min: number,unit?:string) {
         this.label = name;
         this.max = max;
         this.min = min;
+        this.unit=unit;
 
     }
     onChange: (value: number) => void;
     update(value: number, onChange: (value: number) => void) {
         this.value = value;
         this.point.innerText = value + '';
+        if(this.unit!=undefined){
+            this.point.innerText += this.unit;
+        }
 
         this.point.style.left = (value - this.min) / (this.max - this.min) * this.bg.clientWidth + "px";
         this.onChange = onChange;
@@ -603,6 +608,7 @@ export class FormSolider {
         this.bg = bg;
         point.style.left = "0px";
         this.point = point;
+        
         point.onmousedown = (ed: MouseEvent) => {
             var left = parseFloat(point.style.left.replace("px", ""));
             var startX = ed.clientX;
@@ -621,6 +627,9 @@ export class FormSolider {
 
                     val = Math.round((l / bg.clientWidth) * (this.max - this.min) + this.min);
                     point.innerText = val + '';
+                    if(this.unit!=undefined){
+                        point.innerText += this.unit;
+                    }
                     this.onChange(val);
                 }
             }
