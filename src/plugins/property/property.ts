@@ -1189,11 +1189,12 @@ function updateBaseProperty(component: IComponent) {
 
                     });
                 } else if (property.type == "bool") {
-                    form.createDivBool(body, property.label, property.context, (text: string) => {
-                        property.context = text;
+                    form.createDivBool(body, property.label, property.context, (text: string,k:string) => {
+                        var p=component.property[k];
+                        p.context = text;
                         updateComponent(component);
 
-                    });
+                    },key);
                 } else if (property.type == "doc") {
                     form.createDivText(body, property.label, property.context, (text: string) => {
                         property.context = text;

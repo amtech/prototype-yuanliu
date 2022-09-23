@@ -51,7 +51,7 @@ export function loadHubIpc(bw: BrowserWindow) {
             newProject.name = path.basename(list[0],".rpj");
             newProject.path = list[0];
             newProject.modified = getDateTime(time);
-            newProject.version = "v0.0.1";
+            newProject.version = require("../../package.json").version;
             projects.push(newProject);
             storage.saveProjects(projects);
             bw.webContents.send("_readProjects", projects);

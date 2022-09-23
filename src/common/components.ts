@@ -442,9 +442,9 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     //渲染组件
     var rs;
     if (self == undefined) {
-        rs = component.onRender(component, undefined, content);
+        rs = component.onRender(component, undefined, content,"design",getProject().themeColor);
     } else {
-        rs = component.onRender(component, self, undefined);
+        rs = component.onRender(component, self, undefined,"design",getProject().themeColor);
     }
     if (component.type == "layers") {
         console.log("------------edge", component.edge);

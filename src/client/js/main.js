@@ -552,7 +552,7 @@ export function renderComponent(content, component, parent, index, self) {
 
 
 
-    var rs = component.onRender(component, root, content, "product");
+    var rs = component.onRender(component, root, content, "product", project_data.themeColor);
 
     if (component.drop == undefined) {
         root = rs.root;

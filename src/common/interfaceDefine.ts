@@ -113,7 +113,7 @@ export interface IComponent {
      * @param content 
      * @param type 
      */
-    onRender?(component: IComponent, element: HTMLElement, content?: HTMLElement, type?: "design" | "product"): { root: HTMLElement, content: HTMLElement };
+    onRender?(component: IComponent, element: HTMLElement, content?: HTMLElement, type?: "design" | "product",themeColor?:string): { root: HTMLElement, content: HTMLElement };
     /**
      * 
      * 渲染组件预览效果

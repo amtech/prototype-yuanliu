@@ -31,7 +31,7 @@ const component: IComponent = {
 
         table.style.opacity = "0.7";
         return table;
-    }, onRender: (component, element) => {
+    }, onRender: (component, element,content,type,themeColor) => {
         var body: any;
         if (element != undefined)
             body = element;
@@ -46,10 +46,57 @@ const component: IComponent = {
         var thead = document.createElement("thead");
         var tbody = document.createElement("tbody");
         // console.log(component.property);
-     
-        var showHead = component.property.hasHead.context == "true";
-        var mul = component.property.hasMul.context == "true";
+        function get16ToRgb(str:string){
+            var reg = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/
+            if(!reg.test(str)){return;}
+            let newStr = (str.toLowerCase()).replace(/\#/g,'')
+            let len = newStr.length;
+            if(len == 3){
+                let t = ''
+                for(var i=0;i<len;i++){
+                    t += newStr.slice(i,i+1).concat(newStr.slice(i,i+1))
+                }
+                newStr = t
+            }
+            let arr = []; //将字符串分隔，两个两个的分隔
+            for(var i =0;i<6;i=i+2){
+                let s = newStr.slice(i,i+2)
+                arr.push(parseInt("0x" + s))
+            }
+            return arr;
+        }
+        if(themeColor!=undefined){
+            if(themeColor.startsWith("#")){
+                var cr= get16ToRgb(themeColor);
+                thead.style.backgroundColor="rgba("+cr[0]+","+cr[1]+","+cr[2]+",0.05)";
+            }else if(themeColor.startsWith("rgba")){
+                var sp=themeColor.split(",");
+                thead.style.backgroundColor=sp[0]+","+sp[1]+","+sp[2]+",0.05)";
+            }else if(themeColor.startsWith("rgb")){
+                var sp=themeColor.split(",");
+                thead.style.backgroundColor=sp[0].replace("rgb","rgba")+","+sp[1]+","+sp[2].replace(")","")+",0.05)";
+            }
+        
+        }
+       
+       
+        
+        var showHead =false;
+        if(component.property.hasHead!=undefined){
+            showHead= component.property.hasHead.context == "true";
+        } 
+
+        var mul =false;
+        if(component.property.hasMul!=undefined){
+            mul=component.property.hasMul.context == "true";
+        } 
         var colNum = 0;
+        if(component.property.full!=undefined&&component.property.full.context=="true"){
+            table.style.width="100%";
+        }else{
+            //兼容旧版
+            component.property.full={ label: "铺满", type: "bool", context: "false" };
+        }
 
         for (var i = 0; i < data.length; i++) {
             var row = data[i];
@@ -189,7 +236,8 @@ const component: IComponent = {
         return { root: body, content: body };
     }, property: {
         hasHead: { label: "表头", type: "bool", context: "true", },
-        hasMul: { label: "多选", type: "bool", context: "false" }
+        hasMul: { label: "多选", type: "bool", context: "false" },
+        full: { label: "铺满", type: "bool", context: "false" }
     }
     , blue: {
         property: {

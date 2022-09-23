@@ -15,7 +15,7 @@ var config: any;
 window.addEventListener("DOMContentLoaded", () => {
   //theme
   var app = document.getElementById("app");
-  if(app != undefined){
+  if (app != undefined) {
     app.setAttribute("data-platform", process.platform);
   }
   ipcRenderer.send("readConfig_hub");
@@ -28,11 +28,11 @@ window.addEventListener("DOMContentLoaded", () => {
   onContextMenuHub();
   ipcRenderer.send("readVersion_hub");
   ipcRenderer.on("_readVersion", (event: any, arg: any) => {
-    document.getElementById("version").innerText = "version:" + arg;
+    document.getElementById("version").innerText = "yuanliu : " + arg;
   });
 
   if (process.platform != "darwin") {
-    const toolbar=require("../render/toolbar");
+    const toolbar = require("../render/toolbar");
     toolbar.renderWin32TitleBar(() => {
       ipcRenderer.send("min_hub");
     }, () => {
@@ -40,22 +40,22 @@ window.addEventListener("DOMContentLoaded", () => {
     }, () => {
       ipcRenderer.send("close_hub");
     });
-   
-  }else{
+
+  } else {
     ipcRenderer.on("touchBar_back", (event: any, arg: any) => {
-  
-       goBack();
+
+      goBack();
     });
     ipcRenderer.on("touchBar_open", (event: any, arg: any) => {
       ipcRenderer.send("openPeojectBackpage_hub");
 
     });
     ipcRenderer.on("touchBar_new", (event: any, arg: any) => {
-    
+
       onNewProject();
     });
     ipcRenderer.on("touchBar_git", (event: any, arg: any) => {
-   
+
       onGitProject();
     });
   }
@@ -172,17 +172,17 @@ function goBack() {
   }
 
 }
-function onNewProject(){
+function onNewProject() {
   renderView({
     label: "新建项目", taps: [
-     
+
       {
         label: "创建", icon: "bi bi-plus-circle", onTap: () => {
           if (newProject != undefined) {
             if (newProject.name != undefined && newProject.path != undefined) {
               newProject.path += "/" + newProject.name + ".rpj";
               newProject.modified = getNowDateTime();
-              newProject.version = "v0.0.1";
+              newProject.version = require("../../package.json").version;;
               newProject.type = "local";
               projects.push(newProject);
               ipcRenderer.send("saveProjects_hub", projects);
@@ -201,10 +201,10 @@ function onNewProject(){
 
   })
 }
-function onGitProject(){
+function onGitProject() {
   renderView({
     label: "git仓库克隆", taps: [
-     
+
       {
         label: "创建", icon: "bi bi-cloud-download", onTap: () => {
           if (newProject != undefined) {
@@ -212,7 +212,7 @@ function onGitProject(){
 
               newProject.modified = getNowDateTime();
               newProject.type = "git";
-              newProject.version = "v0.0.1";
+              newProject.version = require("../../package.json").version;
               ipcRenderer.send("cloneProject_hub", newProject);
               ipcRenderer.removeAllListeners("_cloneProject_hub");
               ipcRenderer.on("_cloneProject_hub", (event: any, arg: any) => {
@@ -274,19 +274,19 @@ const sideNavs = [{
 
 
 {
-  label: "学习", icon: "bi bi-puzzle-fill",onTap: () => {
-    renderView({ label: "学习", taps: [] ,color:"#f09"}, (content) => {
+  label: "学习", icon: "bi bi-puzzle-fill", onTap: () => {
+    renderView({ label: "学习", taps: [], color: "#f09" }, (content) => {
       var page = document.createElement("div");
       content.appendChild(page);
 
       page.style.padding = "20px";
 
-    
+
       renderExtensions(page);
 
     });
   }
-},{
+}, {
   label: "社区", icon: "bi bi-exclude", onTap: () => {
     // renderView({ label: "社区", taps: [], color: "#f90" }, (content) => {
     // },"https://www.violetime.com")
@@ -297,119 +297,123 @@ const sideNavs = [{
 function renderExtensions(content: HTMLElement) {
 
   //签名
-  form.createDivInput(content, "搜索", "", (value: string) => { 
-    searchExtensions(list,value);
+  form.createDivInput(content, "搜索", "", (value: string) => {
+    searchExtensions(list, value);
   });
   content.appendChild(document.createElement("br"));
   content.appendChild(document.createElement("br"));
 
- 
 
 
-  var list=document.createElement("div");
+
+  var list = document.createElement("div");
   content.appendChild(list);
-  
+
   requestIdleCallback(() => {
-    const request=require("request");
-    request.get("https://www.violetime.com/extensions.json",(err:any,res:any,body:any)=>{
- 
-      extensions=eval(body);
+    const request = require("request");
+    request.get("https://www.violetime.com/extensions.json", (err: any, res: any, body: any) => {
+
+      extensions = eval(body);
       searchExtensions(list);
-    },{json:true});
- 
+    }, { json: true });
+
   });
 
- 
+
 
 }
-var extensions:Array<IExtension>=[]
-function searchExtensions(content: HTMLElement,searchText?:string) {
- 
+var extensions: Array<IExtension> = []
+function searchExtensions(content: HTMLElement, searchText?: string) {
 
-  var list:Array<IExtension>=[];
-  if(searchText==undefined||searchText.length==0){
-    list=extensions;
-  }else{
-    list=extensions.filter(item=>{item.label.indexOf(searchText)>-1});
+
+  var list: Array<IExtension> = [];
+  if (searchText == undefined || searchText.length == 0) {
+    list = extensions;
+  } else {
+    list = extensions.filter(item => { item.label.indexOf(searchText) > -1 });
   }
 
-  content.innerHTML="";
+  content.innerHTML = "";
 
-  list.forEach(item=>{
-    var row=document.createElement("div");
-    row.className="ex_row";
-    row.onclick=()=>{
+  list.forEach(item => {
+    var row = document.createElement("div");
+    row.className = "ex_row";
+    row.onclick = () => {
 
-      renderView({label: item.label,icon:item.icon, taps: [{icon:"bi bi-download",label:"安装",onTap:()=>{
+      renderView({
+        label: item.label, icon: item.icon, taps: [{
+          icon: "bi bi-download", label: "安装", onTap: () => {
 
-      }}], color: "#f90" }, (itemContent) => {
-        itemContent.style.padding="0px 20px 0px 20px";
-        const request=require("request");
-        request.get(item.readmeUrl,(err:any,res:any,body:any)=>{
+          }
+        }], color: "#f90"
+      }, (itemContent) => {
+        itemContent.style.padding = "0px 20px 0px 20px";
+        const request = require("request");
+        request.get(item.readmeUrl, (err: any, res: any, body: any) => {
           const markdown = require("markdown").markdown;
-         // arg = arg.replaceAll("![image](", "![image](./markdown/");
-         itemContent.innerHTML = markdown.toHTML(body);
+          // arg = arg.replaceAll("![image](", "![image](./markdown/");
+          itemContent.innerHTML = markdown.toHTML(body);
 
         });
 
-     
+
 
       });
 
     }
-   
 
-    var icon=document.createElement("div");
-    icon.className="ex_icon";
+
+    var icon = document.createElement("div");
+    icon.className = "ex_icon";
     row.appendChild(icon);
 
-    var i=document.createElement("i");
-    i.className=item.icon;
+    var i = document.createElement("i");
+    i.className = item.icon;
     icon.appendChild(i);
 
-    var context=document.createElement("div");
-    context.className="ex_context";
+    var context = document.createElement("div");
+    context.className = "ex_context";
     row.appendChild(context);
 
-    var label=document.createElement("div");
-    label.className="ex_label";
-    label.innerText=item.label;
+    var label = document.createElement("div");
+    label.className = "ex_label";
+    label.innerText = item.label;
     context.appendChild(label);
 
-    var discription=document.createElement("div");
-    discription.className="ex_discription";
-    discription.innerText=item.discription;
+    var discription = document.createElement("div");
+    discription.className = "ex_discription";
+    discription.innerText = item.discription;
     context.appendChild(discription);
 
-    var botttom=document.createElement("div");
-    botttom.className="ex_bottom";
+    var botttom = document.createElement("div");
+    botttom.className = "ex_bottom";
     context.appendChild(botttom);
 
-    var at=document.createElement("i");
-    at.className="bi bi-at";
+    var at = document.createElement("i");
+    at.className = "bi bi-at";
     botttom.appendChild(at);
 
-    var author=document.createElement("div");
-    author.className="ex_author";
-    author.innerText=item.author;
+    var author = document.createElement("div");
+    author.className = "ex_author";
+    author.innerText = item.author;
     botttom.appendChild(author);
 
-    var space=document.createElement("div");
-    space.className="ex_space";
+    var space = document.createElement("div");
+    space.className = "ex_space";
     botttom.appendChild(space);
 
-    var count=document.createElement("div");
-    count.className="ex_count";
-    count.innerText=item.count+"";
+    var count = document.createElement("div");
+    count.className = "ex_count";
+    count.innerText = item.count + "";
     botttom.appendChild(count);
 
 
-    var button=document.createElement("i");
+    var button = document.createElement("i");
     botttom.appendChild(button);
-    if(item.installed){
-      button.className="bi bi-trash ex_button";
-    }else{
-      button.className="bi bi-download ex_button";
+    if (item.installed) {
+      button.className = "bi bi-trash ex_button";
+    } else {
+      button.className = "bi bi-download ex_button";
     }
 
     content.appendChild(row);
@@ -544,7 +548,7 @@ function renderProjects(content: HTMLElement) {
 
   var headModify = document.createElement("div");
   headModify.className = "head_modify";
-  headModify.innerText = "修改日期";
+  headModify.innerText = "创建时间";
   projectHead.appendChild(headModify);
 
 
@@ -583,14 +587,14 @@ function renderProject(project: any, body: HTMLElement) {
   projectHead.className = "project_row";
   body.appendChild(projectHead);
 
-  projectHead.ondblclick = () => { 
-    
+  projectHead.ondblclick = () => {
+
     ipcRenderer.send("openProject_hub", project);
-    document.getElementById("open_project_process").style.display="flex";
+    document.getElementById("open_project_process").style.display = "flex";
     setTimeout(() => {
-      document.getElementById("open_project_process").style.display="none";
+      document.getElementById("open_project_process").style.display = "none";
     }, 2000);
-  
+
   }
 
   var headCheck = document.createElement("div");
@@ -657,9 +661,9 @@ function renderProject(project: any, body: HTMLElement) {
         id: "editor",
         label: "编辑", icon: "bi bi-backspace-reverse", accelerator: "dbclick", onclick: () => {
           ipcRenderer.send("openProject_hub", project);
-          document.getElementById("open_project_process").style.display="flex";
+          document.getElementById("open_project_process").style.display = "flex";
           setTimeout(() => {
-            document.getElementById("open_project_process").style.display="none";
+            document.getElementById("open_project_process").style.display = "none";
           }, 2000);
         }
 
@@ -685,7 +689,7 @@ function renderProject(project: any, body: HTMLElement) {
 }
 var projects: Array<any> = []
 
-function renderView(title: { label: string, taps: { label: string, icon: string, onTap(): void }[], image?: string, color?: string,icon?:string}, render: (content: HTMLElement) => void,url?:string) {
+function renderView(title: { label: string, taps: { label: string, icon: string, onTap(): void }[], image?: string, color?: string, icon?: string }, render: (content: HTMLElement) => void, url?: string) {
   var views = document.getElementById("views");
   if (views != undefined) {
     //  views.innerHTML = "";
@@ -695,26 +699,26 @@ function renderView(title: { label: string, taps: { label: string, icon: string,
 
     var view = document.createElement("div");
     view.className = "view";
-    console.log("url",url);
+    console.log("url", url);
 
-    if(url!=undefined){ 
-      var iframe=document.createElement("iframe");
-      iframe.src=url;
-      iframe.style.border='0';
-      iframe.style.width='100%';
-      iframe.style.height='100%';
+    if (url != undefined) {
+      var iframe = document.createElement("iframe");
+      iframe.src = url;
+      iframe.style.border = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
       view.appendChild(iframe);
-      view.style.overflow="hidden";
+      view.style.overflow = "hidden";
       views.appendChild(view);
-    }else{
+    } else {
 
       var titleBar = document.createElement("div");
       titleBar.className = "title_bar";
       titleBar.style.userSelect = "none";
       titleBar.style.position = "sticky";
       titleBar.style.top = "-60px";
-  
-  
+
+
       if (title.image != undefined) {
         titleBar.style.backgroundImage = "url(" + title.image + ")";
         setTimeout(() => {
@@ -722,57 +726,59 @@ function renderView(title: { label: string, taps: { label: string, icon: string,
             titleBar.style.color = c;
           });
         }, 10);
-  
+
       }
       if (title.color != undefined) {
         titleBar.style.backgroundColor = title.color;
         titleBar.style.color = "white";
       }
-  
+
       view.appendChild(titleBar);
 
-      if(title.icon!=undefined){
-        var titleIcon=document.createElement("i");
-        titleIcon.className=title.icon;
+      if (title.icon != undefined) {
+        var titleIcon = document.createElement("i");
+        titleIcon.className = title.icon;
         titleIcon.style.position = "sticky";
         titleIcon.style.top = "10px";
-        titleIcon.style.padding="0px 10px 0px 20px";
-        titleIcon.style.fontSize="30px";
+        titleIcon.style.padding = "0px 10px 0px 20px";
+        titleIcon.style.fontSize = "30px";
         titleBar.appendChild(titleIcon);
       }
-  
-  
+
+
       var titleLabel = document.createElement("div");
       titleLabel.className = "view_title";
       titleLabel.style.position = "sticky";
       titleLabel.style.top = "10px";
       titleBar.appendChild(titleLabel);
-  
+
       var flex = document.createElement("div");
       flex.style.flex = "1";
       titleBar.appendChild(flex);
-  
+
       var titleTaps = document.createElement("div");
       titleTaps.style.position = "sticky";
       titleTaps.style.top = "10px";
       titleTaps.className = "title_taps";
       titleBar.appendChild(titleTaps);
-  
-  
+
+
       if (title.label != undefined) {
-  
+
         titleLabel.innerText = title.label;
-  
+
       }
-      if( title.taps==undefined){
-        title.taps=[];
+      if (title.taps == undefined) {
+        title.taps = [];
       }
-      title.taps.splice(0,0,{label:"返回",icon:"bi bi-arrow-90deg-left",onTap:()=>{
-        view.remove();
-      }});
+      title.taps.splice(0, 0, {
+        label: "返回", icon: "bi bi-arrow-90deg-left", onTap: () => {
+          view.remove();
+        }
+      });
       if (title.taps != undefined) {
         title.taps.forEach(tap => {
-  
+
           var tapDiv = document.createElement("div");
           tapDiv.className = "title_tap";
           tapDiv.title = tap.label;
@@ -784,14 +790,14 @@ function renderView(title: { label: string, taps: { label: string, icon: string,
             tapDiv.innerText = tap.label;
           }
           titleTaps.appendChild(tapDiv);
-  
+
           tapDiv.onclick = () => {
             tap.onTap();
           }
-  
+
         })
       }
-  
+
       var content = document.createElement("div");
       view.appendChild(content);
       views.appendChild(view);
@@ -800,9 +806,9 @@ function renderView(title: { label: string, taps: { label: string, icon: string,
 
 
 
-  
 
-   
+
+
 
   }
 

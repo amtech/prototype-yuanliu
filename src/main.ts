@@ -26,6 +26,8 @@ function createWindow(project: any) {
     titleBarStyle: "hidden",
     transparent: process.platform === "darwin"?true:false,
     show: false,
+    minWidth:1000,
+    minHeight:600,
   });
 
   // and load the index.html of the app.
@@ -100,6 +102,8 @@ function createHub() {
 
   var mainWindow: BrowserWindow = new BrowserWindow({
     height: 600,
+    minHeight:500,
+    minWidth:700,
     webPreferences: {
       preload: path.join(__dirname, "./hub/hubPreload.js"),
     },

@@ -573,9 +573,10 @@ export function createDivIconTap(content: HTMLElement, icons: string[], values: 
 
 }
 
-export function createDivBool(content: HTMLElement, name: string, values: string, onChange: (value: any) => void) {
+export function createDivBool(content: HTMLElement, name: string, values: string, onChange: (value: any,key?:string) => void,key?:string) {
 
    var div = document.createElement("div");
+
    div.style.marginTop = "5px";
    div.style.display = "flex";
    div.style.height = "20px";
@@ -610,17 +611,19 @@ export function createDivBool(content: HTMLElement, name: string, values: string
    icon.style.marginLeft = "10px";
    icon.style.marginTop = "2px";
    iconDiv.appendChild(icon);
-
+   icon.setAttribute("data-key",key);
    iconDiv.style.overflow = "hidden";
 
    div.appendChild(iconDiv);
-   icon.onclick = () => {
+   icon.onclick = (e) => {
+      var i:any=e.target;
+      var k=i.getAttribute("data-key");
       if (icon.className == "bi bi-toggle-on") {
          icon.className = "bi bi-toggle-off";
-         onChange("false");
+         onChange("false",k);
       } else {
          icon.className = "bi bi-toggle-on";
-         onChange("true");
+         onChange("true",k);
       }
    }
 
