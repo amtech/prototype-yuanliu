@@ -426,7 +426,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
                 workBook.forEach((sheet: any) => {
                     if (sheet.data.length > 1) {
                         var st: any = {
-                            key: getUUID,
+                            key: getUUID(),
                             name: sheet.name,
                             columns: [],
                             data: sheet.data
