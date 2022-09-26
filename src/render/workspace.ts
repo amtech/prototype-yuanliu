@@ -240,7 +240,7 @@ function layout(app: HTMLElement) {
     pages.className = "workbench_pages";
     pages.id = "workbench_pages";
     pages.style.position = "relative";
-    pages.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - tabsHeight) + "px";
+    pages.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - tabsHeight-statusBarHeight) + "px";
     workbench.appendChild(row);
     workbench.appendChild(pages);
 
@@ -283,113 +283,7 @@ function layout(app: HTMLElement) {
         loadProjectTitleNav();
     });
 }
-/**
- * 渲染主窗口
- * @param app 
- */
-function render(app: HTMLElement) {
 
-    app.className = config.theme;
-    //标题工具栏
-    var toolBarHeight: number = 32;//60;
-    var toolBar = document.createElement("div");
-
-    toolBar.style.height = toolBarHeight + "px";
-    toolBar.style.position = "fixed";
-    toolBar.style.width = "100%";
-    toolBar.style.overflow = "hidden";
-    // toolBar.style.top="0px";
-    app.appendChild(toolBar);
-    var flex = document.createElement("div");
-    flex.style.display = "flex";
-    flex.style.position = "fixed";
-    flex.style.inset = toolBarHeight + "px 0px 0px";
-
-
-    app.appendChild(flex);
-    //侧边栏
-    var sideBar = document.createElement("div");
-    flex.appendChild(sideBar);
-
-
-    var main = document.createElement("div");
-    main.id = "main";
-    main.style.flex = "1";
-    flex.appendChild(main);
-
-    var floatPanelHeight = 210;
-    //工作台
-    var workbench = document.createElement("div");
-    workbench.id = "workbench";
-    main.appendChild(workbench);
-
-    workbench.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight) + "px";
-
-    var tabsHeight = 32;
-
-    var row = document.createElement("div");
-
-    row.style.display = "flex";
-    row.style.height = tabsHeight + "px";
-
-    //多标签页面
-    var tabs = document.createElement("div");
-    tabs.className = "workbench_tabs";
-    tabs.id = "workbench_tabs";
-    tabs.style.display = "flex";
-    tabs.style.userSelect = "none";
-    tabs.style.height = tabsHeight + "px";
-    tabs.style.flex = "1";
-    row.appendChild(tabs);
-    //工具栏
-    var tools = document.createElement("div");
-    tools.id = "workbench_tools";
-    tools.style.display = "flex";
-    tools.style.height = tabsHeight + "px";
-    row.appendChild(tools);
-    //多标签页面
-    var pages = document.createElement("div");
-    pages.className = "workbench_pages";
-    pages.id = "workbench_pages";
-    pages.style.position = "relative";
-    pages.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - tabsHeight) + "px";
-    workbench.appendChild(row);
-    workbench.appendChild(pages);
-
-
-    //底部栏
-    var floatPanel = document.createElement("div");
-    floatPanel.id = "floatPanel";
-    main.appendChild(floatPanel);
-
-    floatPanel.style.height = floatPanelHeight + "px";
-
-
-
-    renderRightSilderBar(flex, window.innerHeight - toolBarHeight);
-    //右侧属性栏
-    var propertyPanel = document.createElement("div");
-    flex.appendChild(propertyPanel);
-
-
-
-    renderToolbar(toolBar);
-
-
-    renderSidebar(sideBar);
-
-
-    loadProjectTitleNav();
-
-    setTimeout(() => {
-        renderPropertyPanel(propertyPanel);
-        renderFloatPanel(floatPanel);
-    }, 500);
-
-
-
-
-}
 /**
  * 渲染左侧边栏 滚动条
  * @param content 

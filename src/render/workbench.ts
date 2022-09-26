@@ -16,7 +16,7 @@ import { updateBlueView } from "./blueprint";
 import * as dargData from "./DragData";
 import { INavItem, renderNavTrees } from "./pageNav";
 import { renderTitleBar } from "./pageTitle";
-import { getKeyCode, getMousePosition } from "../render/shorcuts";
+import { getKeyCode, getMousePosition, getShiftKeyDown } from "../render/shorcuts";
 import { activePropertyPanel } from "./propertypanel";
 import { pushHistory } from "./history";
 import { isDark } from "../dialog/picker";
@@ -586,8 +586,9 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         workbench.appendChild(ruler_top);
         var ruler_view = document.createElement("div");
         ruler_view.className = "ruler_view";
+        ruler_view.style.left="100px";
         ruler_top.appendChild(ruler_view);
-        for (var r = -100; r <= pageWidth + 200; r += 50) {
+        for (var r = 0; r <= pageWidth + 200; r += 50) {
             var ruler_px = document.createElement("div");
             ruler_px.className = "ruler_px";
             ruler_px.innerText = r + "";
@@ -600,10 +601,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         workbench.appendChild(ruler_left);
         var ruler_view1 = document.createElement("div");
         ruler_view1.className = "ruler_view_left";
-        // ruler_view1.id = "ruler_view_left";
-        ruler_view1.style.top = (-ruler_width) + "px";
+
+        ruler_view1.style.top = (100-ruler_width) + "px";
         ruler_left.appendChild(ruler_view1);
-        for (var r = -100; r <= pageHeight + 100; r += 50) {
+        for (var r =0; r <= pageHeight + 100; r += 50) {
             var ruler_px = document.createElement("div");
             ruler_px.className = "ruler_px_left";
             ruler_px.innerText = r + "";
@@ -612,16 +613,134 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     }
 
     //页面滚动，标尺跟着滚动
-    page_view.onscroll = (e: Event) => {
-        //  var ruler_view = document.getElementById("ruler_view");
-        if (ruler_view != undefined) {
-            ruler_view.style.left = (-page_view.scrollLeft) + "px";
+ 
+    var sroll_h = document.createElement("div");
+    sroll_h.className = "sroll_h";
+    workbench.appendChild(sroll_h);
+    var sroll_h_block = document.createElement("div");
+    sroll_h_block.className = "sroll_h_block";
+    sroll_h.appendChild(sroll_h_block);
+
+    var sroll_h_block_w = page_view.clientWidth * page_view.clientWidth / (p.width + 200);
+    var sroll_h_rate = ((p.width + 200) - page_view.clientWidth) / (page_view.clientWidth - sroll_h_block_w);
+    sroll_h_block.style.width = sroll_h_block_w + "px";
+    sroll_h_block.style.left = 0 + "px";
+    var sroll_h_block_m = false;
+    sroll_h_block.onmousedown = (e) => {
+        var lb = parseFloat(sroll_h_block.style.left.replace("px", ""));
+        var eb = e.clientX;
+        sroll_h_block_m = true;
+        document.onmousemove = (em) => {
+            if (sroll_h_block_m) {
+                var le = em.clientX - eb + lb;
+                if (le <= 0) {
+                    le = 0;
+                }
+                if (le > page_view.clientWidth - sroll_h_block_w) {
+                    le = page_view.clientWidth - sroll_h_block_w;
+                }
+                page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
+                sroll_h_block.style.left = le + "px";
+                if (ruler_view != undefined) {
+                    ruler_view.style.left =    page_parent.style.left;
+                }
+            }
         }
-        //   var ruler_view_left = document.getElementById("ruler_view_left");
-        if (ruler_view1 != undefined) {
-            ruler_view1.style.top = - page_view.scrollTop - ruler_width + "px";
+        document.onmouseup = (eu) => {
+            sroll_h_block_m = false;
+
+
         }
+
+
+
+
+
     }
+
+
+    var sroll_v = document.createElement("div");
+    sroll_v.className = "sroll_v";
+    workbench.appendChild(sroll_v);
+    var sroll_v_block = document.createElement("div");
+    sroll_v_block.className = "sroll_v_block";
+    sroll_v.appendChild(sroll_v_block);
+
+    var sroll_v_block_h = page_view.clientHeight * page_view.clientHeight / (p.height + 200);
+    sroll_v_block.style.height = sroll_v_block_h + "px";
+    sroll_v_block.style.top = "0px";
+    var sroll_v_rate = ((p.height + 200) - page_view.clientHeight) / (page_view.clientHeight - sroll_v_block_h);
+    var sroll_b_block_m = false;
+    sroll_v_block.onmousedown = (e) => {
+        var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
+        var eb = e.clientY;
+        sroll_b_block_m = true;
+        document.onmousemove = (em) => {
+            if (sroll_b_block_m) {
+                var te = em.clientY - eb + tb;
+                if (te <= 0) {
+                    te = 0;
+                }
+                if (te > page_view.clientHeight - sroll_v_block_h) {
+                    te = page_view.clientHeight - sroll_v_block_h;
+                }
+                page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
+                sroll_v_block.style.top = te + "px";
+                if (ruler_view1 != undefined) {
+                    ruler_view1.style.top =((100 - te * sroll_v_rate)-ruler_width)+"px";
+                }
+            }
+        }
+        document.onmouseup = (eu) => {
+            sroll_b_block_m = false;
+
+
+        }
+
+
+
+
+
+    }
+   page_view.onwheel = (e: any) => {
+     
+        if(e.shiftKey){
+            var lb = parseFloat(sroll_h_block.style.left.replace("px", ""));
+            var le =    e.deltaX/5+ lb;
+    
+            if (le <= 0) {
+                le = 0;
+            }
+            if (le > page_view.clientWidth - sroll_h_block_w) {
+                le = page_view.clientWidth - sroll_h_block_w;
+            }
+            page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
+            sroll_h_block.style.left = le + "px";
+            if (ruler_view != undefined) {
+                ruler_view.style.left =    page_parent.style.left;
+            }
+
+        }else{
+            var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
+   
+            var te =      e.deltaY/5+ tb;
+            if (te <= 0) {
+                te = 0;
+            }
+            if (te > page_view.clientHeight - sroll_v_block_h) {
+                te = page_view.clientHeight - sroll_v_block_h;
+            }
+            page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
+            sroll_v_block.style.top = te + "px";
+            if (ruler_view1 != undefined) {
+                ruler_view1.style.top =((100 - te * sroll_v_rate)-ruler_width)+"px";
+            }
+        }
+      
+   
+      
+    }
+
     //渲染 页面 选择效果
     page_view.onmousedown = (e: any) => {
         if (e.button != 0) {
