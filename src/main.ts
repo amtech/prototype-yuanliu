@@ -49,7 +49,7 @@ function createWindow(project: any) {
         "savePage", "startPreview", "build", "readPageCatalog", "readDataCatolog",
         "saveAs", "save", "insertImage", "saveProject", "openPage", "deletePage", "loadPluginsPanel", "loadMapCatalog",
         "loadMap", "readDatabase", "saveDatabase", "min", "max", "close", "touchbar_colors", "touchbar_default", 
-        "desktopCapturer","isSave","show-context-menu","show-notification","importDataExcel"].forEach((item: any) => {
+        "desktopCapturer","isSave","show-context-menu","show-notification","importDataExcel","loadPluginsStatus_"].forEach((item: any) => {
 
           ipcMain.removeAllListeners(item + "_" + id);
         });

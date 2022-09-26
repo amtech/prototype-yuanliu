@@ -11,14 +11,8 @@ import { clearDelete, getCurPage, reRenderPage } from "./workbench";
 import { getProject, showMessageBox } from "./workspace";
 
 import { renderExport } from "../dialog/export";
-import { activePropertyPanel } from "./propertypanel";
 export function updateToolbar() {
-    if (getProject().type == "git") {
 
-    } else {
-        document.getElementById("tool_push").remove();
-        document.getElementById("tool_pull").remove();
-    }
 
     document.getElementById("app_title").innerText = getProject().name + " - " + getProject().path;
 }
@@ -199,9 +193,7 @@ function savePage() {
 
 
 const tools = [
-
     {
-        label: "",
         taps: [{
             key: "tool_fresh", label: "刷新", icon: "bi bi-arrow-clockwise", onTaped: (component: IComponent) => {
                 reRenderPage();
@@ -212,45 +204,49 @@ const tools = [
             key: "tool_save", label: "保存页面", icon: "bi bi-file-post", onTaped: (component: IComponent) => {
                 saveSimplePage(getCurPage());
             }
-        },
-
-        {
-            key: "tool_push", label: "提交", icon: "bi bi-cloud-upload", onTaped: (component: IComponent) => {
-                ipcRendererSend("push");
-            }
-        }, {
-            key: "tool_pull", label: "更新", icon: "bi bi-cloud-download", onTaped: (component: IComponent) => {
-                ipcRendererSend("pull");
-            }
-        },
-        {
-            key: "tool_insertextension", label: "插入素材", icon: "bi bi-bag-plus", onTaped: (component: IComponent) => {
-                activePropertyPanel("store");
-            }
-        }, {
+        }
+       
+        ]
+    },
+    {type:"sperator"},
+    {
+        taps: [  {
             key: "tool_insertfile", label: "插入文件", icon: "bi bi-file-earmark-plus", onTaped: (component: IComponent) => {
                 ipcRendererSend("insertImage");
             }
-        }, {
-            key: "tool_build", label: "编译", icon: "bi bi-hammer", onTaped: (component: IComponent) => {
-                ipcRendererSend("build", getProject().name);
+        }, 
+        ]
+    },
+    {type:"sperator"},
+    {
+        label: "",
+        taps: [
+
+
+          {
+                key: "tool_build", label: "编译", icon: "bi bi-hammer", onTaped: (component: IComponent) => {
+                    ipcRendererSend("build", getProject().name);
+                }
+            }, {
+                key: "tool_preview", label: "预览", icon: "bi bi-play-circle", onTaped: (component: IComponent) => {
+                    ipcRendererSend("startPreview", "");
+                }
             }
-        }, {
-            key: "tool_preview", label: "预览", icon: "bi bi-play-circle", onTaped: (component: IComponent) => {
-                ipcRendererSend("startPreview", "");
+            
+        ]
+    },
+    {type:"sperator"},
+    {
+        label: "",
+        taps: [
+
+
+            {
+                key: "tool_export", label: "导出", icon: "bi bi-download", onTaped: (component: IComponent) => {
+                    // ipcRendererSend("export", "");
+                    renderExport();
+                }
             }
-        }, {
-            key: "tool_savesa", label: "另存为", icon: "bi bi-box-arrow-up", onTaped: (component: IComponent) => {
-                ipcRendererSend("saveAs");
-            }
-        }
-            ,
-        {
-            key: "tool_export", label: "导出", icon: "bi bi-download", onTaped: (component: IComponent) => {
-                // ipcRendererSend("export", "");
-                renderExport();
-            }
-        }
         ]
     }
 ]
@@ -269,7 +265,7 @@ function renderTaps(content: HTMLElement, tools: Array<any>) {
             if (group.type == "sperator") {
                 groupDiv.style.borderLeft = "1px solid";
                 groupDiv.style.height = "10px";
-                groupDiv.style.opacity = "0.5";
+                groupDiv.style.opacity = "0.3";
 
             } else {
                 groupDiv.className = "tool_group";
@@ -280,12 +276,22 @@ function renderTaps(content: HTMLElement, tools: Array<any>) {
                     tapDiv.id = tap.key;
                     tapDiv.className = "tool_tap";
                     tapDiv.title = tap.label;
-                    tapDiv.onclick = () => { tap.onTaped() };
+                    tapDiv.onclick = () => {
+                        tap.onTaped();
+
+                        if (tap.renderIcon != undefined) {
+                            tapIcon.className = tap.renderIcon();
+                        }
+                    };
                     groupDiv.appendChild(tapDiv);
                     var tapIcon = document.createElement("i");
                     tapIcon.style.fontSize = "12px";
                     tapIcon.className = tap.icon;
                     tapDiv.appendChild(tapIcon);
+
+                    if (tap.renderIcon != undefined) {
+                        tapIcon.className = tap.renderIcon();
+                    }
 
 
                 });

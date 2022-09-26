@@ -268,6 +268,14 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
         bw.webContents.send("_loadPluginsProperty", result);
 
     });
+
+    ipcMain.on("loadPluginsStatus_" + wId, (event: any, arg: any) => {
+        var result = storage.loadPluginsStatus();
+
+        bw.webContents.send("_loadPluginsStatus", result);
+
+    });
+
     ipcMain.on("loadMapCatalog_" + wId, (event: any, arg: any) => {
 
         var result = storage.loadMapCatalog();

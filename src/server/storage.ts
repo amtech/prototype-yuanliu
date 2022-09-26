@@ -523,7 +523,22 @@ export function loadMap(map: string): any {
     var file = path.join(getAppFolderPath("map"), map);
     return JSON.parse(fs.readFileSync(file).toString());
 }
+export function loadPluginsStatus():string[]{
 
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "status");
+    //  console.log("loadPluginsComponent",componentsFolder);
+    var result: string[] = [];
+    if (fs.existsSync(componentsFolder)) {
+        fs.readdirSync(componentsFolder).forEach(file => {
+            if (file.endsWith(".js")) {
+                var path = "../plugins/status/" + file;
+                result.push(path);
+            }
+
+        })
+    }
+    return result;
+}
 export function loadPluginsProperty(): string[] {
     var componentsFolder = path.join(getAppFolderPath("plugins"), "property");
     //  console.log("loadPluginsComponent",componentsFolder);

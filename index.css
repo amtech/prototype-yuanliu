@@ -596,7 +596,7 @@ table {
 .tool_group {
     display: flex;
     align-items: center;
-    padding: 0px 10px 0px 10px;
+    padding: 0px 4px 0px 4px;
 }
 
 textarea {
@@ -1587,4 +1587,29 @@ iframe {
     padding: 10px 10px 0px 10px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.statusBar {
+    height: 22px;
+    background-color: var(--theme-color);
+    color: #eee;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    display: flex;
+    font-size: 12px;
+}
+
+.statusBarActivity {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    padding: 0px 5px 0px 5px;
+    margin: 0px 5px 0px 5px;
+    cursor: pointer;
+    align-items: center;
+}
+
+.statusBarActivity:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }

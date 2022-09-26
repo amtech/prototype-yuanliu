@@ -14,9 +14,10 @@ import { copyComponents } from "../render/pageTitle";
 import { activePropertyPanel, getComponentStyle, setComponentStyle } from "../render/propertypanel";
 import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
 import { clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine } from "../render/workbench";
-import { getProject } from "../render/workspace";
+import { getConfig, getProject } from "../render/workspace";
 import { checkContextMenu, IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
 import { getUUID, IComponent, IComponentProperty, IExtension } from "./interfaceDefine";
+import { updateStatus } from "../render/statusBar";
 export function getComponentTempateByType(type: string): IComponent {
     if (componentsTemplate == undefined || componentsTemplate.length == 0) {
         console.log("componentsTemplate is undefined");
@@ -475,7 +476,14 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         if (component.toogle != undefined) {
             component.toogle(root, true);
         } else {
+          //  root.style.display = "none";
+          var config= getConfig();
+          if(config.eye==undefined||config.eye==false){
             root.style.display = "none";
+          }else{
+            root.style.opacity="0.5";
+          }
+         
         }
     }
     //控制层级 layer
@@ -567,6 +575,8 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         //右侧面板
         activePropertyPanel(component);
         updateFloatPanel(component);
+        //状态栏
+        updateStatus(getCurPage(),component,getSelectComponents());
 
     }
     ////////////

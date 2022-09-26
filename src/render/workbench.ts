@@ -22,6 +22,7 @@ import { pushHistory } from "./history";
 import { isDark } from "../dialog/picker";
 import { getProject, renderRecent } from "./workspace";
 import { saveSimplePage } from "./toolbar";
+import { updateStatus } from "./statusBar";
 
 
 // var hoverComponentRoot: HTMLElement;
@@ -232,6 +233,8 @@ export function renderPage(page: IPage) {
     var workbenchtabs = document.getElementById("workbench_tabs");
     var workbenchpages = document.getElementById("workbench_pages");
 
+
+
     if (pages.findIndex(p => p.key == page.key) == -1) {
 
 
@@ -261,8 +264,7 @@ export function renderPage(page: IPage) {
         }
 
 
-        //切换主题色
-        document.body.style.cssText = "--theme-color:" + getProject().themeColor;
+
 
 
         //打开新页面
@@ -317,21 +319,21 @@ export function renderPage(page: IPage) {
         button.appendChild(changed);
 
         //contextmenu
-        pageTab.oncontextmenu = (event:any) => {
-            var menuList:IMenuItem[]=[
+        pageTab.oncontextmenu = (event: any) => {
+            var menuList: IMenuItem[] = [
                 {
-                    label:"关闭",id:"close",accelerator:"Command+w",onclick:()=>{
+                    label: "关闭", id: "close", accelerator: "Command+w", onclick: () => {
                         closePage(page);
                     }
                 },
                 {
-                    label:"关闭全部",id:"closeall",onclick:()=>{
+                    label: "关闭全部", id: "closeall", onclick: () => {
                         //closePage(page);
                     }
                 },
                 {
-                    label:"关闭其他",id:"closeother",onclick:()=>{
-                      //  closePage(page);
+                    label: "关闭其他", id: "closeother", onclick: () => {
+                        //  closePage(page);
                     }
                 }
             ];
@@ -387,7 +389,7 @@ export function renderPage(page: IPage) {
         pageView.style.right = "0px";
         pageView.style.bottom = "0px";
         workbenchpages.appendChild(pageView);
-        
+
         //渲染页面工作区
         renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
         //更新右侧、底部面板
@@ -400,6 +402,8 @@ export function renderPage(page: IPage) {
             //右侧面板
             activePropertyPanel("page");
             //renderGuidePanel();//引导面板
+            //状态栏
+            updateStatus(page, undefined, undefined);
         }, 500);
         //历史记录
         //    pushHistory(page);
@@ -439,6 +443,8 @@ export function renderPage(page: IPage) {
             //右侧面板
             activePropertyPanel("page");
             //renderGuidePanel();//引导面板
+            //状态栏
+            updateStatus(page, undefined, undefined);
         }, 100);
     }
     requestIdleCallback(() => {
@@ -447,6 +453,7 @@ export function renderPage(page: IPage) {
             theme = "dark";
         }
         regeditTheme();
+
 
     });
 
@@ -480,8 +487,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     var curPage = p;
     content.innerHTML = "";
     var scale = 1;
-    if(p.scale!=undefined){
-        scale=p.scale;
+    if (p.scale != undefined) {
+        scale = p.scale;
     }
     var workbench = document.createElement("div");
     workbench.className = "workbench";
@@ -501,14 +508,14 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     var view_control = document.createElement("div");
     view_control.className = "view_control";
     workbench.appendChild(view_control);
-  
+
     var pageHeight = 800;
     var pageWidth = 1200;
     if (curPage.height != undefined) pageHeight = curPage.height;
     if (curPage.width != undefined) pageWidth = curPage.width;
     //
     var page_parent = document.createElement("div");
-    page_parent.id="page_parent_"+p.key;
+    page_parent.id = "page_parent_" + p.key;
     page_parent.className = "page_parent " + curPage.theme;
     page_view.appendChild(page_parent);
     page_parent.style.transform = "scale(" + scale + ")";
@@ -518,16 +525,16 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         if (getKeyCode() == "Control") {
             scale += ew.deltaY / 1000;
             scale = Math.round(scale * 100) / 100;
-            if(scale<0.1){
-                scale=0.1;
-                
+            if (scale < 0.1) {
+                scale = 0.1;
+
             }
-            if (scale>1.1){
-                scale=1.1;
+            if (scale > 1.1) {
+                scale = 1.1;
             }
             page_parent.style.transform = "scale(" + scale + ")";
-            getCurPage().scale=scale;
-              //右侧面板
+            getCurPage().scale = scale;
+            //右侧面板
             activePropertyPanel("page");
         }
     }
@@ -616,9 +623,9 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         }
     }
     //渲染 页面 选择效果
-    page_view.onmousedown = (e:any) => {
-        if(e.button!=0){
-                return;
+    page_view.onmousedown = (e: any) => {
+        if (e.button != 0) {
+            return;
         }
         checkContextMenu();
         if (e.target.className == "page_view" || e.target.className == "component" || e.target.className == "page" || e.target.className == "grid") {
@@ -676,7 +683,7 @@ function renderTitleBody(title_bar: HTMLElement, titleJson: any, pageHeight: num
     renderTitleBar(title_bar, titleJson);
 
 }
-var zoomType:"50"|"100"|"150"="100";
+var zoomType: "50" | "100" | "150" = "100";
 export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: number, pageHeight: number) {
     page.innerHTML = "";
     page.className = "page";
@@ -714,36 +721,36 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
                     ipcRendererSend("insertImage");
                 }, 1);
             }
-        },{
-            type:"separator"
-        },{
-            id:"zoom50",
-            label:"50%",
-            type:"radio",
-            checked:zoomType=="50",
-            onclick:()=>{
-                zoomType="50";
-             
+        }, {
+            type: "separator"
+        }, {
+            id: "zoom50",
+            label: "50%",
+            type: "radio",
+            checked: zoomType == "50",
+            onclick: () => {
+                zoomType = "50";
+
                 // page_parent.style.transform = "scale(" + scale + ")";
                 // page_sacle.innerText = scale + "";
             }
 
-        },{
-            id:"zoom100",
-            label:"100%",
-            type:"radio",
-            checked:zoomType=="100",
-            onclick:()=>{
-                zoomType="100";
+        }, {
+            id: "zoom100",
+            label: "100%",
+            type: "radio",
+            checked: zoomType == "100",
+            onclick: () => {
+                zoomType = "100";
                 // page.style.transform="scale(1)";
             }
-        },{
-            id:"zoom150",
-            label:"150%",
-            type:"radio",
-            checked:zoomType=="150",
-            onclick:()=>{
-                zoomType="150";
+        }, {
+            id: "zoom150",
+            label: "150%",
+            type: "radio",
+            checked: zoomType == "150",
+            onclick: () => {
+                zoomType = "150";
                 // page.style.transform="scale(1.5)";
             }
 
@@ -831,12 +838,12 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
             //右侧面板
             //  activePropertyPanel();
             //如果是扩展组件
-            if(component.isExpand){
-                var expand=document.getElementById("project_expand");
-                expand.innerHTML="";
-                expand.style.display="flex";
+            if (component.isExpand) {
+                var expand = document.getElementById("project_expand");
+                expand.innerHTML = "";
+                expand.style.display = "flex";
                 renderComponent(expand, component);
-            }else{
+            } else {
                 renderComponent(page, component);
             }
 
@@ -906,7 +913,7 @@ export function setSelectComponents(data: Array<string>) {
  * @returns 
  */
 export function shortcutInsertComponent(x: number, y: number, component?: IComponent, position?: number) {
-   
+
     if (component != undefined) {
         if (component.type != "grid" && component.type != "row") {
             if (component.drop != "component") {
@@ -922,8 +929,8 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
     var contextMenus: IMenuItem[] = [];
 
     showComponents.forEach((key: string) => {
-        var t=getComponentsTemplate().find(t=>t.type==key);
-        if(t!=undefined){
+        var t = getComponentsTemplate().find(t => t.type == key);
+        if (t != undefined) {
             var item: IMenuItem = {
                 id: getUUID(),
                 label: t.label, icon: t.icon, onclick: () => {
@@ -962,9 +969,9 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                 }
             }
             contextMenus.push(item);
-            if(t.key=="dialog" ||t.key=="text"){
+            if (t.key == "dialog" || t.key == "text") {
                 contextMenus.push({
-                    type:"separator"
+                    type: "separator"
                 })
             }
         }
@@ -977,7 +984,7 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
         label = "前/上插入"
     }
     openContextMenu(contextMenus);
-  
+
 }
 
 var nav_items: INavItem[] = [];

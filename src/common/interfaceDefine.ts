@@ -446,3 +446,15 @@ export interface IStyle {
 export function renderPageByCatalogKey(a:any,b:any){
 
 }
+/**
+ * 状态栏组件接口
+ */
+export interface IStatusBarActivity{
+    key?:string;
+    title:string;
+    sort:number;
+    position:"left"|"right";
+    onRender:(acticity:HTMLElement,config?:any,project?:IProject)=>void;
+    onClick?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,componentSelects?:string[])=>void;
+    onUpdate?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,component?:IComponent,selects?:string[])=>void;
+}

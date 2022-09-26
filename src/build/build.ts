@@ -15,12 +15,13 @@ import { zhToEn } from "../common/dict";
 import { Notification } from "electron/main";
 
 
+
 export function packge(dist: string,terminal:(log:any)=>void) {
 
     var config = {
-        entry: dist + '/js/main.js',
+        entry:path.join(dist ,'js','main.js'),
         output: {
-            path: dist + '/js/',
+            path:path.join(dist ,'js'),
             filename: 'index.js',
         },
         mode: "production",
