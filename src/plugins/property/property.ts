@@ -604,7 +604,23 @@ function loadComponentsProperty(component: IComponent) {
         setComponentStyle(component, "text-shadow", textshadow[0] + "px " + textshadow[1] + "px " + textshadow[2] + "px " + textshadowColor);
         pushHistory(getCurPage());
     });
+    var opacity=0;
+    var op=getComponentStyle(component,"opacity");
+    if(op!=undefined&&op.length>0){
+        try {
+            opacity=100-parseFloat(op)*100;
+        } catch (error) {
+            
+        }
+    }
+    
 
+    //opacity
+    formOpacity.update(opacity,(value)=>{
+        var nop=1-Math.round(value)/100;
+        setComponentStyle(component,"opacity",nop+"");
+
+    })
 
 
 
@@ -844,6 +860,8 @@ var formBorderPanelRadius: FormNumber;
 var formBoxShadow: FormNumbers;
 var formBoxShadowColor: FormColor;
 
+var formOpacity:FormSolider;
+
 function renderThemeProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
@@ -940,6 +958,9 @@ function renderThemeProperty(context: HTMLElement) {
     formBoxShadowColor = new FormColor("");
     formBoxShadowColor.render(c);
 
+
+    formOpacity=new FormSolider("透明",100,0,"%");
+    formOpacity.render(body);
 
 
 

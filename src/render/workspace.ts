@@ -211,7 +211,7 @@ function layout(app: HTMLElement) {
     var tabsHeight = 32;
 
     var row = document.createElement("div");
-
+    row.id="workbench_row";
     row.style.display = "flex";
     row.style.height = tabsHeight + "px";
 
@@ -263,6 +263,18 @@ function layout(app: HTMLElement) {
     expand.oncontextmenu = () => {
         expand.style.display = "none";
     }
+    //工作区 左侧 阴影线
+    var leftShadow=document.createElement("div");
+    leftShadow.id="left_shadow";
+    leftShadow.style.position="absolute";
+    leftShadow.style.left="-10px";
+    leftShadow.style.top="32px";
+    leftShadow.style.bottom="0px";
+    leftShadow.style.width="10px";
+  
+    workbench.appendChild(leftShadow);
+
+
     //底部栏
     var floatPanel = document.createElement("div");
     floatPanel.id = "floatPanel";

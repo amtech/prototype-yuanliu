@@ -644,6 +644,11 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (ruler_view != undefined) {
                     ruler_view.style.left =    page_parent.style.left;
                 }
+                if(le * sroll_h_rate>100){
+                    document.getElementById("left_shadow").className="scroll_shadow";
+                }else{
+                    document.getElementById("left_shadow").className="";
+                }
             }
         }
         document.onmouseup = (eu) => {
@@ -689,6 +694,11 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (ruler_view1 != undefined) {
                     ruler_view1.style.top =((100 - te * sroll_v_rate)-ruler_width)+"px";
                 }
+                if(te * sroll_v_rate>100){
+                    document.getElementById("workbench_row").className="scroll_shadow";
+                }else{
+                    document.getElementById("workbench_row").className="";
+                }
             }
         }
         document.onmouseup = (eu) => {
@@ -719,6 +729,11 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             if (ruler_view != undefined) {
                 ruler_view.style.left =    page_parent.style.left;
             }
+            if(le * sroll_h_rate>100){
+                document.getElementById("left_shadow").className="scroll_shadow";
+            }else{
+                document.getElementById("left_shadow").className="";
+            }
 
         }else{
             var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
@@ -734,6 +749,11 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             sroll_v_block.style.top = te + "px";
             if (ruler_view1 != undefined) {
                 ruler_view1.style.top =((100 - te * sroll_v_rate)-ruler_width)+"px";
+            }
+            if(te * sroll_v_rate>100){
+                document.getElementById("workbench_row").className="scroll_shadow";
+            }else{
+                document.getElementById("workbench_row").className="";
             }
         }
       

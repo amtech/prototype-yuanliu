@@ -592,7 +592,7 @@ export class FormSolider {
 
         point.style.position = "absolute";
 
-        point.className = "foreground";
+        point.className = "drag";
         point.style.height = "10px";
         point.style.width = "10px";
         point.style.cursor = "ew-resize";

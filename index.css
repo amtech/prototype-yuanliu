@@ -65,6 +65,7 @@ select {
     position: absolute;
     left: 100px;
     top: 100px;
+    transition: top 0.3s, left 0.3s;
 }
 
 .page {
