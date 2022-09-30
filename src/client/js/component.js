@@ -203,7 +203,17 @@ export function loadChart(chart, component, isMap) {
             //            console.log("renderChart ", theme);
             var data = [];
             if (isMap) {
-                var map = eval(component.option).series[0].map;
+                //geo
+                var map = "";
+                if (eval(component.option).geo != undefined) {
+
+                    map = eval(component.option).geo.map;
+
+
+                } else {
+                    map = eval(component.option).series[0].map;
+
+                }
                 var mapName = map.replace(".json", "");
 
                 echarts.registerMap(map, map_data[mapName]);
@@ -226,7 +236,7 @@ export function loadChart(chart, component, isMap) {
             if (component.option != undefined) {
                 // console.log(component.option);
                 eval(component.option);
-                if (data.length > 0 && option.series[0].data.length == 0) {
+                if (data.length > 0 && option.series != undefined && option.series[0] != undefined && option.series[0].data.length == 0) {
                     option.series[0].data = data;
                 }
                 if (option.tooltip == undefined)

@@ -284,6 +284,8 @@ function buildData(wProject: any,terminal?:(log:any)=>void) {
     //page
     var catalogs = storage.readPageCatalog(wProject);
     if (catalogs != undefined) {
+        //删除打包后非必要数据，较小整体的大小，
+
         pagesData += "export default " + JSON.stringify(catalogs) + ";\n";
     }
     fs.writeFileSync(path.join(jsPath, "pagesData.js"), pagesData);

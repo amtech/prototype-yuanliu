@@ -155,7 +155,7 @@ export function saveSimplePage(page: IPage) {
             var dom = document.getElementById("page_view_" + page.key);
             requestIdleCallback(() => {
 
-                domToImage.toJpeg(dom.getElementsByClassName("page_parent").item(0), { quality: 0.1 })
+                domToImage.toJpeg(dom.getElementsByClassName("page_parent").item(0), { quality: 0.1})
                     .then((jpeg: any) => {
 
                         ipcRendererSend("savePageJpeg", { key: page.key, data: jpeg });

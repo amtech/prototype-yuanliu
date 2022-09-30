@@ -1,11 +1,16 @@
-var path = "电力负荷\n" +
-    "    平均负荷\n" +
-    "	    年均负荷\n" +
-    "    最大负荷\n" +
-    "    最小负荷\n" +
-    "    ada\n" +
-    "        asda\n";
-path.split("\n").forEach(item => {
-    console.log(item.split(" "));
+var style =
+    "display:flex;" +
+    "	background:transparent;" +
+    "	min-height:34px;" +
+    "	padding:5px;" +
+    "	border-radius:5px;" +
+    "	align-items: center;" +
+    "	";
+var property = "display";
+var rep = RegExp("[^\-]" + property + ":[^;]+;");
 
-})
+var m = style.match(rep);
+for (var i = 0; i < m.length; i++) {
+
+    console.log(m[i].substring(1));
+}

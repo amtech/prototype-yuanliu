@@ -128,6 +128,17 @@ export function saveNavBar(nav: string, wProject: IProject): any {
 }
 export function savePage(page: string, folder: string, wProject: IProject): any {
 
+
+    //删除组件中不需要保存的数据，减少整体的大小。
+    
+    //edge
+
+    //blue
+
+
+
+
+
     //page
     var navPath = path.join(getProjectFolderPath(wProject, "pages"), folder);
     try {
@@ -136,7 +147,7 @@ export function savePage(page: string, folder: string, wProject: IProject): any 
         console.log(e);
     }
     //多余的图片删除 (png)|(jpeg)|(gif)|(bmp)|(JPG)|(PNG)|(JPEG)|(GIF)|(BMP)
-    var ms = page.match(/(uuid_([a-z]|[0-9])+\.jpg)|(uuid_([a-z]|[0-9])+\.png)|(uuid_([a-z]|[0-9])+\.jpeg)|(uuid_([a-z]|[0-9])+\.gif)|(uuid_([a-z]|[0-9])+\.bmp)|(uuid_([a-z]|[0-9])+\.JPG)|(uuid_([a-z]|[0-9])+\.PNG)|(uuid_([a-z]|[0-9])+\.JPEG)|(uuid_([a-z]|[0-9])+\.GIF)|(uuid_([a-z]|[0-9])+\.NMP)/g);
+    var ms = page.match(/(u([a-z]|[0-9])+\.jpg)|(u([a-z]|[0-9])+\.png)|(u([a-z]|[0-9])+\.jpeg)|(u([a-z]|[0-9])+\.gif)|(u([a-z]|[0-9])+\.bmp)|(u([a-z]|[0-9])+\.JPG)|(u([a-z]|[0-9])+\.PNG)|(u([a-z]|[0-9])+\.JPEG)|(u([a-z]|[0-9])+\.GIF)|(u([a-z]|[0-9])+\.NMP)/g);
     if (ms != undefined && ms.length > 0) {
         //page key 
         var tempKey = page.match(/"key"\:"[^"]+"/)[0];//"key":"index"

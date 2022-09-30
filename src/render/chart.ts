@@ -20,12 +20,23 @@ export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boo
                 theme = "dark";
             }
             //    regeditTheme()
-            console.log("renderChart ", theme);
+            console.log("renderChart ", theme,isMap);
             var echarts = require("echarts");
             if (isMap) {
 
+                //geo
+                var map="";
+                if(eval(component.option).geo!=undefined){
 
-                var map = eval(component.option).series[0].map;
+                    map=eval(component.option).geo.map;
+                    console.log(eval(component.option).geo);
+
+                }else{
+                    map= eval(component.option).series[0].map;
+
+                }
+
+              
                 if (map != undefined) {
                     ipcRendererSend("loadMap", map);
                     ipcRenderer.on("_loadMap", (event, arg) => {
@@ -48,7 +59,7 @@ export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boo
                         var option: any;
                         if (component.option != undefined) {
                             eval(component.option);
-                            if (option.series[0].data.length == 0) {
+                            if (option.series!=undefined&& option.series[0]!=undefined&&option.series[0].data.length == 0) {
                                 option.series[0].data = data;
                             }
                             myChart.setOption(option);

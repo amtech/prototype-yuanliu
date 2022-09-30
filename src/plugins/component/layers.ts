@@ -4,7 +4,7 @@ import { IBlueProperty, IComponent } from "../../common/interfaceDefine";
 const component: IComponent = {
     isTemplate: true, key: "layers", label: "layers", icon: "bi bi-layers", type: "layers", group: "container",
     drop: "component",
-    style: "flex:1;background-color:transparent;min-height:200px;margin:5px;padding:5px;;border-radius:5px;",
+    style: "flex:1;background-color:transparent;min-height:50px;margin:5px;padding:5px;;border-radius:5px;",
     onPreview: () => {
         var gird = document.createElement("div");
         return gird;

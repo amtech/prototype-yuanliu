@@ -14,7 +14,12 @@ const version:IStatusBarActivity={
             i.className=component.icon;
             acticity.appendChild(i);
             i.style.paddingRight="4px";
-            acticity.innerHTML+=""+component.label;
+            if(component.children!=undefined&&component.children.length>0){
+                acticity.innerHTML+=""+component.label+" children["+component.children.length+"]";
+            }else{
+                acticity.innerHTML+=""+component.label;
+            }
+        
         }   
     },
 }

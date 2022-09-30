@@ -195,6 +195,7 @@ function loadComponentsProperty(component: IComponent) {
     });
 
     var styleDisplay = getComponentStyle(component, "display");
+    console.log("styleDisplay : ",styleDisplay);
     if (styleDisplay == "flex") {
         formFlex.style.display = "block";
         var valign = 0;
@@ -314,17 +315,64 @@ function loadComponentsProperty(component: IComponent) {
         setComponentStyle(component, "margin-left", values[3] + "px");
         pushHistory(getCurPage());
     });
-    var overview=getComponentStyle(component,"overflow");
-    var overviewVal=0;
-    if(overview==undefined){
-        overview="visible";
-    }else{
-        overviewVal= ["visible","auto","hidden"].findIndex(p=>p==overview);
+    var overview = getComponentStyle(component, "overflow");
+    var overviewVal = 0;
+    if (overview == undefined) {
+        overview = "visible";
+    } else {
+        overviewVal = ["visible", "auto", "hidden"].findIndex(p => p == overview);
     }
 
-    formOverFlow.update(overviewVal,(index)=>{
-        setComponentStyle(component,"overflow",["visible","auto","hidden"][index]);
+    formOverFlow.update(overviewVal, (index) => {
+        setComponentStyle(component, "overflow", ["visible", "auto", "hidden"][index]);
     })
+    var tranform = getComponentStyle(component, "transform");
+
+    var rotate = 0;
+
+    if (tranform != undefined && tranform.indexOf("rotate") >= 0) {
+        var rotateM = tranform.match(/\-?\d+\.?\d*/);
+        if (rotateM != null) {
+            rotate = parseFloat(rotateM[0]);
+        }
+
+    }
+    formRotate.update(rotate, (value) => {
+        if (tranform != undefined && tranform.indexOf("rotate") >= 0) {
+            var newTranform = tranform.replace(/rotate\(\-?\d+\.?\d*deg\)/, ("rotate(" + value + "deg)"));
+            setComponentStyle(component, "transform", newTranform);
+
+        } else {
+            setComponentStyle(component, "transform", "rotate(" + value + "deg)");
+        }
+
+    })
+
+
+
+    //position
+    var top = "0";
+    var topStyle = getComponentStyle(component, "top","px");
+    if (topStyle != undefined&&topStyle.length>0) {
+        top = topStyle;
+    }
+    console.log("top",top);
+    formTop.update(top, (value) => {
+        setComponentStyle(component, "top", value+"px");
+        setComponentStyle(component, "position", "relative");
+    })
+    var left = "0";
+    var leftStyle = getComponentStyle(component, "left","px");
+    if (leftStyle != undefined&&leftStyle.length>0) {
+        left = leftStyle;
+    }
+
+    //position
+    formLeft.update(left, (value) => {
+        setComponentStyle(component, "left", value+"px");
+        setComponentStyle(component, "position", "relative");
+    })
+
     //font
     formFontFamily.update(getComponentStyle(component, "font-family", ""), (value) => {
         setComponentStyle(component, "font-family", value);
@@ -604,23 +652,25 @@ function loadComponentsProperty(component: IComponent) {
         setComponentStyle(component, "text-shadow", textshadow[0] + "px " + textshadow[1] + "px " + textshadow[2] + "px " + textshadowColor);
         pushHistory(getCurPage());
     });
-    var opacity=0;
-    var op=getComponentStyle(component,"opacity");
-    if(op!=undefined&&op.length>0){
+    var opacity = 0;
+    var op = getComponentStyle(component, "opacity");
+    if (op != undefined && op.length > 0) {
         try {
-            opacity=100-parseFloat(op)*100;
+            opacity = 100 - parseFloat(op) * 100;
         } catch (error) {
-            
+
         }
     }
-    
+
 
     //opacity
-    formOpacity.update(opacity,(value)=>{
-        var nop=1-Math.round(value)/100;
-        setComponentStyle(component,"opacity",nop+"");
+    formOpacity.update(opacity, (value) => {
+        var nop = 1 - Math.round(value) / 100;
+        setComponentStyle(component, "opacity", nop + "");
 
     })
+
+
 
 
 
@@ -860,7 +910,7 @@ var formBorderPanelRadius: FormNumber;
 var formBoxShadow: FormNumbers;
 var formBoxShadowColor: FormColor;
 
-var formOpacity:FormSolider;
+var formOpacity: FormSolider;
 
 function renderThemeProperty(context: HTMLElement) {
     var body = document.createElement("div");
@@ -959,7 +1009,7 @@ function renderThemeProperty(context: HTMLElement) {
     formBoxShadowColor.render(c);
 
 
-    formOpacity=new FormSolider("透明",100,0,"%");
+    formOpacity = new FormSolider("透明", 100, 0, "%");
     formOpacity.render(body);
 
 
@@ -1099,6 +1149,10 @@ var formPadding: FormNumbers;
 var formMargin: FormNumbers;
 var formOverFlow: FormIcons;
 var formFlex: HTMLElement;
+var formRotate: FormSolider;
+
+var formTop: FormNumber;
+var formLeft: FormNumber;
 
 function renderLayoutProperty(context: HTMLElement) {
     var body = document.createElement("div");
@@ -1141,10 +1195,24 @@ function renderLayoutProperty(context: HTMLElement) {
     formMargin = new FormNumbers("外边距", 4);
     formMargin.render(body);
 
-    formOverFlow=new FormIcons("组件溢出",["bi bi-dash-circle","bi bi-dash-circle-dotted","bi bi-dash"]);
+    formOverFlow = new FormIcons("组件溢出", ["bi bi-dash-circle", "bi bi-dash-circle-dotted", "bi bi-dash"]);
     formOverFlow.render(body);
 
+    formRotate = new FormSolider("旋转", 180, -180, "˙")
+    formRotate.render(body);
 
+
+    var positionRow = document.createElement("div");
+    body.appendChild(positionRow);
+
+
+    var topDiv = form.createDivRow(positionRow, true);
+    formTop = new FormNumber("距顶");
+    formTop.render(topDiv);
+
+    var leftDiv = form.createDivRow(positionRow, false);
+    formLeft = new FormNumber("距左");
+    formLeft.render(leftDiv);
 
 
 
@@ -1210,12 +1278,12 @@ function updateBaseProperty(component: IComponent) {
 
                     });
                 } else if (property.type == "bool") {
-                    form.createDivBool(body, property.label, property.context, (text: string,k:string) => {
-                        var p=component.property[k];
+                    form.createDivBool(body, property.label, property.context, (text: string, k: string) => {
+                        var p = component.property[k];
                         p.context = text;
                         updateComponent(component);
 
-                    },key);
+                    }, key);
                 } else if (property.type == "doc") {
                     form.createDivText(body, property.label, property.context, (text: string) => {
                         property.context = text;

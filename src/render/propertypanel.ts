@@ -171,12 +171,15 @@ export function getComponentStyle(component: IComponent, property: string, repla
         style = component.styles["root"];
     }
     if (style != undefined) {
-        var rep = RegExp(property + ":[^;]+;");
+        var rep =  RegExp("[^\-]" + property + ":[^;]+;");
    
-        var m = style.match(rep);
+        var m = (" "+style).match(rep);
+   
         if (m != undefined && m != null && m.length > 0) {
             for (var i = 0; i < m.length; i++) {
-                var s = m[i];
+                var s =m[i].substring(1);
+
+
                 if (s.trim().startsWith(property + ":")) {
                     var v = s.split(":")[1];
                     v = v.substring(0, v.length - 1).trim();

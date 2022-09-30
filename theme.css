@@ -26,11 +26,11 @@ Copyright (c) taoyongwen. All rights reserved.
     border-color: #999;
 }
 
-.light .workbench .component_canvas:hover {
+.workbench .light .component_canvas:hover {
     outline: 1px dotted rgba(0, 0, 0, 0.5);
 }
 
-.dark .workbench .component_canvas:hover {
+.workbench .dark .component_canvas:hover {
     outline: 1px dotted rgba(255, 255, 255, 0.5);
 }
 

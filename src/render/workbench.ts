@@ -187,7 +187,14 @@ export function loadProjectTitleNav() {
 export function reRenderPage() {
     var page = getCurPage();
     var body = document.getElementById("page_content_" + selectPageKey);
-    renderPageBody(body, page, page.width, page.height);
+    var nav_bar=document.getElementById("nav_bar_"+selectPageKey);
+
+    var width=page.width;
+    if(nav_bar!=undefined){
+        width=page.width-nav_bar.clientWidth;
+    }
+
+    renderPageBody(body, page, width, page.height);
     //   renderWorkbench(view, projectTitleJson, projectNavJson, page);
     try {
         var title_bar: any = getCurViewContent().getElementsByClassName("title_bar")[0];
@@ -560,6 +567,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     if (nav_display && curPage.type == "page") {
         page_content.style.display = "flex";
         var nav_bar = document.createElement("div");
+        nav_bar.id="nav_bar_"+p.key;
         nav_bar.className = "nav_bar";
         nav_bar.style.background = navJson.background;
         if (isDark(navJson.background) && curPage.theme == "light") {
@@ -713,8 +721,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
 
     }
    page_view.onwheel = (e: any) => {
-     
-        if(e.shiftKey){
+        {
             var lb = parseFloat(sroll_h_block.style.left.replace("px", ""));
             var le =    e.deltaX/5+ lb;
     
@@ -735,7 +742,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 document.getElementById("left_shadow").className="";
             }
 
-        }else{
+        }
+        {
             var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
    
             var te =      e.deltaY/5+ tb;
@@ -831,6 +839,8 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
     page.setAttribute("data-type", curPage.type);
     page.style.width = pageWidth + "px";
     page.style.height = pageHeight + "px";
+    console.log("page size:",pageWidth+"x"+pageHeight);
+
     //render
     if (curPage.children != undefined && curPage.children.length > 0) {
         var rs = Date.now();
