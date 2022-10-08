@@ -265,6 +265,7 @@ export class FormIcons {
             var icon = document.createElement("i");
             icon.className = this.icons[i];
             icon.style.padding = "5px";
+            
             icon.setAttribute("data-index", i + "");
             icon.style.borderRadius = "5px";
             icon.style.cursor = "pointer";

@@ -4,6 +4,22 @@ import { ipcRendererSend } from "../preload";
 import { getCurPage, getSelectComponents } from "./workbench";
 import { getConfig, getProject } from "./workspace";
 
+export function showStatusLoadding(msg:any){
+    var loadding=acticities.find(a=>a.title=="加载中");
+    if(loadding!=undefined){
+
+        loadding.onUpdate(document.getElementById(loadding.key),undefined,undefined,undefined,undefined,undefined,msg);
+
+    }
+}
+export function hideStatusLoadding(){
+    var loadding=acticities.find(a=>a.title=="加载中");
+    if(loadding!=undefined){
+
+        loadding.onUpdate(document.getElementById(loadding.key),undefined,undefined,undefined,undefined,undefined,undefined);
+
+    }
+}
 export function renderStatusBar(){
     var statusBar=document.getElementById("statusBar");
     statusBar.innerHTML="";
@@ -18,7 +34,7 @@ export function renderStatusBar(){
 
     var right=document.createElement("div");
     right.style.display="flex";
-    right.style.paddingRight="10px";
+
     statusBar.appendChild(right);
 
 

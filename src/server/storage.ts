@@ -550,6 +550,24 @@ export function loadPluginsStatus():string[]{
     }
     return result;
 }
+export function loadPluginsBg():string[]{
+
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "background");
+    //  console.log("loadPluginsComponent",componentsFolder);
+    var result: string[] = [];
+    if (fs.existsSync(componentsFolder)) {
+        fs.readdirSync(componentsFolder).forEach(file => {
+            if (file.endsWith(".js")) {
+                var path = "../../plugins/background/" + file;
+                result.push(path);
+            }
+
+        })
+    }
+    return result;
+}
+
+
 export function loadPluginsProperty(): string[] {
     var componentsFolder = path.join(getAppFolderPath("plugins"), "property");
     //  console.log("loadPluginsComponent",componentsFolder);
@@ -588,6 +606,21 @@ export function loadPluginsComponent(): string[] {
         fs.readdirSync(componentsFolder).forEach(file => {
             if (file.endsWith(".js")) {
                 var path = "../plugins/component/" + file;
+                result.push(path);
+            }
+
+        })
+    }
+    return result;
+}
+export function loadPluginsBackground(): string[] {
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "background");
+    //  console.log("loadPluginsComponent",componentsFolder);
+    var result: string[] = [];
+    if (fs.existsSync(componentsFolder)) {
+        fs.readdirSync(componentsFolder).forEach(file => {
+            if (file.endsWith(".js")) {
+                var path = "../plugins/background/" + file;
                 result.push(path);
             }
 
@@ -665,6 +698,16 @@ export function savePageJpeg(key:string,data:any,wProject: IProject){
     var imagePath=path.join(getProjectFolderPath(wProject,"images"),key+".jpeg");
     fs.writeFile(imagePath,dataBuffer,()=>{
         console.log("save page image "+key);
+    });
+
+}
+export function downloadPageJpeg(key:string,data:any,wProject: IProject,folder:string){
+
+    var base64Data = data.replace(/^data:image\/\w+;base64,/, "");
+    var dataBuffer = Buffer.from(base64Data, 'base64');
+    var imagePath=path.join(folder,key+".jpeg");
+    fs.writeFile(imagePath,dataBuffer,()=>{
+        console.log("save as page image "+key);
     });
 
 }

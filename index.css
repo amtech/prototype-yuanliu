@@ -167,6 +167,11 @@ select {
     text-align: center;
     font-size: 14px;
     line-height: 28px;
+    transition: transform 0.3s;
+}
+
+.component:active {
+    transform: scale(0.9);
 }
 
 .component_canvas {
@@ -260,6 +265,7 @@ select {
     /* font-weight: bold; */
     overflow: auto;
     max-height: 400px;
+    overflow-x: hidden;
 }
 
 .explorer_body {
@@ -302,6 +308,11 @@ select {
     outline: none;
     border-radius: 5px;
     position: relative;
+    transition: transform 0.3s;
+}
+
+.explorer_row:active {
+    transform: scale(0.9);
 }
 
 .contextMenu {
@@ -680,6 +691,11 @@ i[data-rotate]::before {
     opacity: 0.8;
     padding-right: 10px;
     transition: background 0.5s;
+    transition: transform 0.3s;
+}
+
+.nav_row:active {
+    transform: scale(0.9);
 }
 
 .nav_row:hover {
@@ -1552,6 +1568,20 @@ iframe {
     }
 }
 
+.rotate {
+    animation: rotate 1s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .project_recent {
     position: absolute;
     top: 0;
@@ -1590,6 +1620,11 @@ iframe {
     padding: 10px 10px 0px 10px;
     border-radius: 5px;
     cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.recent_card:active {
+    transform: scale(0.9);
 }
 
 .statusBar {
@@ -1669,4 +1704,47 @@ iframe {
     position: absolute;
     top: 0px;
     border-radius: 5px;
+}
+
+.component_canvas[active=true] {
+    transition: transform 0.3s;
+}
+
+.component_canvas[active=true]:active {
+    transform: scale(0.9);
+}
+
+.tab {
+    transition: transform 0.3s;
+}
+
+.tab:active {
+    transform: scale(0.9);
+}
+
+.page_bg {
+    position: absolute;
+    z-index: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.light .page_bg {
+    background-color: #fff;
+}
+
+.dark .page_bg {
+    background-color: #000;
+}
+
+.title_bar {
+    backdrop-filter: blur(5px);
+}
+
+.nav_bar {
+    backdrop-filter: blur(5px);
+}
+
+.page {
+    backdrop-filter: blur(2px);
 }

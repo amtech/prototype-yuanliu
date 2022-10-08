@@ -364,7 +364,7 @@ export function renderRecent() {
     content.appendChild(list);
 
     ipcRenderer.on("_readProjectRecentPage", (event, recentData) => {
-        console.log("renderRecent", recentData);
+      
         if (recentData.length > 0) {
             for (var i = recentData.length - 1; i >= 0; i--) {
 

@@ -47,6 +47,8 @@ const component: IComponent = {
         //新的
         label.innerText = component.property.text.context;
         button.setAttribute("hover", "true");
+        button.setAttribute("active", "true");
+        
         if (type != "product") {
             label.ondblclick = () => {
                 var input = document.createElement("input");

@@ -593,7 +593,7 @@ function renderCatalog(content: HTMLElement, catalogs: ICatalog[], level: number
         //  catalogs.sort((a, b) => (a.sort - b.sort));
         // console.log("load Catalog:---")
         logj("load Catalog:---", "sidebar", 569);
-        console.log(catalogs);
+
         catalogs.forEach((catalog: ICatalog) => {
             renderFileTree(content, catalog, level);
         });

@@ -11,6 +11,7 @@ import { clearDelete, getCurPage, reRenderPage } from "./workbench";
 import { getProject, showMessageBox } from "./workspace";
 
 import { renderExport } from "../dialog/export";
+import { showStatusLoadding } from "./statusBar";
 export function updateToolbar() {
 
 
@@ -38,7 +39,7 @@ export function renderToolbar(content: HTMLElement) {
             reRenderPage();
         });
         ipcRenderer.on("touchBar_build", (event: any, arg: any) => {
-
+            showStatusLoadding("save page");
             ipcRendererSend("build", getProject().name);
         });
         ipcRenderer.on("touchBar_preview", (event: any, arg: any) => {
@@ -153,9 +154,11 @@ export function saveSimplePage(page: IPage) {
             //页面截图 保存
             const domToImage = require("dom-to-image");
             var dom = document.getElementById("page_view_" + page.key);
+            var target:any=dom.getElementsByClassName("page_parent_content").item(0);
+   
             requestIdleCallback(() => {
 
-                domToImage.toJpeg(dom.getElementsByClassName("page_parent").item(0), { quality: 0.1})
+                domToImage.toJpeg(target, { quality: 0.1})
                     .then((jpeg: any) => {
 
                         ipcRendererSend("savePageJpeg", { key: page.key, data: jpeg });

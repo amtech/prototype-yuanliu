@@ -6,6 +6,8 @@ const version:IStatusBarActivity={
     sort:0,
     onRender(acticity, config?, project?) {
         acticity.innerHTML= require("../../../package.json").version;
+        acticity.style.marginRight="0px";
+        acticity.style.paddingRight="15px";
     }
 }
 export default version;

@@ -23,7 +23,7 @@ const panel: IPanel = {
         renderPropertypanel(content);
     },
     update: (args: any) => {
-        console.log("update property");
+        //console.log("update property");
         if (args != undefined) {
             var component: IComponent = args;
             loadComponentsProperty(component);
@@ -48,7 +48,7 @@ export default function load() {
 
 function renderPropertypanel(content: HTMLElement) {
 
-    console.log("renderPropertypanel");
+    //console.log("renderPropertypanel");
 
     var propertyPanel = document.createElement("div");
     propertyPanel.className = "propertyPanel";
@@ -195,7 +195,7 @@ function loadComponentsProperty(component: IComponent) {
     });
 
     var styleDisplay = getComponentStyle(component, "display");
-    console.log("styleDisplay : ",styleDisplay);
+    //console.log("styleDisplay : ",styleDisplay);
     if (styleDisplay == "flex") {
         formFlex.style.display = "block";
         var valign = 0;
@@ -356,7 +356,7 @@ function loadComponentsProperty(component: IComponent) {
     if (topStyle != undefined&&topStyle.length>0) {
         top = topStyle;
     }
-    console.log("top",top);
+    //console.log("top",top);
     formTop.update(top, (value) => {
         setComponentStyle(component, "top", value+"px");
         setComponentStyle(component, "position", "relative");
@@ -450,12 +450,12 @@ function loadComponentsProperty(component: IComponent) {
                 type = 1;
 
             } else if (background.indexOf("linear-gradient") >= 0) {
-                console.log(background);
+                //console.log(background);
                 var as = background.match(/\d+deg/g);
                 if (as != undefined) {
                     angle = parseInt(as[0].substring(0, as[0].length - 2));
                 }
-                console.log("angle", angle);
+                //console.log("angle", angle);
                 var cs = background.match(/rgb([^)]+)/g);
                 if (cs != undefined) {
                     // var rgb=cs[0].substring(4).split(",");
@@ -621,7 +621,7 @@ function loadComponentsProperty(component: IComponent) {
     }
 
     formBoxShadow.update(boxshadow, (value) => {
-        console.log(value);
+        //console.log(value);
         boxshadow = value;
         setComponentStyle(component, "box-shadow", boxshadow[0] + "px " + boxshadow[1] + "px " + boxshadow[2] + "px " + boxshadowColor);
         pushHistory(getCurPage());
@@ -758,7 +758,7 @@ function getStyleBorder(component: IComponent): {
     var position = 0;
     var m = style.match(/[^-]border[^:]*:[^;]+;/g);
     if (m != undefined && m != null && m.length > 0) {
-        console.log(m);
+        //console.log(m);
         for (var i = 0; i < m.length; i++) {
             var s = m[i];
             if (s.indexOf("radius:") >= 0) {
@@ -774,7 +774,7 @@ function getStyleBorder(component: IComponent): {
                 } else {
                     type = 1;
                 }
-                console.log(s);
+                //console.log(s);
                 var mc = s.match(/(rgb[^;]*)|(#[^;]*)/);
 
                 if (mc != undefined && mc.length > 0) {
@@ -1264,7 +1264,7 @@ function updateBaseProperty(component: IComponent) {
                 var property: IComponentProperty = component.property[key];
                 if (property.type == "text") {
                     form.createDivInput(body, property.label, property.context, (text: string, callKey?: string) => {
-                        console.log(callKey);
+                        //console.log(callKey);
 
                         component.property[callKey].context = text;
 
@@ -1322,10 +1322,10 @@ function updateBaseProperty(component: IComponent) {
 }
 
 function renderLayersProperty(context: HTMLElement) {
-    console.log("renderLayersProperty");
+    //console.log("renderLayersProperty");
     var layers = getLayers();
     if (layers == undefined) return;
-    // console.log("layers", layers);
+    // //console.log("layers", layers);
     layers.forEach((layer: any) => {
 
         renderLayersTree(context, layer, 1);
@@ -1620,7 +1620,7 @@ function renderComponentStyleEditor(component: IComponent) {
     }
     editorChange = true;
     editorComponent = component;
-    //console.log("renderComponentStyle");
+    ////console.log("renderComponentStyle");
 
     var codeEdior = document.createElement("div");
     codeEdior.style.height = (300 - 50) + "px";

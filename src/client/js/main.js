@@ -21,6 +21,7 @@ import nav_data from "./navData.js";
 import pages_data from "./pagesData.js";
 import project_data from "./projectData.js";
 import title_data from "./titleData.js";
+import background_data from "./backgrounds.js";
 
 
 window.onload = () => {
@@ -268,13 +269,26 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     }
     //清除之前的
     clearExpands();
+    var pg = document.getElementById("page_bg");
 
     //开始新的
-
-
-    if (pageJson.backgroundColor != "auto" && pageJson.backgroundColor != "transparent") {
-        document.getElementById("app").style.background = pageJson.backgroundColor;
+    if (pageJson.backgroundType == undefined || pageJson.backgroundType == 0) {
+        pg.style.background = "auto";
+    } else if (pageJson.backgroundType == 1) {
+        pg.style.background = pageJson.backgroundColor;
+    } else if (pageJson.backgroundType == 2) {
+        pg.style.background = pageJson.backgroundColor;
+    } else if (pageJson.backgroundType == 3) {
+        //图像
+        var bd = background_data.find(b => b.key == pageJson.backgroundColor);
+        console.log("background_data");
+        console.log(background_data, pageJson.backgroundColor);
+        console.log(bd);
+        if (bd != undefined)
+            bd.onRender(pg, project_data.themeColor);
     }
+
+
 
     curpages = [];
     curpages.push(pageJson);

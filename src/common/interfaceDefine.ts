@@ -207,6 +207,11 @@ export interface IComponent {
      */
     isExpand?:boolean;
 }
+export interface IBackground{
+    title:string,
+    key:string,
+    onRender:(canvas:HTMLCanvasElement,color:string)=>void;
+}
 export interface IBlueEvent {
     label: string;
     on?:(args:any)=>void
@@ -239,6 +244,7 @@ export interface IPage {
     path?: string;
     width?: number;
     height?: number;
+    backgroundType?:number;
     backgroundColor?: string;
     theme: "light" | "dark";
     children?: IComponent[];
@@ -456,5 +462,5 @@ export interface IStatusBarActivity{
     position:"left"|"right";
     onRender:(acticity:HTMLElement,config?:any,project?:IProject)=>void;
     onClick?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,componentSelects?:string[])=>void;
-    onUpdate?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,component?:IComponent,selects?:string[])=>void;
+    onUpdate?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,component?:IComponent,selects?:string[],msg?:string)=>void;
 }

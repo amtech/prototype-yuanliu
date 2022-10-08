@@ -574,6 +574,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         checkContextMenu();
         //右侧面板
         activePropertyPanel(component);
+        //底部面板
         updateFloatPanel(component);
         //状态栏
         updateStatus(getCurPage(),component,getSelectComponents());

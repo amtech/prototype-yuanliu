@@ -5,20 +5,22 @@ Copyright (c) taoyongwen. All rights reserved.
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
 import { cal_gradient } from "../../render/propertypanel";
-import { IComponent, IPanel } from "../../common/interfaceDefine";
+import { IBackground, IComponent, IPanel } from "../../common/interfaceDefine";
 import { ipcRendererSend } from "../../preload";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
 import { renderPageLayout } from "../../render/pageLayout";
-import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, reRenderPage } from "../../render/workbench";
+import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, renderPageBackground, reRenderPage } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
 import { saveSimplePage } from "../../render/toolbar";
 import { getProject, renderExpand } from "../../render/workspace";
+import { showStatusLoadding } from "../../render/statusBar";
 
-var image:HTMLImageElement;
+
+var image: HTMLImageElement;
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
-var formScale:forms.FormSolider;
+var formScale: forms.FormSolider;
 var formTheme: forms.FormIcons;
 var formStyle: forms.FormSelect;
 var formBackgroundType: forms.FormIcons;
@@ -30,9 +32,11 @@ var formBackgroundGradientPanelColor2: forms.FormColor;
 var formBackgroundGradientPanelType: forms.FormIcons;
 var formBackgroundGradientPanelAngle: forms.FormSolider;
 var formBackgroundGradientPanelPosition: forms.FormSolider;
+var formBackgroundImage: forms.FormSelect;
+var formBackgroundImageDiv: HTMLElement;
 var formInfo: forms.FormPragraph;
 var component_list: HTMLElement;
-var hiddenMap=new Map();
+var hiddenMap = new Map();
 const panel: IPanel = {
   key: "page", name: "页面", hidden: true, sort: 0,
   render: (content: HTMLElement) => {
@@ -62,26 +66,46 @@ const panel: IPanel = {
 
     //image
 
-    var imageDiv=document.createElement("div");
-    imageDiv.style.textAlign="center";
-    imageDiv.style.paddingTop="20px";
-    imageDiv.style.paddingBottom="20px";
- 
-    imageDiv.style.overflow="hidden";
+    var imageDiv = document.createElement("div");
+    imageDiv.style.textAlign = "center";
+    imageDiv.style.paddingTop = "20px";
+    imageDiv.style.paddingBottom = "20px";
+
+    imageDiv.style.overflow = "hidden";
     setting.appendChild(imageDiv);
 
-    image=document.createElement("img");
-    image.style.maxWidth="200px";
-    image.style.maxHeight="200px";
-    image.style.boxShadow="0px 0px 5px rgb(157 157 157 / 50%)";
+    image = document.createElement("img");
+    image.style.maxWidth = "200px";
+    image.style.maxHeight = "200px";
+    image.style.boxShadow = "0px 0px 5px rgb(157 157 157 / 50%)";
     //image.src=getProject().work+"/images/cover.png";
     imageDiv.appendChild(image);
+    image.ondblclick = () => {
+
+      var page = getCurPage();
+
+      //页面截图 保存
+      const domToImage = require("dom-to-image");
+      var dom = document.getElementById("page_view_" + page.key);
+      var target: any = dom.getElementsByClassName("page_parent_content").item(0);
+
+      requestIdleCallback(() => {
+
+        domToImage.toJpeg(target, { quality: 1 })
+          .then((jpeg: any) => {
+
+            ipcRendererSend("downloadPageJpeg", { key: page.name, data: jpeg });
+
+          })
+      });
+
+    }
 
 
     var row = document.createElement("div");
     setting.appendChild(row);
 
-    var w = form.createDivRow(row,true);
+    var w = form.createDivRow(row, true);
     formWidth = new forms.FormNumber("宽度");
     formWidth.render(w);
 
@@ -90,7 +114,7 @@ const panel: IPanel = {
     formHeight.render(h);
 
 
-    formScale=new forms.FormSolider("缩放",110,10,"%");
+    formScale = new forms.FormSolider("缩放", 110, 10, "%");
     formScale.render(setting);
 
 
@@ -117,7 +141,7 @@ const panel: IPanel = {
 
     });
 
-    formBackgroundType = new forms.FormIcons("背景", ["bi bi-slash-circle", "bi bi-palette", "bi bi-circle-half", "bi bi-image"]);
+    formBackgroundType = new forms.FormIcons("背景", ["bi bi-slash-circle", "bi bi-palette", "bi bi-circle-half", "bi bi-star"]);
     formBackgroundType.render(setting);
 
 
@@ -160,6 +184,41 @@ const panel: IPanel = {
     formBackgroundGradientPanelPosition = new forms.FormSolider("位置", 100, 0);
     formBackgroundGradientPanelPosition.render(formBackgroundGradientPanel);
 
+    //3 image
+    formBackgroundImageDiv = document.createElement("div");
+    formBackgroundImageDiv.style.display = "none";
+    formBackgroundPanel.appendChild(formBackgroundImageDiv);
+    formBackgroundImageDiv.style.paddingLeft = "5px";
+
+    
+    ipcRendererSend("loadPluginsBg");
+    ipcRenderer.on("_loadPluginsBg", (event, args) => {
+      var list:any = [];
+
+      args.forEach((item: string) => {
+        try {
+          // console.log(item);
+          var bg: IBackground = require("../"+item).default;
+          if (bg != undefined) {
+            list.push({
+              label:bg.title,value:bg.key
+            })
+
+          }
+
+        } catch (error) {
+          console.log(error);
+        }
+
+      })
+      formBackgroundImage = new forms.FormSelect("内置背景", list);
+      formBackgroundImage.render(formBackgroundImageDiv);
+
+
+    })
+
+
+    //
 
     formInfo = new forms.FormPragraph("页面大纲");
     formInfo.render(setting);
@@ -180,7 +239,7 @@ const panel: IPanel = {
       return;
     }
 
-    image.src=getProject().work+"/images/"+getCurPage().key+".jpeg";
+    image.src = getProject().work + "/images/" + getCurPage().key + ".jpeg";
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
       getCurPage().height = parseFloat(value);
@@ -203,19 +262,19 @@ const panel: IPanel = {
       }
       pushHistory(getCurPage());
     });
-    var scale=100;
-    if(getCurPage().scale!=undefined){
-      scale=getCurPage().scale*100;
+    var scale = 100;
+    if (getCurPage().scale != undefined) {
+      scale = getCurPage().scale * 100;
       scale = Math.round(scale * 100) / 100;
     }
 
-    formScale.update(scale,(value)=>{
-      var s=value/100;
+    formScale.update(scale, (value) => {
+      var s = value / 100;
       s = Math.round(s * 100) / 100;
 
-      getCurPage().scale=s;
-      var div=document.getElementById("page_parent_"+getCurPage().key);
-      if(div!=undefined){
+      getCurPage().scale = s;
+      var div = document.getElementById("page_parent_" + getCurPage().key);
+      if (div != undefined) {
         div.style.transform = "scale(" + s + ")";
       }
     })
@@ -305,44 +364,42 @@ const panel: IPanel = {
     // // });
 
     var bgType = 0;
-    var bgtc = getCurPage().backgroundColor;
-    if (bgtc == "" || bgtc == "none" || bgtc == "transparent" || bgtc == "auto") {
-      bgType = 0;
-    } else if (bgtc.startsWith("rgb") || bgtc.startsWith("#")) {
-      bgType = 1;
-    } else if (bgtc.startsWith("linear-gradient") || bgtc.startsWith("radial-gradient")) {
-      bgType = 2;
+    if (getCurPage().backgroundType != undefined) {
+      bgType = getCurPage().backgroundType;
     }
+
 
     formBackgroundType.update(bgType, (value) => {
       bgType = value;
-      if (value == 0) {
-        var gb: any = getCurViewContent().getElementsByClassName("page_parent")[0];
-        gb.style.background = "auto";
-        getCurPage().backgroundColor = "auto";
-      }
+      getCurPage().backgroundType = value;
+
       backgroundTypeSwitch();
     });
     backgroundTypeSwitch();
     function backgroundTypeSwitch() {
-      var gb: any = getCurViewContent().getElementsByClassName("page_parent")[0];
-      var background = gb.style.background;
+      //  var gb: any = getCurViewContent().getElementsByClassName("page_parent")[0];
+      var background = getCurPage().backgroundColor;
       if (bgType == 0) {
         formBackgroundSolidPanel.style.display = "none";
         formBackgroundGradientPanel.style.display = "none";
-
+        formBackgroundImageDiv.style.display = "none";
+        renderPageBackground(getCurPage());
 
       } else if (bgType == 1) {
         formBackgroundSolidPanel.style.display = "block";
         formBackgroundGradientPanel.style.display = "none";
+        formBackgroundImageDiv.style.display = "none";
+
+        renderPageBackground(getCurPage());
         formBackgroundSolidPanelColor.update(background, (value) => {
-          gb.style.background = value;
+
           getCurPage().backgroundColor = value;
+          renderPageBackground(getCurPage());
         })
       } else if (bgType == 2) {
         formBackgroundSolidPanel.style.display = "none";
         formBackgroundGradientPanel.style.display = "block";
-
+        formBackgroundImageDiv.style.display = "none";
         var type: number = 0;
         var angle = 0;
         var colors = ["", ""];
@@ -388,41 +445,55 @@ const panel: IPanel = {
         formBackgroundGradientPanelColor1.update(colors[0], (value) => {
           colors[0] = value;
           var bg = cal_gradient(colors, angle, type, position);
-          gb.style.background = bg;
+
           getCurPage().backgroundColor = bg;
+          renderPageBackground(getCurPage());
         });
         formBackgroundGradientPanelColor2.update(colors[1], (value) => {
           colors[1] = value;
           var bg = cal_gradient(colors, angle, type, position);
-          gb.style.background = bg;
+
           getCurPage().backgroundColor = bg;
+          renderPageBackground(getCurPage());
         });
 
         formBackgroundGradientPanelType.update(type, (value) => {
           type = value;
           var bg = cal_gradient(colors, angle, type, position);
-          gb.style.background = bg;
+
           getCurPage().backgroundColor = bg;
+          renderPageBackground(getCurPage());
         })
 
         formBackgroundGradientPanelAngle.update(angle, (value) => {
           angle = value;
           var bg = cal_gradient(colors, angle, type, position);
-          gb.style.background = bg;
+
           getCurPage().backgroundColor = bg;
+          renderPageBackground(getCurPage());
         })
         formBackgroundGradientPanelPosition.update(position, (value) => {
           position = value;
           var bg = cal_gradient(colors, angle, type, position);
-          gb.style.background = bg;
+
           getCurPage().backgroundColor = bg;
+          renderPageBackground(getCurPage());
         })
 
 
       } else if (bgType == 3) {
+        //内置背景
         formBackgroundSolidPanel.style.display = "none";
         formBackgroundGradientPanel.style.display = "none";
-        //   formBackgroundImagePanel.style.display = "block";
+        formBackgroundImageDiv.style.display = "block";
+
+        formBackgroundImage.update(getCurPage().backgroundColor, (value) => {
+         
+            getCurPage().backgroundColor = value;
+            renderPageBackground(getCurPage());
+          
+     
+        })
       }
     }
 
@@ -444,7 +515,7 @@ const panel: IPanel = {
       });
 
       function renderLayersTree(layer: IComponent) {
-        if (layer.hidden||layer.isExpand) {
+        if (layer.hidden || layer.isExpand) {
           var component_item = document.createElement("div");
           component_item.style.margin = "10px";
           component_item.style.cursor = "pointer";
@@ -454,31 +525,31 @@ const panel: IPanel = {
           component_item_icon.className = layer.icon;
           component_item.appendChild(component_item_icon);
           component_list.appendChild(component_item);
-          hiddenMap.set(layer.key,layer.hidden);
+          hiddenMap.set(layer.key, layer.hidden);
           component_item.onclick = () => {
 
-            if(layer.isExpand){
+            if (layer.isExpand) {
               renderExpand(layer);
 
-            }else{
-              var hidden=hiddenMap.get(layer.key);
-              hidden=!hidden;
-              hiddenMap.set(layer.key,hidden);
+            } else {
+              var hidden = hiddenMap.get(layer.key);
+              hidden = !hidden;
+              hiddenMap.set(layer.key, hidden);
               if (layer.toogle != undefined) {
-                  layer.toogle(document.getElementById(layer.key), hidden);
+                layer.toogle(document.getElementById(layer.key), hidden);
               } else {
-                  document.getElementById(layer.key).style.display = hidden? "none" : "block";
+                document.getElementById(layer.key).style.display = hidden ? "none" : "block";
               }
-              if(!hidden){
-                  component_item_icon.style.color="var(--theme-color)";
-              }else{
-              
-                  component_item_icon.style.color="";
-            
+              if (!hidden) {
+                component_item_icon.style.color = "var(--theme-color)";
+              } else {
+
+                component_item_icon.style.color = "";
+
               }
             }
 
-          
+
 
           }
 

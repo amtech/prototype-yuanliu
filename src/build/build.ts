@@ -310,6 +310,8 @@ function buildData(wProject: any,terminal?:(log:any)=>void) {
     }
     //components
     buildComponents(wProject,terminal);
+    //
+    buildPluginsBackground(wProject);
 
     //css
     var cssPath = path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "css");
@@ -322,6 +324,11 @@ function buildData(wProject: any,terminal?:(log:any)=>void) {
     var imageFolder = storage.getProjectFolderPath(wProject, "images");
     var imageDist = path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "images");
     copyDir(imageFolder, imageDist);
+
+    //bgimage 内置图片
+   // storage.read
+ 
+
     if(terminal){
         terminal("image");
     }
@@ -329,4 +336,25 @@ function buildData(wProject: any,terminal?:(log:any)=>void) {
         terminal("buildData success");
     }
     console.log("buildData success");
+}
+function buildPluginsBackground(wProject:IProject){
+    var rs="export default [";
+    storage.loadPluginsBackground().forEach(item=>{
+
+
+        var cPath = path.join(storage.getAppFolderPath("plugins"), "background", item.replace("../plugins/background/", ""));
+
+        var file = fs.readFileSync(cPath).toString();
+
+        var start = file.indexOf("var background = ") + "var background = ".length;
+        var end = file.indexOf("exports[\"default\"] = background;") - 2;
+        var code = file.substring(start, end);
+
+        rs+=code+",";
+
+
+    })
+    rs+="]";
+    fs.writeFileSync(path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "js", "backgrounds.js"), rs);
+
 }

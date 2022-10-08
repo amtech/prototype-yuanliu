@@ -276,6 +276,13 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     });
 
+    ipcMain.on("loadPluginsBg_" + wId, (event: any, arg: any) => {
+        var result = storage.loadPluginsBg();
+
+        bw.webContents.send("_loadPluginsBg", result);
+
+    });
+
     ipcMain.on("loadMapCatalog_" + wId, (event: any, arg: any) => {
 
         var result = storage.loadMapCatalog();
@@ -419,6 +426,14 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
     ipcMain.on("savePageJpeg_" + wId, (event, arg) => {
 
         storage.savePageJpeg(arg.key, arg.data, wProject);
+
+    });
+    ipcMain.on("downloadPageJpeg_" + wId, (event, arg) => {
+        var list = dialog.showOpenDialogSync(bw, { properties: ['openDirectory'] });
+        if(list!=undefined&&list.length>0){
+            storage.downloadPageJpeg(arg.key, arg.data, wProject,list[0]);
+        }
+      
 
     });
     ipcMain.on("importDataExcel_" + wId, (event, arg) => {

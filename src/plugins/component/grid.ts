@@ -16,7 +16,7 @@ import { IComponent } from "../../common/interfaceDefine"
             gird = document.createElement("div");
 
         if(component.property!=undefined&&component.property.isHost!=undefined&&component.property.isHost.context=="true"){
-
+            gird.setAttribute("active", "true");
             gird.onmouseover=()=>{
                 gird.style.backgroundColor="rgba(175,175,175,0.2)";
                 gird.style.cursor="pointer";

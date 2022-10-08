@@ -1,3 +1,4 @@
+import { activePropertyPanel } from "../../render/propertypanel";
 import { IBlueProperty, IComponent } from "../../common/interfaceDefine"
 
 const component: IComponent = {
@@ -5,7 +6,7 @@ const component: IComponent = {
     style: "font-size:14px;padding:10px;border:0;width:300px;text-indent: 2em;background:transparent;border-radius:5px;",
     onPreview: () => {
         var label = document.createElement("div");
-        label.innerText = "Prototyping-让设计跟接近产品.功能强大、可扩展且功能丰富的,利用预构建的网格系统和组件，并使用强大的JavaScript插件给项目带来生命。";
+        label.innerHTML = "yuanliu-让设计跟接近产品.功能强大、可扩展且功能丰富的,利用预构建的网格系统和组件，并使用强大的JavaScript插件给项目带来生命。";
         return label;
     }, onRender: (component, element, content, type) => {
         var label: HTMLElement;
@@ -14,24 +15,25 @@ const component: IComponent = {
         else
             label = document.createElement("div");
        
-        label.innerText = component.property.text.context;
+        label.innerHTML = component.property.text.context;
         if (type != "product")
             label.ondblclick = () => {
 
                 var input = document.createElement("div");
+                input.className="editor";
                 input.style.width = "100%";
                 input.style.height = "max-content";
                 input.contentEditable = "true";
                 input.style.outline = "none";
 
-                input.innerText = component.property.text.context;
+                input.innerHTML = component.property.text.context;
                 input.onkeydown = (ky) => {
                     ky.stopPropagation();
                 }
                 label.innerHTML = "";
                 label.appendChild(input);
                 input.onchange = () => {
-                    component.property.text.context = input.innerText;
+                    component.property.text.context = input.innerHTML;
                 }
                 input.focus();
                 input.onmousedown = (oc) => {
@@ -44,9 +46,14 @@ const component: IComponent = {
                     oc.stopPropagation();
                 }
                 input.onblur = () => {
-                    component.property.text.context = input.innerText;
-                    label.innerText = input.innerText;
+                    component.property.text.context = input.innerHTML;
+                    label.innerHTML = input.innerHTML;
                     input.remove();
+
+                }
+                input.onmouseup=()=>{
+
+                    activePropertyPanel(component);
 
                 }
 
@@ -54,7 +61,7 @@ const component: IComponent = {
         return { root: label, content: label };
     }, property: {
         text: {
-            label: "文本", type: "doc", context: "Prototyping-让设计跟接近产品.功能强大、可扩展且功能丰富的,利用预构建的网格系统和组件，并使用强大的JavaScript插件给项目带来生命。"
+            label: "文本", type: "doc", context: "yuanliu-让设计跟接近产品功能强大、可扩展且功能丰富的,利用预构建的网格系统和组件，并使用强大的JavaScript插件给项目带来生命。"
         }
     }, blue: {
 
@@ -70,7 +77,8 @@ const component: IComponent = {
             }
 
         }
-    }
+    },
+    panel:"editor"
 }
 export default function load() {
     return component;

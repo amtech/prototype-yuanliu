@@ -51,7 +51,7 @@ function showPropertyTab(panels: string[],args?:any) {
             try {
                 panelsMap.get(key).update(args);
             } catch (error) {
-                console.log(error);
+                //console.log(error);
             }
         }else{
             ele.style.display = "none";
@@ -101,7 +101,7 @@ export function renderPropertyPanel(content: HTMLElement) {
             plugins.push(panel);
         });
         plugins.sort((a, b) => a.sort - b.sort);
-        console.log("loadPluginsProperty", plugins);
+        //console.log("loadPluginsProperty", plugins);
         renderPanels(tabsBar, tabsBody, plugins);
     });
 
@@ -207,7 +207,7 @@ export function getComponentStyle(component: IComponent, property: string, repla
             } else if (property == "height") {
                 var d=document.getElementById(component.key);
                 if(d!=undefined){
-                    console.log("cli ",v);
+                    //console.log("cli ",v);
                     return d.clientHeight + "";
                 }
                    
