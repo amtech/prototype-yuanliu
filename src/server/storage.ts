@@ -93,6 +93,7 @@ export function openPage(catalog: ICatalog, project: IProject): IPage {
         var page = readPage(file);
         page.name = catalog.name;
         page.path = p;
+
         return page;
     }
     return undefined;
@@ -126,6 +127,7 @@ export function saveNavBar(nav: string, wProject: IProject): any {
     return fs.writeFileSync(navPath, nav);
 
 }
+var pageSizeMap:Map<string,number>=new Map();
 export function savePage(page: string, folder: string, wProject: IProject): any {
 
 
@@ -134,13 +136,22 @@ export function savePage(page: string, folder: string, wProject: IProject): any 
     //edge
 
     //blue
-
-
-
-
-
     //page
     var navPath = path.join(getProjectFolderPath(wProject, "pages"), folder);
+
+    //异常备份，如果 页面大小变化异常小于一半，自动备份页面
+    if(pageSizeMap.has(navPath)){
+        if(page.length<pageSizeMap.get(navPath)*0.5){
+            //备份
+            try {
+                fs.copyFileSync(navPath, path.join(navPath,".backup"));
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+    }
+
     try {
         fs.writeFileSync(navPath, page);
     } catch (e) {
@@ -224,17 +235,18 @@ export function renameFile(args: { catalog: ICatalog, oldName: string, newName: 
     var pt = catalog.path;
     var newPath = catalog.path.replace(args.oldName, args.newName);
     try {
+        //原文件地址
         var p = path.join(pagesPath, pt);
         if (fs.existsSync(p)) {
             //如果新的名字与就文件一样，直接使用旧文件
+            //新文件地址
             var newPath=path.join(pagesPath, newPath);
             if(fs.existsSync(newPath)){
-                fs.unlinkSync(p);
+                //fs.unlinkSync(p);错误代码，导致1页面数据丢失
             }else{
                 fs.renameSync(p, path.join(pagesPath, newPath));
             }
-
-           
+     
         } else {
             catalog.path = newPath;
             newFile(catalog, wProject);
@@ -408,7 +420,9 @@ function readPagesFile(p: string, file: string, catalogs: IPage[], wProject: IPr
     }
 }
 function readPage(file: string): IPage {
-    return JSON.parse(fs.readFileSync(file).toString());
+    var json=fs.readFileSync(file).toString();
+    pageSizeMap.set(file,json.length);
+    return JSON.parse(json);
 
 }
 
@@ -558,7 +572,7 @@ export function loadPluginsBg():string[]{
     if (fs.existsSync(componentsFolder)) {
         fs.readdirSync(componentsFolder).forEach(file => {
             if (file.endsWith(".js")) {
-                var path = "../../plugins/background/" + file;
+                var path = "../plugins/background/" + file;
                 result.push(path);
             }
 
