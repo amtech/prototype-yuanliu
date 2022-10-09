@@ -376,9 +376,8 @@ export interface IBlueLink {
     color?: string;
 }
 export function getUUID(): string {
-    // import {v4 as uuid} from "uuid";
-    //简化 时间戳+随机数
-    return "u" +Date.now().toString().substring(8)+""+Math.round(Math.random()*100);
+    
+     return "u" +Date.now().toString().substring(8)+""+Math.round(Math.random()*100);
 }
 /**
  * 面板

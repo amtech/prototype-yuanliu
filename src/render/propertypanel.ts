@@ -229,6 +229,7 @@ export function setComponentStyle(component: IComponent, property: string, value
         }
         style += property + ":" + value + ";";
         component.style = style.replace(/; /g, ";");
+        component.style = style.replace(/  /g, "");
     } else {
         style = component.styles["root"].replace(/;/g, "; ");
         var rep = RegExp("[^-]" + property + ":[^;]+;");
@@ -239,6 +240,7 @@ export function setComponentStyle(component: IComponent, property: string, value
         }
         style += property + ":" + value + ";";
         component.styles["root"] = style.replace(/; /g, ";");
+        component.styles["root"]= style.replace(/  /g, "");
     }
     updateComponentsStyle([component]);
 }

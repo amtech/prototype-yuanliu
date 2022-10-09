@@ -77,7 +77,8 @@ const panel: IPanel = {
     image = document.createElement("img");
     image.style.maxWidth = "200px";
     image.style.maxHeight = "200px";
-    image.style.boxShadow = "0px 0px 5px rgb(157 157 157 / 50%)";
+    image.style.borderRadius="5px";
+    image.style.boxShadow = "0px 0px 10px rgb(157 157 157 / 50%)";
     //image.src=getProject().work+"/images/cover.png";
     imageDiv.appendChild(image);
     image.ondblclick = () => {
