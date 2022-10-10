@@ -385,9 +385,10 @@ export interface IBlueLink {
     },
     color?: string;
 }
+var count=0;
 export function getUUID(): string {
-    
-     return "u" +Date.now().toString().substring(8)+""+Math.round(Math.random()*100);
+    count++;
+    return "u" +Date.now().toString().substring(8)+""+Math.round(Math.random()*100)+count;
 }
 /**
  * 面板
