@@ -16,7 +16,7 @@ import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
 import { clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine } from "../render/workbench";
 import { getConfig, getProject } from "../render/workspace";
 import { checkContextMenu, IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
-import { getUUID, IComponent, IComponentProperty, IExtension } from "./interfaceDefine";
+import { getUUID, IComponent, IComponentProperty, IExtension, IShape } from "./interfaceDefine";
 import { updateStatus } from "../render/statusBar";
 export function getComponentTempateByType(type: string): IComponent {
     if (componentsTemplate == undefined || componentsTemplate.length == 0) {
@@ -165,12 +165,13 @@ export function initComponent(componentT: IComponent, clone?: boolean): ICompone
             onDrop: componentT.onDrop,
             onPreview: componentT.onPreview,
             onRender: componentT.onRender,
+            shape: componentT.shape,
             isFixed: componentT.isFixed,
             property: copyComponentProperty(componentT.property),
             styles: copyStyles(componentT.styles),
             toogle: componentT.toogle,
             hidden: componentT.hidden,
-            isExpand:componentT.isExpand,
+            isExpand: componentT.isExpand,
             blue: copyBlue(componentT.blue),
             sort: 0,
             edge: componentT.edge,
@@ -297,10 +298,10 @@ export function renderComponents(content: HTMLElement, components: IComponent[],
                     if (parent != undefined && parent.type == "row") {
                         component.flex = true;
                     }
-                    if(component.isExpand){
+                    if (component.isExpand) {
                         //初始化时，不渲染 扩展内容
-                    }else
-                     renderComponent(content, component, undefined, index, parent);
+                    } else
+                        renderComponent(content, component, undefined, index, parent);
                 } catch (error) {
                     console.log(error);
                 }
@@ -347,8 +348,8 @@ export function installComponent(component: IComponent) {
                 pi = element;
             else
                 pi = document.createElement("div");
-           // if (component.blue!=undefined&&component.blue.event!=undefined&& component.blue.event.click != undefined)
-                pi.setAttribute("icon_hover", "true");
+            // if (component.blue!=undefined&&component.blue.event!=undefined&& component.blue.event.click != undefined)
+            pi.setAttribute("icon_hover", "true");
             pi.innerHTML = "<i class='" + icon_e + "'></i>";
             pi.onclick = () => {
                 if (component.blue.event.click.on != undefined) {
@@ -410,7 +411,7 @@ export function onSelectComponent(componentPath: string) {
  * @returns 
  */
 export function renderComponent(content: HTMLElement, component: IComponent, dropIndex?: number, index?: number, parent?: IComponent, self?: HTMLElement): HTMLElement {
- 
+
 
     //如果隐藏，不渲染。
     // if (component.hidden) {
@@ -443,9 +444,9 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     //渲染组件
     var rs;
     if (self == undefined) {
-        rs = component.onRender(component, undefined, content,"design",getProject().themeColor);
+        rs = component.onRender(component, undefined, content, "design", getProject().themeColor);
     } else {
-        rs = component.onRender(component, self, undefined,"design",getProject().themeColor);
+        rs = component.onRender(component, self, undefined, "design", getProject().themeColor);
     }
     if (component.type == "layers") {
         console.log("------------edge", component.edge);
@@ -476,14 +477,14 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         if (component.toogle != undefined) {
             component.toogle(root, true);
         } else {
-          //  root.style.display = "none";
-          var config= getConfig();
-          if(config.eye==undefined||config.eye==false){
-            root.style.display = "none";
-          }else{
-            root.style.opacity="0.5";
-          }
-         
+            //  root.style.display = "none";
+            var config = getConfig();
+            if (config.eye == undefined || config.eye == false) {
+                root.style.display = "none";
+            } else {
+                root.style.opacity = "0.5";
+            }
+
         }
     }
     //控制层级 layer
@@ -508,6 +509,16 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             content.appendChild(root);
         }
     }
+    //渲染形状背景
+    if (component.shape != undefined&&component.shape .length>0) {
+        requestIdleCallback(() => {
+         setTimeout(() => {
+            renderComponentShape(component, root)
+         }, 100);
+        })
+    }
+
+
     //渲染看操作按钮,hover时触发。
     // var soliderBottom=document.createElement("div");
     // soliderBottom.className="component_tap solider_bottom";
@@ -577,7 +588,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         //底部面板
         updateFloatPanel(component);
         //状态栏
-        updateStatus(getCurPage(),component,getSelectComponents());
+        updateStatus(getCurPage(), component, getSelectComponents());
 
     }
     ////////////
@@ -873,14 +884,15 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         // folderTitle.setAttribute("selected", "true");
         var menuItems: Array<IMenuItem> = [{
             id: "delete",
-            label: "删除", icon: "bi bi-trash", accelerator: "Backspace",onclick: () => {
+            label: "删除", icon: "bi bi-trash", accelerator: "Backspace", onclick: () => {
                 getSelectComponents().forEach((path: string) => {
                     var cmpt = findCurPageComponent(path);
                     deleteComponent(cmpt);
                 });
 
             }
-        }, {  id: "copy",
+        }, {
+            id: "copy",
             label: "复制", icon: "bi bi-files", accelerator: "Command/control+c", onclick: () => {
                 console.log("copy", getSelectComponents());
                 var _selectComponents: IComponent[] = [];
@@ -899,14 +911,14 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                 clipboardPaste(body, component);
 
             }
-        },{
-           
-            type:"separator"
-        } 
-        ,{
+        }, {
+
+            type: "separator"
+        }
+            , {
             id: "insert",
-       
-            label: "插入组件", icon: "bi bi-layout-wtf", accelerator: "i", 
+
+            label: "插入组件", icon: "bi bi-layout-wtf", accelerator: "i",
             onclick: () => {
                 setTimeout(() => {
                     shortcutInsertComponent(e.clientX, e.clientY, component);
@@ -991,11 +1003,11 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                 showComponentsOutLine();
             } else if (e.key == "y") {
                 //隐藏组件
-                component.hidden=true;
+                component.hidden = true;
                 if (component.toogle != undefined) {
                     component.toogle(document.getElementById(component.key), component.hidden);
                 } else {
-                    document.getElementById(component.key).style.display =  "none";
+                    document.getElementById(component.key).style.display = "none";
                 }
 
 
@@ -1061,6 +1073,49 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
     return root;
 }
+export function renderComponentShape(component?: IComponent, root?: HTMLElement) {
+
+    var bgs = root.getElementsByClassName("component_bg");
+    if (bgs == undefined || bgs.length == 0) {
+        return;
+    }
+    root.style.background="";
+    var bg = root.getElementsByClassName("component_bg")[0];
+    var w = bg.clientWidth;
+    var h = bg.clientHeight;
+
+    var bgcolor = "transparent";
+    var property = "background";
+    var style = component.style;
+    var rep = RegExp("[^\-]" + property + ":[^;]+;");
+
+    var m = (" " + style).match(rep);
+
+    if (m != undefined && m != null && m.length > 0) {
+        for (var i = 0; i < m.length; i++) {
+            var s = m[i].substring(1);
+            if (s.trim().startsWith(property + ":")) {
+                var v = s.split(":")[1];
+                v = v.substring(0, v.length - 1).trim();
+                bgcolor = v;
+            }
+        }
+    }
+    bg.innerHTML="";
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.style.zIndex = "1";
+    svg.style.width = w + "px";
+    svg.style.height = h + "px";
+    bg.appendChild(svg);
+ 
+    var shape: IShape = require(component.shape).default;
+    if (shape != undefined)
+    {
+      
+            shape.onRender(svg,bgcolor,"var(--theme-color)");
+       
+    }
+}
 /**
  * 删除组件
  * @param component 
@@ -1076,8 +1131,8 @@ export function deleteComponent(component: IComponent) {
     if (componentDiv != undefined) {
         componentDiv.remove();
     }
-    activePropertyPanel();
-    updateBlueView();
+  //  activePropertyPanel();
+   // updateBlueView();
     pushHistory(getCurPage());
 
 }

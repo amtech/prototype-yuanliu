@@ -412,6 +412,8 @@ export function renderPage(page: IPage) {
             //renderGuidePanel();//引导面板
             //状态栏
             updateStatus(page, undefined, undefined);
+            //渲染 背景
+          //  document.getElementById("edgePanel").style.backgroundImage="url("+getProject().work + "/images/" +page.key+".jpeg)";
         }, 500);
         //历史记录
         //    pushHistory(page);

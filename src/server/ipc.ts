@@ -283,6 +283,13 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
 
     });
 
+    ipcMain.on("loadPluginsShape_" + wId, (event: any, arg: any) => {
+        var result = storage.loadPluginsShape();
+
+        bw.webContents.send("_loadPluginsShape", result);
+
+    });
+
     ipcMain.on("loadMapCatalog_" + wId, (event: any, arg: any) => {
 
         var result = storage.loadMapCatalog();

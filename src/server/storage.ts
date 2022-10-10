@@ -580,7 +580,22 @@ export function loadPluginsBg():string[]{
     }
     return result;
 }
+export function loadPluginsShape():string[]{
 
+    var componentsFolder = path.join(getAppFolderPath("plugins"), "shape");
+    //  console.log("loadPluginsComponent",componentsFolder);
+    var result: string[] = [];
+    if (fs.existsSync(componentsFolder)) {
+        fs.readdirSync(componentsFolder).forEach(file => {
+            if (file.endsWith(".js")) {
+                var path = "../plugins/shape/" + file;
+                result.push(path);
+            }
+
+        })
+    }
+    return result;
+}
 
 export function loadPluginsProperty(): string[] {
     var componentsFolder = path.join(getAppFolderPath("plugins"), "property");

@@ -1,3 +1,4 @@
+
 import { IComponent } from "../../common/interfaceDefine"
 
  const  component:IComponent={
@@ -14,6 +15,16 @@ import { IComponent } from "../../common/interfaceDefine"
             gird.innerHTML="";
         }else
             gird = document.createElement("div");
+        var gridBg=document.createElement("div");
+        gridBg.className="component_bg";
+        gridBg.style.position="absolute";
+        gridBg.style.top="0";
+        gridBg.style.left="0";
+        gridBg.style.bottom="0";
+        gridBg.style.right="0";
+        var gridContent=document.createElement("div");
+        gird.appendChild(gridBg);
+        gird.appendChild(gridContent);
 
         if(component.property!=undefined&&component.property.isHost!=undefined&&component.property.isHost.context=="true"){
             gird.setAttribute("active", "true");
@@ -38,7 +49,7 @@ import { IComponent } from "../../common/interfaceDefine"
 
         }
     
-        return {root:gird,content:gird};
+        return {root:gird,content:gridContent};
     },
     property: {
         isHost: { label: "热区", type: "bool", context: "false", },

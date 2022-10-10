@@ -100,7 +100,16 @@ export function renderBlueView(content: HTMLElement) {
 
     //icon contxtmenu
     var viewContentMenu: IMenuItem[] = [
-
+        {
+            id:"update",
+            label:"刷新",
+            onclick:()=>{
+                updateBlueView();
+            }
+        },
+        {
+            type: "separator"
+        },
         {
             id: "sim",
             label: "单变量", onclick: () => {

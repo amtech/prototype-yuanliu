@@ -118,9 +118,14 @@ export interface IComponent {
      * 
      * 渲染组件预览效果
      * 
-     * @param omponent 
+     * @param component 
      */
-    onPreview?(omponent?: IComponent): HTMLElement;
+    onPreview?(component?: IComponent): HTMLElement;
+    /**
+     * 形状
+     * @param component 
+     */
+    shape?:string;
     /**
      * 是否已被删除
      */
@@ -211,6 +216,11 @@ export interface IBackground{
     title:string,
     key:string,
     onRender:(canvas:HTMLCanvasElement,color:string)=>void;
+}
+export interface IShape{
+    title:string,
+    key:string,
+    onRender:(svg:SVGElement,fill:string,stroke:string)=>void;
 }
 export interface IBlueEvent {
     label: string;

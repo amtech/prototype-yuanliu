@@ -312,6 +312,8 @@ function buildData(wProject: any,terminal?:(log:any)=>void) {
     buildComponents(wProject,terminal);
     //
     buildPluginsBackground(wProject);
+    //
+    buildPluginsShape(wProject);
 
     //css
     var cssPath = path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "css");
@@ -356,5 +358,26 @@ function buildPluginsBackground(wProject:IProject){
     })
     rs+="]";
     fs.writeFileSync(path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "js", "backgrounds.js"), rs);
+
+}
+function buildPluginsShape(wProject:IProject){
+    var rs="export default [";
+    storage.loadPluginsShape().forEach(item=>{
+
+
+        var cPath = path.join(storage.getAppFolderPath("plugins"), "shape", item.replace("../plugins/shape/", ""));
+
+        var file = fs.readFileSync(cPath).toString();
+
+        var start = file.indexOf("var shape = ") + "var shape = ".length;
+        var end = file.indexOf("exports[\"default\"] = shape;") - 2;
+        var code = file.substring(start, end);
+
+        rs+=code+",";
+
+
+    })
+    rs+="]";
+    fs.writeFileSync(path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "js", "shapes.js"), rs);
 
 }

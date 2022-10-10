@@ -22,6 +22,7 @@ import pages_data from "./pagesData.js";
 import project_data from "./projectData.js";
 import title_data from "./titleData.js";
 import background_data from "./backgrounds.js";
+import shapes_data from "./shapes.js";
 
 
 window.onload = () => {
@@ -62,10 +63,10 @@ window.onload = () => {
     if (hash.indexOf("?") > 0) {
         hash = hash.split("?")[0];
     }
+    console.log("hash", hash);
     if (hash != undefined && hash.length > 0) {
 
-        var page = pages_data.find(p => p.key == hash.substring(1));
-        renderPage(page);
+        renderPageByCatalogKey(hash.substring(1));
         return;
 
 
@@ -662,7 +663,57 @@ export function renderComponent(content, component, parent, index, self) {
             renderComponents(body, component.children, component);
         }, 0);
     }
+    //渲染形状背景
+    if (component.shape != undefined && component.shape.length > 0) {
+        setTimeout(() => {
+            renderComponentShape(component, root)
+        }, 100);
+
+    }
+
     return root;
+}
+
+function renderComponentShape(component, root) {
+    var bgs = root.getElementsByClassName("component_bg");
+    if (bgs == undefined || bgs.length == 0) {
+        return;
+    }
+    root.style.background = "";
+    var bg = root.getElementsByClassName("component_bg")[0];
+    var w = bg.clientWidth;
+    var h = bg.clientHeight;
+
+    var bgcolor = "transparent";
+    var property = "background";
+    var style = component.style;
+    var rep = RegExp("[^\-]" + property + ":[^;]+;");
+
+    var m = (" " + style).match(rep);
+
+    if (m != undefined && m != null && m.length > 0) {
+        for (var i = 0; i < m.length; i++) {
+            var s = m[i].substring(1);
+            if (s.trim().startsWith(property + ":")) {
+                var v = s.split(":")[1];
+                v = v.substring(0, v.length - 1).trim();
+                bgcolor = v;
+            }
+        }
+    }
+    bg.innerHTML = "";
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.style.zIndex = "1";
+    svg.style.width = w + "px";
+    svg.style.height = h + "px";
+    bg.appendChild(svg);
+
+    var shape = shapes_data.find(b => "../plugins/shape/" + b.key == component.shape);
+    if (shape != undefined) {
+
+        shape.onRender(svg, bgcolor, "var(--theme-color)");
+
+    }
 }
 
 function renderHubIcon() {

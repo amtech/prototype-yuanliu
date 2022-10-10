@@ -166,7 +166,7 @@ function layout(app: HTMLElement) {
     //标题工具栏
     var toolBarHeight: number = 32;//60;
     var toolBar = document.createElement("div");
-
+    toolBar.id="toolBar";
     toolBar.style.height = toolBarHeight + "px";
     toolBar.style.position = "fixed";
     toolBar.style.width = "100%";

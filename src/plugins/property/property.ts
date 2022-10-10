@@ -7,7 +7,7 @@ import { IMenuItem, openContextMenu } from "../../common/contextmenu";
 import { ICatalog, IComponent, IComponentProperty, IPanel } from "../../common/interfaceDefine";
 import { updateComponentsStyle } from "../../render/floatPanel";
 
-import { copyStyles, deleteComponent, onSelectComponent, updateComponent } from "../../common/components";
+import { copyStyles, deleteComponent, onSelectComponent, renderComponentShape, updateComponent } from "../../common/components";
 import { set16ToRgb } from "../../dialog/picker";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
@@ -16,6 +16,8 @@ import { pushHistory } from "../../render/history";
 import { cal_gradient, getComponentStyle, setComponentStyle } from "../../render/propertypanel";
 import { isHiddenExplorer, renderExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
+import { ipcRendererSend } from "../../preload";
+import { ipcRenderer } from "electron";
 
 const panel: IPanel = {
     key: "property", name: "属性", hidden: true, sort: 0,
@@ -671,7 +673,11 @@ function loadComponentsProperty(component: IComponent) {
     })
 
 
-
+    //shape 
+    formShape.update(component.shape,(value)=>{
+        component.shape=value;
+        renderComponentShape(component,document.getElementById(component.key));
+    })
 
 
 
@@ -912,6 +918,8 @@ var formBoxShadowColor: FormColor;
 
 var formOpacity: FormSolider;
 
+var formShape: FormSelect;
+
 function renderThemeProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
@@ -1013,6 +1021,20 @@ function renderThemeProperty(context: HTMLElement) {
     formOpacity.render(body);
 
 
+    ipcRendererSend("loadPluginsShape");
+    ipcRenderer.on("_loadPluginsShape",(event,args)=>{
+        var ops=[{
+            label:"请选择",value:""
+        }];
+        args.forEach((item: string) => {
+            var val = item.replace(".js", "");
+            ops.push({ label: val, value: val });
+          });
+        formShape=new FormSelect("形状",ops);
+        formShape.render(body);
+    
+
+    });
 
 
 
@@ -1473,7 +1495,13 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
             }, {
                 id: "delete",
                 label: "删除", icon: "bi bi-trash", onclick: () => {
+                    var del=  document.getElementById("layer_" + component.key);
+                    console.log("del",del);
+                    if(del!=undefined){
+                        del.remove();
+                    }
                     deleteComponent(component);
+                  
 
                 }
             }, {
@@ -1573,7 +1601,11 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
             }, {
                 id: "delete",
                 label: "删除", icon: "bi bi-trash", onclick: () => {
-
+                    var del=  document.getElementById("layer_" + component.key);
+                    console.log("del",del);
+                    if(del!=undefined){
+                        del.remove();
+                    }
                     deleteComponent(component);
 
 
