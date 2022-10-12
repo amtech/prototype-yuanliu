@@ -13,14 +13,18 @@ const component: IComponent = {
         if (element != undefined)
             button = element;
         else
-            button = document.createElement("input");
-        button.type = "text";
-
+            button = document.createElement("div");
      
+
+        var input:any=document.createElement("input");
+        button.appendChild(input);
+        input.type = "text";
+        input.style.background="transparent";
+        input.style.width="inherit";
         //xin
-        button.value = component.property.text.context;
-        button.onChange = () => {
-            component.property.text.context = button.value;
+        input.value = component.property.text.context;
+        input.onChange = () => {
+            component.property.text.context = input.value;
         }
         return { root: button, content: button };
     }, property: {
@@ -30,9 +34,7 @@ const component: IComponent = {
     }, blue: {
         event: {
             change: {
-                label: "改变", on: (comp: IComponent, action: (args: any) => void) => {
-
-                }
+                label: "改变"
             }
         },
         property: {

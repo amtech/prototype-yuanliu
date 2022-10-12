@@ -118,7 +118,9 @@ export function renderComponentPreview(content: HTMLElement, component: ICompone
 
         }
         preview.style.pointerEvents = "none";
-
+        preview.ondragover=(e)=>{
+            e.stopPropagation();
+        }
         if (component.type == "dialog") {
             getCurPageContent().appendChild(preview);
 
@@ -298,6 +300,10 @@ export function renderComponents(content: HTMLElement, components: IComponent[],
                     if (parent != undefined && parent.type == "row") {
                         component.flex = true;
                     }
+                    //兼容旧的dialog
+                    if (component.type == "dialog")
+                        component.isExpand = true;
+
                     if (component.isExpand) {
                         //初始化时，不渲染 扩展内容
                     } else
@@ -497,12 +503,13 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
     //渲染子组件
     var eventEle = root;
-    if (component.type == "dialog") {
-        requestIdleCallback(() => {
-            getCurPageContent().appendChild(root);
-        })
-        eventEle = body;
-    } else if (content != undefined) {
+    // if (component.type == "dialog") {
+    //     requestIdleCallback(() => {
+    //         getCurPageContent().appendChild(root);
+    //     })
+    //     eventEle = body;
+    // } else 
+    if (content != undefined) {
         if (dropIndex != undefined && dropIndex >= 0) {
             content.children.item(dropIndex).insertAdjacentElement("beforebegin", root);
         } else {
@@ -510,11 +517,11 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         }
     }
     //渲染形状背景
-    if (component.shape != undefined&&component.shape .length>0) {
+    if (component.shape != undefined && component.shape.length > 0) {
         requestIdleCallback(() => {
-         setTimeout(() => {
-            renderComponentShape(component, root)
-         }, 100);
+            setTimeout(() => {
+                renderComponentShape(component, root)
+            }, 100);
         })
     }
 
@@ -1079,7 +1086,7 @@ export function renderComponentShape(component?: IComponent, root?: HTMLElement)
     if (bgs == undefined || bgs.length == 0) {
         return;
     }
-    root.style.background="";
+    root.style.background = "";
     var bg = root.getElementsByClassName("component_bg")[0];
     var w = bg.clientWidth;
     var h = bg.clientHeight;
@@ -1101,19 +1108,18 @@ export function renderComponentShape(component?: IComponent, root?: HTMLElement)
             }
         }
     }
-    bg.innerHTML="";
+    bg.innerHTML = "";
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.style.zIndex = "1";
     svg.style.width = w + "px";
     svg.style.height = h + "px";
     bg.appendChild(svg);
- 
+
     var shape: IShape = require(component.shape).default;
-    if (shape != undefined)
-    {
-      
-            shape.onRender(svg,bgcolor,"var(--theme-color)");
-       
+    if (shape != undefined) {
+
+        shape.onRender(svg, bgcolor, "var(--theme-color)");
+
     }
 }
 /**
@@ -1131,8 +1137,8 @@ export function deleteComponent(component: IComponent) {
     if (componentDiv != undefined) {
         componentDiv.remove();
     }
-  //  activePropertyPanel();
-   // updateBlueView();
+    //  activePropertyPanel();
+    // updateBlueView();
     pushHistory(getCurPage());
 
 }

@@ -231,7 +231,7 @@ export function setComponentStyle(component: IComponent, property: string, value
         component.style = style.replace(/; /g, ";");
         component.style = style.replace(/  /g, "");
     } else {
-        style = component.styles["root"].replace(/;/g, "; ");
+        style ="  "+component.styles["root"].replace(/;/g, "; ");
         var rep = RegExp("[^-]" + property + ":[^;]+;");
         style = style.replace(rep, "")
         ///(;|^)background:[^;]+;/g

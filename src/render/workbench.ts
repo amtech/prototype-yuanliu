@@ -20,7 +20,7 @@ import { getKeyCode, getMousePosition, getShiftKeyDown } from "../render/shorcut
 import { activePropertyPanel } from "./propertypanel";
 import { pushHistory } from "./history";
 import { isDark } from "../dialog/picker";
-import { getProject, renderRecent } from "./workspace";
+import { getProject, openExpand, renderExpand, renderRecent } from "./workspace";
 import { saveSimplePage } from "./toolbar";
 import { updateStatus } from "./statusBar";
 
@@ -413,7 +413,7 @@ export function renderPage(page: IPage) {
             //状态栏
             updateStatus(page, undefined, undefined);
             //渲染 背景
-          //  document.getElementById("edgePanel").style.backgroundImage="url("+getProject().work + "/images/" +page.key+".jpeg)";
+            //  document.getElementById("edgePanel").style.backgroundImage="url("+getProject().work + "/images/" +page.key+".jpeg)";
         }, 500);
         //历史记录
         //    pushHistory(page);
@@ -530,9 +530,9 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     page_view.appendChild(page_parent);
     page_parent.style.transform = "scale(" + scale + ")";
 
-    var page_parent_content= document.createElement("div");
-    page_parent_content.id="page_parent_content_" + p.key;
-    page_parent_content.className="page_parent_content";
+    var page_parent_content = document.createElement("div");
+    page_parent_content.id = "page_parent_content_" + p.key;
+    page_parent_content.className = "page_parent_content";
     page_parent.appendChild(page_parent_content);
 
 
@@ -801,8 +801,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (div) div.removeAttribute("selected");
             })
             selectComponents = [];
-            //右侧面板
-            activePropertyPanel("page");
+
             var x = e.clientX;
             var y = e.clientY;
             var h = 0;
@@ -832,6 +831,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 select = false;
                 selectCover.remove();
             }
+         setTimeout(() => {
+             //右侧面板
+             activePropertyPanel("page");
+         }, 500);
         }
     }
     console.log("renderPage---", Date.now() - start);
@@ -846,28 +849,27 @@ function renderTitleBody(title_bar: HTMLElement, titleJson: any, pageHeight: num
 
 }
 
-export function renderPageBackground( curPage: IPage,){
-    var page_bg:any = document.getElementById("page_bg_" + curPage.key);
-    if(curPage.backgroundType==undefined||curPage.backgroundType==0){
+export function renderPageBackground(curPage: IPage,) {
+    var page_bg: any = document.getElementById("page_bg_" + curPage.key);
+    if (curPage.backgroundType == undefined || curPage.backgroundType == 0) {
         //无
-        page_bg.style.background="none";
-        page_bg.getContext("2d").clearRect(0,0,page_bg.clientWidth,page_bg.clientHeight);
-    }else if(curPage.backgroundType==1){
-        page_bg.style.background=curPage.backgroundColor;
-        page_bg.getContext("2d").clearRect(0,0,page_bg.clientWidth,page_bg.clientHeight);
+        page_bg.style.background = "none";
+        page_bg.getContext("2d").clearRect(0, 0, page_bg.clientWidth, page_bg.clientHeight);
+    } else if (curPage.backgroundType == 1) {
+        page_bg.style.background = curPage.backgroundColor;
+        page_bg.getContext("2d").clearRect(0, 0, page_bg.clientWidth, page_bg.clientHeight);
         //纯色
-    }else if(curPage.backgroundType==2){
-        page_bg.style.background=curPage.backgroundColor;
-        page_bg.getContext("2d").clearRect(0,0,page_bg.clientWidth,page_bg.clientHeight);
+    } else if (curPage.backgroundType == 2) {
+        page_bg.style.background = curPage.backgroundColor;
+        page_bg.getContext("2d").clearRect(0, 0, page_bg.clientWidth, page_bg.clientHeight);
         //渐变
-    }else if(curPage.backgroundType==3){
+    } else if (curPage.backgroundType == 3) {
         //内置图片
 
-        var bg: IBackground = require("../plugins/background/"+curPage.backgroundColor).default;
-        if (bg != undefined)
-        {
-            requestIdleCallback(()=>{
-                bg.onRender(page_bg,getProject().themeColor);
+        var bg: IBackground = require("../plugins/background/" + curPage.backgroundColor).default;
+        if (bg != undefined) {
+            requestIdleCallback(() => {
+                bg.onRender(page_bg, getProject().themeColor);
             })
         }
     }
@@ -1035,10 +1037,9 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
             //  activePropertyPanel();
             //如果是扩展组件
             if (component.isExpand) {
-                var expand = document.getElementById("project_expand");
-                expand.innerHTML = "";
-                expand.style.display = "flex";
-                renderComponent(expand, component);
+                openExpand();
+                renderExpand(component);
+
             } else {
                 renderComponent(page, component);
             }

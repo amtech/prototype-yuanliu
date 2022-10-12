@@ -34,14 +34,6 @@ Copyright (c) taoyongwen. All rights reserved.
     outline: 1px dotted rgba(255, 255, 255, 0.5);
 }
 
-.light .component_canvas[component_type=dialog]>div {
-    background: white;
-}
-
-.dark .component_canvas[component_type=dialog]>div {
-    background: black;
-}
-
 .dark .background {
     background: #444;
 }

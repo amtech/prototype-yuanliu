@@ -14,7 +14,7 @@ import { renderPropertyPanel, activePropertyPanel } from "./propertypanel";
 import { renderSidebar, updateSidebar } from "./sidebar";
 import { renderStatusBar } from "./statusBar";
 import { renderToolbar, updateToolbar } from "./toolbar";
-import { findCurPageComponent, getCurPage, getCurPageContent, getSelectComponents, loadProjectTitleNav, renderPage } from "./workbench";
+import { findCurPageComponent, getCurPage, getCurPageContent, getLayers, getSelectComponents, loadProjectTitleNav, renderPage } from "./workbench";
 var project: IProject;
 export function getProject(): IProject {
     return project;
@@ -60,8 +60,9 @@ export function renderWorkSpace(app: HTMLElement) {
         project = arg;
         //  render(app);
         //切换主题色
-        document.body.style.cssText = "--theme-color:" + getProject().themeColor;
-        requestIdleCallback(()=>{
+        document.body.style.cssText = "--theme-color:" + getProject().themeColor+";"+ "--light-color:" + getProject().lightColor;
+
+        requestIdleCallback(() => {
             updateToolbar();
             updateSidebar();
             activePropertyPanel("project");
@@ -166,7 +167,7 @@ function layout(app: HTMLElement) {
     //标题工具栏
     var toolBarHeight: number = 32;//60;
     var toolBar = document.createElement("div");
-    toolBar.id="toolBar";
+    toolBar.id = "toolBar";
     toolBar.style.height = toolBarHeight + "px";
     toolBar.style.position = "fixed";
     toolBar.style.width = "100%";
@@ -211,7 +212,7 @@ function layout(app: HTMLElement) {
     var tabsHeight = 32;
 
     var row = document.createElement("div");
-    row.id="workbench_row";
+    row.id = "workbench_row";
     row.style.display = "flex";
     row.style.height = tabsHeight + "px";
 
@@ -240,7 +241,7 @@ function layout(app: HTMLElement) {
     pages.className = "workbench_pages";
     pages.id = "workbench_pages";
     pages.style.position = "relative";
-    pages.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - tabsHeight-statusBarHeight) + "px";
+    pages.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - tabsHeight - statusBarHeight) + "px";
     workbench.appendChild(row);
     workbench.appendChild(pages);
 
@@ -257,6 +258,21 @@ function layout(app: HTMLElement) {
     expand.id = "project_expand";
     expand.style.position = "absolute";
     workbench.appendChild(expand);
+
+    var expandContent = document.createElement("div");
+    expandContent.className = "expandContent";
+    expandContent.id = "expandContent";
+    expandContent.style.position = "absolute";
+    expand.appendChild(expandContent);
+
+    var expandCatalog = document.createElement("div");
+    expandCatalog.className = "expandCatalog";
+    expandCatalog.id = "expandCatalog";
+    expandCatalog.style.position = "absolute";
+    expand.appendChild(expandCatalog);
+
+
+
     // expand.ondblclick=()=>{
     //     expand.style.display="none";
     // }
@@ -264,14 +280,14 @@ function layout(app: HTMLElement) {
         expand.style.display = "none";
     }
     //工作区 左侧 阴影线
-    var leftShadow=document.createElement("div");
-    leftShadow.id="left_shadow";
-    leftShadow.style.position="absolute";
-    leftShadow.style.left="-10px";
-    leftShadow.style.top="32px";
-    leftShadow.style.bottom="0px";
-    leftShadow.style.width="10px";
-  
+    var leftShadow = document.createElement("div");
+    leftShadow.id = "left_shadow";
+    leftShadow.style.position = "absolute";
+    leftShadow.style.left = "-10px";
+    leftShadow.style.top = "32px";
+    leftShadow.style.bottom = "0px";
+    leftShadow.style.width = "10px";
+
     workbench.appendChild(leftShadow);
 
 
@@ -364,7 +380,7 @@ export function renderRecent() {
     content.appendChild(list);
 
     ipcRenderer.on("_readProjectRecentPage", (event, recentData) => {
-      
+
         if (recentData.length > 0) {
             for (var i = recentData.length - 1; i >= 0; i--) {
 
@@ -443,10 +459,65 @@ export function getPageByPath(pagePath: string, catalogs: ICatalog[]) {
  * @param component 
  */
 export function renderExpand(component: IComponent) {
-    var expand = document.getElementById("project_expand");
-    expand.innerHTML = "";
-    expand.style.display = "flex";
+    console.log(component);
+    var expandContent = document.getElementById("expandContent");
+    var project_expand = document.getElementById("project_expand");
+    expandContent.innerHTML = "";
     requestIdleCallback(() => {
-        renderComponent(expand, component);
+        var root= renderComponent(expandContent, component);
+        expandContent.style.width = (root.clientWidth + 20) + "px";
+        project_expand.style.width = (root.clientWidth + 20) + "px";
     })
+}
+/**
+ * 渲染扩展组件
+ * @param component 
+ */
+export function openExpand() {
+    var layers = getLayers();
+    if (layers == undefined||layers.length==0) return;
+    var expand = document.getElementById("project_expand");
+    expand.style.display = "block";
+    var expandCatalog = document.getElementById("expandCatalog");
+    expandCatalog.innerHTML = "";
+
+
+    // console.log("layers", layers);
+    layers.forEach((layer: IComponent) => {
+
+        renderLayersTree(layer, expandCatalog);
+
+    });
+
+
+
+}
+function renderLayersTree(layer: IComponent, expandCatalog: HTMLElement) {
+    if (layer.isExpand) {
+        var component_item = document.createElement("div");
+        component_item.style.margin = "10px";
+        component_item.style.cursor = "pointer";
+        component_item.title = layer.label;
+        component_item.style.display = "inline-block";
+        var component_item_icon = document.createElement("i");
+        component_item_icon.className = layer.icon;
+        component_item.appendChild(component_item_icon);
+        expandCatalog.appendChild(component_item);
+
+        component_item.onclick = () => {
+
+            if (layer.isExpand) {
+                renderExpand(layer);
+                activePropertyPanel(layer);
+
+            }
+
+
+
+        }
+
+
+    }
+
+
 }

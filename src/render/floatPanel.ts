@@ -220,8 +220,9 @@ export function updateComponentsStyle(components: Array<IComponent>) {
                                 break;
                             }
                         }
-
+                        
                         componentDiv.style.cssText = component.styles["root"];
+                     
                         continue;
                     }
 

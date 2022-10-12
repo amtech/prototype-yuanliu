@@ -699,7 +699,8 @@ i[data-rotate]::before {
 }
 
 .nav_row:hover {
-    background: var(--theme-color);
+    background: var(--light-color);
+    color: #fff;
 }
 
 .nav_row[selected=true] {
@@ -1032,7 +1033,7 @@ iframe {
 }
 
 .hover:hover {
-    background: var(--theme-color);
+    background: var(--light-color);
     color: #fff;
 }
 
@@ -1041,8 +1042,12 @@ iframe {
     color: #fff;
 }
 
+[hover=true] {
+    transition: background 0.5s;
+}
+
 [hover=true]:hover {
-    background: var(--theme-color);
+    background: var(--light-color);
     color: #fff;
 }
 
@@ -1604,14 +1609,33 @@ iframe {
     right: 0;
     top: 0;
     bottom: 0;
+    padding: 0px 10px 0px 10px;
     min-width: 400px;
     background-color: rgba(157, 157, 157, 0.3);
     backdrop-filter: blur(5px);
     position: absolute;
     display: none;
+    box-shadow: 0px 0px 5px rgba(157, 157, 157, 0.3);
+}
+
+.expandContent {
+    display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0px 0px 5px rgba(157, 157, 157, 0.3);
+    right: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.expandCatalog {
+    right: 0;
+    height: 50px;
+    bottom: 0;
+    line-height: 30px;
+    left: 0;
+    text-align: center;
+    backdrop-filter: blur(1px);
 }
 
 .recent_card {

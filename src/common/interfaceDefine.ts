@@ -23,6 +23,7 @@ export interface IProject {
     cover?: string;
     launch?:string;
     themeColor?:string;
+    lightColor?:string;
     recent?:string[];
 }
 /**

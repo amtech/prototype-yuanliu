@@ -33,7 +33,7 @@ window.onload = () => {
 
     document.getElementById("loadding").remove();
     document.title = project_data.name;
-    document.body.style.cssText = "--theme-color:" + project_data.themeColor;
+    document.body.style.cssText = "--theme-color:" + project_data.themeColor + ";" + "--light-color:" + project_data.lightColor;
     var hash = document.location.hash;
     var pagType;
     if (hash.indexOf("type=simple") > 0) {
@@ -329,7 +329,12 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     if (content != undefined) {
         app = content;
     } else {
-        app.style.height = (window.innerHeight - 44) + "px";
+        if (title_data.display) {
+            app.style.height = (window.innerHeight - 44) + "px";
+        } else {
+            app.style.height = (window.innerHeight) + "px";
+        }
+
     }
     app.innerHTML = "";
 
@@ -556,10 +561,23 @@ export function renderComponent(content, component, parent, index, self) {
 
     //  console.log("----renderComponent----")
     var root = null;
-    if (component.drop != undefined) {
+    if (component.self == undefined) {
         root = document.createElement("div");
         if (content != undefined)
-            content.appendChild(root);
+        //处理特殊的对话框
+        {
+            if (component.type == "dialog") {
+                console.log("处理特殊的对话框");
+                var dialog = document.createElement("div");
+                dialog.id = "dialog" + component.key;
+                dialog.style.cssText = "background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;";
+                dialog.appendChild(root);
+                //     root = dialog;
+                content.appendChild(dialog);
+            } else {
+                content.appendChild(root);
+            }
+        }
     }
     if (self != undefined) {
         root = self;
@@ -568,12 +586,6 @@ export function renderComponent(content, component, parent, index, self) {
 
 
     var rs = component.onRender(component, root, content, "product", project_data.themeColor);
-
-    if (component.drop == undefined) {
-        root = rs.root;
-        if (content != undefined)
-            content.appendChild(root);
-    }
 
     var body = rs.content;
     if (root == undefined) {
@@ -588,8 +600,10 @@ export function renderComponent(content, component, parent, index, self) {
 
     if (root.style != undefined && root.style.cssText.length <= 0) {
         if (component.styles != undefined && component.styles["root"] != undefined) {
+
             root.style.cssText = component.styles["root"];
         } else if (component.style != undefined) {
+
             root.style.cssText = component.style;
         }
     }
@@ -675,11 +689,12 @@ export function renderComponent(content, component, parent, index, self) {
 }
 
 function renderComponentShape(component, root) {
+    console.log("渲染背景", component.shape);
     var bgs = root.getElementsByClassName("component_bg");
     if (bgs == undefined || bgs.length == 0) {
         return;
     }
-    root.style.background = "";
+    console.log("-->");
     var bg = root.getElementsByClassName("component_bg")[0];
     var w = bg.clientWidth;
     var h = bg.clientHeight;
@@ -710,7 +725,7 @@ function renderComponentShape(component, root) {
 
     var shape = shapes_data.find(b => "../plugins/shape/" + b.key == component.shape);
     if (shape != undefined) {
-
+        root.style.background = "";
         shape.onRender(svg, bgcolor, "var(--theme-color)");
 
     }

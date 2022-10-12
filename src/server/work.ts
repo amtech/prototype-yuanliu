@@ -82,7 +82,8 @@ export function initWork(project: IProject) {
                 { key: "index", name: "index", dir: "/", path: "/index.json", sort: 0 }
             ],
             launch: "",
-            themeColor: "#0078d4"
+            themeColor: "#0078d4",
+            lightColor:"rgba(0,120,212,0.4)"
         };
         fs.writeFileSync(projectPath, JSON.stringify(projectJson));
         //cover

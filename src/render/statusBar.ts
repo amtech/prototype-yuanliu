@@ -69,7 +69,17 @@ export function updateStatus(page:IPage,component:IComponent,selects:string[]){
     acticities.forEach(acticity=>{
 
         if(acticity.onUpdate!=undefined){
-            acticity.onUpdate(document.getElementById(acticity.key),getConfig(),getProject(),page,component,selects);
+            var root=document.getElementById(acticity.key);
+            if(root!=undefined){
+                acticity.onUpdate(root,getConfig(),getProject(),page,component,selects);
+                if(root.children.length==0){
+                    root.style.display="none";
+                }else{
+                    root.style.display="flex";
+                }
+              
+            }
+        
         }
     })
 }
@@ -93,6 +103,11 @@ function renderActivities(left:HTMLElement,right:HTMLElement,plugins:IStatusBarA
             right.appendChild(root);
         }
         plugin.onRender(root,getConfig(),getProject());
+        if(root.children.length==0){
+            root.style.display="none";
+        }else{
+            root.style.display="flex";
+        }
       
 
 

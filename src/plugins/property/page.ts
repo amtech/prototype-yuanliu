@@ -13,7 +13,7 @@ import { renderPageLayout } from "../../render/pageLayout";
 import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, renderPageBackground, reRenderPage } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
 import { saveSimplePage } from "../../render/toolbar";
-import { getProject, renderExpand } from "../../render/workspace";
+import { getProject, openExpand, renderExpand } from "../../render/workspace";
 import { showStatusLoadding } from "../../render/statusBar";
 
 
@@ -530,6 +530,8 @@ const panel: IPanel = {
           component_item.onclick = () => {
 
             if (layer.isExpand) {
+             // renderExpand(layer);
+              openExpand();
               renderExpand(layer);
 
             } else {

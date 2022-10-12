@@ -3,24 +3,24 @@ import { IComponent } from "../../common/interfaceDefine"
  const  component:IComponent={
     isTemplate: true, key: "dialog", label: "dialog", icon: "bi bi-front", type: "dialog", drop:"component",group:"container",
         style: "",
+        background:1,
         styles:{
-            root:"background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;position:absolute;top:0;left:0;right:0;bottom:0;z-index:200;",
-            main:"min-height:400px;min-width:500px;position:relative;border-radius:5px;",
+            root:" background:rgba(157,157,175,0.5);min-height:400px;min-width:500px;position:relative;border-radius:5px;padding:5px;",
          
         },
+        isExpand:true,
         onPreview: (component) => {
-            var dialog = document.createElement("div");
-            //TODO
-            dialog.style.cssText=component.styles.root;
-            
+       
 
             var main=document.createElement("div");
             main.style.cssText=component.styles.main;
-            dialog.appendChild(main);
+           
             
         
-            return dialog;
+            return main;
         }, onRender: (component, element,content,type) => {
+           
+
             var dialog: any;
             if (element != undefined)
                {
@@ -29,62 +29,43 @@ import { IComponent } from "../../common/interfaceDefine"
                }
             else
                 dialog = document.createElement("div");
-            //TODO
-            if(type=="product"){
-                component.styles.root=component.styles.root.replace("position:absolute;","position:fixed;")
-            }
-
-            if(component.property.focus!=undefined){
+               
+            if(type=="product"&&component.property.focus!=undefined){
                 if(component.property.focus.context=="true"){
-                    dialog.onclick=()=>{
-                        component.hidden=true;
-                        dialog.className="";
-                        dialog.style.display="none";
+                    dialog.parentElement.onclick=(e:any)=>{
+                        e.stopPropagation();
+                        dialog.parentElement.remove();
+                     
+                    }
+                    dialog.onclick=(e:any)=>{
+                        e.stopPropagation();
+                       
+                     
                     }
                 }
                 
             }
-          
-
-
-            var main=document.createElement("div");
-            main.setAttribute("data-styles","main");
-            main.className="ground";
-            main.style.cssText=component.styles.main;
-        //    main.onclick=(e)=>{e.stopPropagation();}
-            dialog.appendChild(main);
+      
+            var gridBg=document.createElement("div");
+            gridBg.className="component_bg";
+            gridBg.style.position="absolute";
+            gridBg.style.top="0";
+            gridBg.style.left="0";
+            gridBg.style.bottom="0";
+            gridBg.style.right="0";
+            gridBg.style.zIndex="-1";
+            var gridContent=document.createElement("div");
+            dialog.appendChild(gridBg);
+            dialog.appendChild(gridContent);
             
-       
 
-            // //event
-            // var close=document.createElement("i");
-            // close.style.position="absolute";
-            // close.className="bi bi-x";
-            // close.style.right="5px";
-            // close.style.top="5px";
-            // close.style.zIndex="1000";
-            // main.appendChild(close);
-            // close.onclick=()=>{
-            //     dialog.style.display="none";
-            //     component.hidden=true;
-            // }
           
-            return {root:dialog,content:main};
+            return {root:dialog,content:gridContent};
         }, property: {
             focus:{ label: "失去焦点-关闭", type: "bool", context: "false", },
         
         }
-        , toogle: ( element,hidden) => {
-           console.log("dialog toogle");
-            //TODO
-            if(hidden){
-                element.style.display="none";
-            }else{
-                element.style.display="flex";
-            }
-
-          
-        }, 
+        ,
         blue:{
           
         }

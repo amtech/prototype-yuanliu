@@ -99,7 +99,13 @@ function createAction(link, blues, links) {
                         }
                         toComponent.hidden = !toComponent.hidden;
                         try {
-                            document.getElementById(toComponent.key).remove();
+                            //   console.log("删除扩展组件", toComponent.type);
+                            if (toComponent.type == "dialog") {
+                                document.getElementById("dialog" + toComponent.key).remove();
+                            } else {
+                                document.getElementById(toComponent.key).remove();
+                            }
+
                         } catch (ex) {
 
                         }
@@ -107,17 +113,16 @@ function createAction(link, blues, links) {
                         if (!toComponent.hidden) {
 
                             renderComponent(document.getElementById("app"), toComponent);
+                            if (expands.findIndex(p => p == toComponent.key) < 0) {
+                                expands.push(toComponent.key);
+                            }
+                            toComponent.hidden = true;
                         }
-                        if (expands.findIndex(p => p == toComponent.key) < 0) {
-                            expands.push(toComponent.key);
-                        }
+
 
                     } else {
                         if (toComponent.hidden == undefined) {
                             toComponent.hidden = false;
-                            if (toComponent.type == "dialog") {
-                                toComponent.hidden = true;
-                            }
 
                         }
                         toComponent.hidden = !toComponent.hidden;
@@ -128,10 +133,7 @@ function createAction(link, blues, links) {
 
                         renderComponent(undefined, toComponent, undefined, 0, toComponentDiv);
                         if (!toComponent.hidden) {
-                            if (toComponent.type == "dialog" || toComponent.type == "row")
-                                toComponentDiv.style.display = "flex";
-                            else
-                                toComponentDiv.style.display = "block";
+
                             var paths = hasComponentPathEach(toComponent);
                             //
                             setTimeout(() => {

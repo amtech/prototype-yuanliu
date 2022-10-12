@@ -227,7 +227,7 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
 
         page.ondragover = (e: DragEvent) => {
             e.preventDefault();
-            page.style.background = "#09f";
+            page.style.background = "var(--theme-color)";
         }
         page.ondragleave = (e: DragEvent) => {
 
