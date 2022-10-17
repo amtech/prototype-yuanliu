@@ -812,8 +812,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             if (le <= 0) {
                 le = 0;
             }
-            if (le > content.clientWidth - sroll_h_block_w) {
-                le = content.clientWidth - sroll_h_block_w;
+            if (le > content.clientWidth - sroll_h_block.clientWidth) {
+                le = content.clientWidth - sroll_h_block.clientWidth;
             }
             page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
             sroll_h_block.style.left = le + "px";
