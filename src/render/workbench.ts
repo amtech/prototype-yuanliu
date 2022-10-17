@@ -5,24 +5,24 @@ Copyright (c) taoyongwen. All rights reserved.
 
 渲染工作区
 ***************************************************************************** */
-import { BrowserWindow, clipboard, ipcRenderer, Menu, MenuItem } from "electron";
+import { clipboard, ipcRenderer } from "electron";
 import { regeditTheme } from "../echarts/theme";
 
 import { copyComponent, deleteComponent, getComponentsTemplate, getComponentTempateByType, getPathKey, initComponent, renderComponent, renderComponentPreview, renderComponents, renderStorePreview } from "../common/components";
 import { checkContextMenu, IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getUUID, IBackground, IComponent, IPage, ITitle } from "../common/interfaceDefine";
-import { ipcContextMenu, ipcRendererSend } from "../preload";
+import { isDark } from "../dialog/picker";
+import { ipcRendererSend } from "../preload";
+import { getKeyCode, getMousePosition } from "../render/shorcuts";
 import { updateBlueView } from "./blueprint";
 import * as dargData from "./DragData";
+import { pushHistory } from "./history";
 import { INavItem, renderNavTrees } from "./pageNav";
 import { renderTitleBar } from "./pageTitle";
-import { getKeyCode, getMousePosition, getShiftKeyDown } from "../render/shorcuts";
 import { activePropertyPanel } from "./propertypanel";
-import { pushHistory } from "./history";
-import { isDark } from "../dialog/picker";
-import { getProject, openExpand, renderExpand, renderRecent } from "./workspace";
-import { saveSimplePage } from "./toolbar";
 import { updateStatus } from "./statusBar";
+import { saveSimplePage } from "./toolbar";
+import { getProject, openExpand, renderExpand, renderRecent } from "./workspace";
 
 
 
@@ -45,26 +45,24 @@ export function getCurViewContent(): HTMLElement {
     var content = document.getElementById("page_view_" + getCurPage().key);
     return content;
 }
-var dragTimerCount:number=0;
-var dragTimer:any;
-export function getDragTimer(){
+var dragTimerCount: number = 0;
+var dragTimer: any;
+export function getDragTimer() {
     return dragTimerCount;
 }
-export function startDargTimer()
-{
+export function startDargTimer() {
     clearDargTimer();
-    dragTimer=setInterval(()=>{
+    dragTimer = setInterval(() => {
         dragTimerCount++;
-    },100);
- 
+    }, 100);
+
 }
-export function clearDargTimer()
-{
-    dragTimerCount=0;
-    if(dragTimer!=undefined){
+export function clearDargTimer() {
+    dragTimerCount = 0;
+    if (dragTimer != undefined) {
         clearInterval(dragTimer);
     }
-    
+
 }
 
 /**
@@ -490,7 +488,52 @@ export function renderPage(page: IPage) {
 
 
 }
+/**
+* 调整界面内容的滚动 条 垂直的
+*/
+export function updatePageViewScrollV() {
+    requestIdleCallback(() => {
+        var workbench_pages = document.getElementById("workbench_pages");
+        pages.forEach(page => {
 
+            var page_view = document.getElementById("page_view_" + page.key);
+            var page_parent = document.getElementById("page_parent_" + page.key);
+
+            var sroll_v_block: any = page_view.getElementsByClassName("sroll_v_block")[0];
+            var sroll_v_block_h = page_view.clientHeight * page_view.clientHeight / (page.height + 200);
+            sroll_v_block.style.height = sroll_v_block_h + "px";
+
+
+
+        });
+    });
+
+
+}
+
+/**
+* 调整界面内容的滚动 条 水平的
+*/
+export function updatePageViewScrollH() {
+
+    requestIdleCallback(() => {
+        var workbench_pages = document.getElementById("workbench_pages");
+        pages.forEach(page => {
+
+            var page_view = document.getElementById("page_view_" + page.key);
+            var page_parent = document.getElementById("page_parent_" + page.key);
+
+            var sroll_h_block: any = page_view.getElementsByClassName("sroll_h_block")[0];
+            var sroll_h_block_w = page_view.clientWidth * page_view.clientWidth / (page.width + 200);
+            sroll_h_block.style.width = sroll_h_block_w + "px";
+
+
+
+        });
+    });
+
+
+}
 
 export function getLayers(): Array<IComponent> {
     if (getCurPage() == undefined) {
@@ -529,7 +572,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     var title_display: boolean = titleJson.display;
     var nav_display: boolean = navJson.display;
     var page_view = document.createElement("div");
-    page_view.className = "page_view";
+    page_view.className = "page_view_" + p.key;
     if (ruler_show) {
         page_view.style.top = "0px";
         page_view.style.left = "0px";
@@ -665,12 +708,13 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     sroll_h_block.className = "sroll_h_block";
     sroll_h.appendChild(sroll_h_block);
 
-    var sroll_h_block_w = page_view.clientWidth * page_view.clientWidth / (p.width + 200);
-    var sroll_h_rate = ((p.width + 200) - page_view.clientWidth) / (page_view.clientWidth - sroll_h_block_w);
+    var sroll_h_block_w = content.clientWidth * content.clientWidth / (p.width + 200);
     sroll_h_block.style.width = sroll_h_block_w + "px";
     sroll_h_block.style.left = 0 + "px";
     var sroll_h_block_m = false;
     sroll_h_block.onmousedown = (e) => {
+        var sroll_h_rate = ((p.width + 200) - content.clientWidth) / (content.clientWidth - sroll_h_block.clientWidth);
+
         var lb = parseFloat(sroll_h_block.style.left.replace("px", ""));
         var eb = e.clientX;
         sroll_h_block_m = true;
@@ -680,8 +724,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (le <= 0) {
                     le = 0;
                 }
-                if (le > page_view.clientWidth - sroll_h_block_w) {
-                    le = page_view.clientWidth - sroll_h_block_w;
+                if (le > content.clientWidth - sroll_h_block.clientWidth) {
+                    le = content.clientWidth - sroll_h_block.clientWidth;
                 }
                 page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
                 sroll_h_block.style.left = le + "px";
@@ -715,12 +759,14 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     sroll_v_block.className = "sroll_v_block";
     sroll_v.appendChild(sroll_v_block);
 
-    var sroll_v_block_h = page_view.clientHeight * page_view.clientHeight / (p.height + 200);
+    var sroll_v_block_h = content.clientHeight * content.clientHeight / (p.height + 200);
+    //console.log("sroll_v_block_h",sroll_v_block_h,page_view.clientHeight,content.clientHeight,p.height);
     sroll_v_block.style.height = sroll_v_block_h + "px";
     sroll_v_block.style.top = "0px";
-    var sroll_v_rate = ((p.height + 200) - page_view.clientHeight) / (page_view.clientHeight - sroll_v_block_h);
+
     var sroll_b_block_m = false;
     sroll_v_block.onmousedown = (e) => {
+        var sroll_v_rate = ((p.height + 200) - content.clientHeight) / (content.clientHeight - sroll_v_block.clientHeight);
         var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
         var eb = e.clientY;
         sroll_b_block_m = true;
@@ -730,8 +776,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (te <= 0) {
                     te = 0;
                 }
-                if (te > page_view.clientHeight - sroll_v_block_h) {
-                    te = page_view.clientHeight - sroll_v_block_h;
+                if (te > content.clientHeight - sroll_v_block.clientHeight) {
+                    te = content.clientHeight - sroll_v_block.clientHeight;
                 }
                 page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
                 sroll_v_block.style.top = te + "px";
@@ -758,14 +804,16 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     }
     page_view.onwheel = (e: any) => {
         {
+            var sroll_h_rate = ((p.width + 200) - content.clientWidth) / (content.clientWidth - sroll_h_block.clientWidth);
+
             var lb = parseFloat(sroll_h_block.style.left.replace("px", ""));
             var le = e.deltaX / 5 + lb;
 
             if (le <= 0) {
                 le = 0;
             }
-            if (le > page_view.clientWidth - sroll_h_block_w) {
-                le = page_view.clientWidth - sroll_h_block_w;
+            if (le > content.clientWidth - sroll_h_block_w) {
+                le = content.clientWidth - sroll_h_block_w;
             }
             page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
             sroll_h_block.style.left = le + "px";
@@ -780,14 +828,15 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
 
         }
         {
+            var sroll_v_rate = ((p.height + 200) - content.clientHeight) / (content.clientHeight - sroll_v_block.clientHeight);
             var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
 
             var te = e.deltaY / 5 + tb;
             if (te <= 0) {
                 te = 0;
             }
-            if (te > page_view.clientHeight - sroll_v_block_h) {
-                te = page_view.clientHeight - sroll_v_block_h;
+            if (te > content.clientHeight - sroll_v_block.clientHeight) {
+                te = content.clientHeight - sroll_v_block.clientHeight;
             }
             page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
             sroll_v_block.style.top = te + "px";
@@ -852,10 +901,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 select = false;
                 selectCover.remove();
             }
-         setTimeout(() => {
-             //右侧面板
-             activePropertyPanel("page");
-         }, 500);
+            setTimeout(() => {
+                //右侧面板
+                activePropertyPanel("page");
+            }, 500);
         }
     }
     console.log("renderPage---", Date.now() - start);
@@ -1011,7 +1060,7 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
     //页面 接受 组件 拖拽
     var previewComponent: HTMLElement;
     page.ondragover = (e: any) => {
-        if(getDragTimer()<=3){
+        if (getDragTimer() <= 3) {
             return;
         }
         e.preventDefault();
@@ -1031,17 +1080,17 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
     }
     page.ondragenter = (e: any) => {
         startDargTimer();
-     
+
     }
     page.ondragleave = (e: DragEvent) => {
-       // clearDargTimer();
+        // clearDargTimer();
         if (previewComponent != undefined) {
             previewComponent.remove();
             previewComponent = undefined;
         }
     }
     page.ondragend = (e: DragEvent) => {
-      
+
         if (previewComponent != undefined) {
             previewComponent.remove();
             previewComponent = undefined;

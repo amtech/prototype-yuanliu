@@ -13,6 +13,7 @@ const component: IComponent = {
             label = element;
         else
             label = document.createElement("div");
+        label.innerHTML="";
         //兼容已签版本
         if(component.property.text==undefined){
             component.property.text=component.property[0];

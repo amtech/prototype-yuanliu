@@ -9,7 +9,7 @@ import { ipcRendererSend } from "../preload";
 import { loadChart } from "./chart";
 import { pushHistory } from "./history";
 import { renderDatabaseExplorer } from "./sidebar";
-import { findCurPageComponent, getCurPage } from "./workbench";
+import { findCurPageComponent, getCurPage, updatePageViewScrollH, updatePageViewScrollV } from "./workbench";
 export function updateFloatPanel(comment?: IComponent) {
     if (comment == undefined) {
         switchFloatTab("页面");
@@ -69,6 +69,7 @@ function renderSilderBar(content: HTMLElement) {
         }
         document.onmouseup = () => {
             move = false;
+            updatePageViewScrollV();
         }
 
     };

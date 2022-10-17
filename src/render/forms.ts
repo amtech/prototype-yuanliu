@@ -56,6 +56,9 @@ export class FormNumber {
         this.input.type = "number";
         // this.input.style.maxWidth = "80px";
         // this.input.style.minWidth = "30px";
+        this.input.style.textAlign = "center";
+
+        this.input.style.background = "rgba(175,175,175,0.1)";
         this.input.style.width = "100%";
         this.input.style.flex = "1";
         this.input.onchange = () => {
@@ -145,8 +148,8 @@ export class FormText {
 
         this.input.style.flex = "1";
         this.input.onchange = () => {
-            if(this.onChange!=undefined)
-             this.onChange((this.input.value));
+            if (this.onChange != undefined)
+                this.onChange((this.input.value));
         };
         div.appendChild(this.input);
     }
@@ -158,7 +161,7 @@ export class FormPragraph {
 
     label: string;
     value: string;
-    pragraph:HTMLDivElement ;
+    pragraph: HTMLDivElement;
     constructor(name: string) {
         this.label = name;
 
@@ -168,9 +171,9 @@ export class FormPragraph {
         this.value = value;
         this.pragraph.innerHTML = value;
         this.onChange = onChange;
-        if(this.onChange!=undefined){
+        if (this.onChange != undefined) {
             this.pragraph.contentEditable = "true";
-        }else{
+        } else {
             this.pragraph.contentEditable = "false";
         }
     }
@@ -183,7 +186,7 @@ export class FormPragraph {
 
         div.style.borderRadius = "5px";
 
- 
+
         div.className = "form_bg";
 
         content.appendChild(div);
@@ -197,13 +200,13 @@ export class FormPragraph {
 
         this.pragraph.style.minHeight = "60px";
         this.pragraph.style.padding = "5px";
-   
+
         this.pragraph.style.backgroundColor = "transparent";
-    
+
         this.pragraph.style.flex = "1";
         this.pragraph.onkeyup = () => {
-            if(this.onChange!=undefined)
-             this.onChange((this.pragraph.innerText));
+            if (this.onChange != undefined)
+                this.onChange((this.pragraph.innerText));
         };
         div.appendChild(this.pragraph);
     }
@@ -265,11 +268,11 @@ export class FormIcons {
             var icon = document.createElement("i");
             icon.className = this.icons[i];
             icon.style.padding = "5px";
-            
+
             icon.setAttribute("data-index", i + "");
             icon.style.borderRadius = "5px";
             icon.style.cursor = "pointer";
-         
+
             iconDiv.appendChild(icon);
 
             icon.onclick = (e: any) => {
@@ -427,8 +430,11 @@ export class FormNumbers {
             input.type = "number";
 
             input.style.maxWidth = "80px";
-            input.style.minWidth = "40px";
+            input.style.minWidth = "30px";
+            input.style.marginRight = "5px";
+            input.style.textAlign = "center";
             input.style.width = "100%";
+            input.style.background = "rgba(175,175,175,0.1)";
             input.style.flex = "1";
             input.setAttribute("data-index", i + "");
             input.onchange = (ei: any) => {
@@ -459,7 +465,7 @@ export class FormColor {
 
         this.value = value;
         this.element.value = value;
-        if (value == null || value == undefined || value == ""||value=="transparent") {
+        if (value == null || value == undefined || value == "" || value == "transparent") {
             this.iconDiv.style.backgroundColor = "#999";
         }
         else
@@ -541,20 +547,20 @@ export class FormSolider {
     point: HTMLElement;
     max: number; min: number;
     bg: HTMLElement;
-    unit?:string;
+    unit?: string;
 
-    constructor(name: string, max: number, min: number,unit?:string) {
+    constructor(name: string, max: number, min: number, unit?: string) {
         this.label = name;
         this.max = max;
         this.min = min;
-        this.unit=unit;
+        this.unit = unit;
 
     }
     onChange: (value: number) => void;
     update(value: number, onChange: (value: number) => void) {
         this.value = value;
         this.point.innerText = value + '';
-        if(this.unit!=undefined){
+        if (this.unit != undefined) {
             this.point.innerText += this.unit;
         }
 
@@ -581,7 +587,7 @@ export class FormSolider {
         solider.style.flex = "1";
         solider.style.position = "relative";
         solider.style.padding = "5px";
-        solider.style.userSelect="none";
+        solider.style.userSelect = "none";
         div.appendChild(solider);
 
         var bg = document.createElement("div");
@@ -609,7 +615,7 @@ export class FormSolider {
         this.bg = bg;
         point.style.left = "0px";
         this.point = point;
-        
+
         point.onmousedown = (ed: MouseEvent) => {
             var left = parseFloat(point.style.left.replace("px", ""));
             var startX = ed.clientX;
@@ -628,7 +634,7 @@ export class FormSolider {
 
                     val = Math.round((l / bg.clientWidth) * (this.max - this.min) + this.min);
                     point.innerText = val + '';
-                    if(this.unit!=undefined){
+                    if (this.unit != undefined) {
                         point.innerText += this.unit;
                     }
                     this.onChange(val);
@@ -747,17 +753,17 @@ export class FormComponent {
         this.input.style.padding = "0px 5px 0px 5px";
         this.input.style.backgroundColor = "transparent";
         this.input.style.height = "24px";
-        this.input.style.overflow="hidden";
+        this.input.style.overflow = "hidden";
         // this.input.style.background="url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>  <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/></svg>\")";
 
         this.input.style.flex = "1";
         this.input.ondblclick = () => {
             alert("拖拽组件到此处");
-            if(this.onChange!=undefined){
+            if (this.onChange != undefined) {
                 this.onChange(undefined);
-                this.value="";
-                this.input.innerHTML="";
-             }
+                this.value = "";
+                this.input.innerHTML = "";
+            }
 
         };
 
@@ -780,7 +786,7 @@ export class FormComponent {
                     this.value = "";
                     alert("拖拽组件到此处");
                 }
-            }else{
+            } else {
                 alert("拖拽组件到此处");
             }
         }
@@ -850,17 +856,17 @@ export class FormCatalog {
         this.input.style.padding = "0px 5px 0px 5px";
         this.input.style.backgroundColor = "transparent";
         this.input.style.height = "24px";
-        this.input.style.overflow="hidden";
+        this.input.style.overflow = "hidden";
         // this.input.style.background="url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>  <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/></svg>\")";
 
         this.input.style.flex = "1";
         this.input.ondblclick = () => {
             alert("拖拽组件到此处");
-            if(this.onChange!=undefined){
+            if (this.onChange != undefined) {
                 this.onChange(undefined);
-                this.value="";
-                this.input.innerHTML="";
-             }
+                this.value = "";
+                this.input.innerHTML = "";
+            }
 
         };
 
@@ -883,7 +889,7 @@ export class FormCatalog {
                     this.value = "";
                     alert("拖拽页面到此处");
                 }
-            }else{
+            } else {
                 alert("拖拽页面到此处");
             }
         }
@@ -916,14 +922,13 @@ export function createDivRow(content: HTMLElement, space?: boolean): HTMLElement
     var child = document.createElement("div");
     content.appendChild(child);
     child.style.flex = "1";
- 
+
     if (space) {
-       var s = document.createElement("div");
-       s.style.width = "5px";
-       content.appendChild(s);
- 
+        var s = document.createElement("div");
+        s.style.width = "5px";
+        content.appendChild(s);
+
     }
- 
+
     return child;
- }
- 
+}

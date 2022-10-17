@@ -14,7 +14,7 @@ import { renderPropertyPanel, activePropertyPanel } from "./propertypanel";
 import { renderSidebar, updateSidebar } from "./sidebar";
 import { renderStatusBar } from "./statusBar";
 import { renderToolbar, updateToolbar } from "./toolbar";
-import { findCurPageComponent, getCurPage, getCurPageContent, getLayers, getSelectComponents, loadProjectTitleNav, renderPage } from "./workbench";
+import { findCurPageComponent, getCurPage, getCurPageContent, getLayers, getSelectComponents, loadProjectTitleNav, renderPage, updatePageViewScrollH, updatePageViewScrollV } from "./workbench";
 var project: IProject;
 export function getProject(): IProject {
     return project;
@@ -342,9 +342,13 @@ function renderRightSilderBar(content: HTMLElement, h: number) {
         }
         document.onmouseup = () => {
             move = false;
+            updatePageViewScrollH();
         }
     };
 }
+
+
+
 /**
  * 展示提示信息
  * @param message 

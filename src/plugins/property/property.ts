@@ -7,17 +7,17 @@ import { IMenuItem, openContextMenu } from "../../common/contextmenu";
 import { ICatalog, IComponent, IComponentProperty, IPanel } from "../../common/interfaceDefine";
 import { updateComponentsStyle } from "../../render/floatPanel";
 
-import { copyStyles, deleteComponent, onSelectComponent, renderComponentShape, updateComponent } from "../../common/components";
+import { ipcRenderer } from "electron";
+import { deleteComponent, onSelectComponent, renderComponentShape, updateComponent } from "../../common/components";
 import { set16ToRgb } from "../../dialog/picker";
+import { ipcRendererSend } from "../../preload";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
 import { FormColor, FormComponent, FormIcon, FormIcons, FormNumber, FormNumbers, FormSelect, FormSolider, FormText } from "../../render/forms";
 import { pushHistory } from "../../render/history";
 import { cal_gradient, getComponentStyle, setComponentStyle } from "../../render/propertypanel";
-import { isHiddenExplorer, renderExplorer } from "../../render/sidebar";
+import { renderExplorer, toggleExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
-import { ipcRendererSend } from "../../preload";
-import { ipcRenderer } from "electron";
 
 const panel: IPanel = {
     key: "property", name: "属性", hidden: true, sort: 0,
@@ -59,23 +59,24 @@ function renderPropertypanel(content: HTMLElement) {
 
 
 
-    layers = renderExplorer("property_layer", propertyPanel, "层级", true);
+    layers = renderExplorer("property_layer", propertyPanel, "层级", true, undefined, onExplorerHide);
     renderLayersProperty(layers);
-    base = renderExplorer("property_base", propertyPanel, "基础", true);
+    base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide);
     renderBaseProperty(base);
-    layout = renderExplorer("property_layout", propertyPanel, "布局", true);
+    layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide);
     renderLayoutProperty(layout);
 
-    theme = renderExplorer("property_theme", propertyPanel, "填充");
+    theme = renderExplorer("property_theme", propertyPanel, "填充", false, undefined, onExplorerHide);
     renderThemeProperty(theme);
 
-    font = renderExplorer("property_font", propertyPanel, "字体&段落");
+
+    font = renderExplorer("property_font", propertyPanel, "字体&段落", true, undefined, onExplorerHide);
     renderFontProperty(font);
 
-    style = renderExplorer("property_style", propertyPanel, "样式", true);
+    style = renderExplorer("property_style", propertyPanel, "样式", true, undefined, onExplorerHide);
     renderComponentStyle(style);
 
-    var shortcuts = renderExplorer("property_panel", propertyPanel, "快捷键", true);
+    var shortcuts = renderExplorer("property_panel", propertyPanel, "快捷键", true, undefined, onExplorerHide);
     renderShortcutsProperty(shortcuts);
 
     layout.style.display = "none";
@@ -85,6 +86,33 @@ function renderPropertypanel(content: HTMLElement) {
     base.style.display = "none";
 
 }
+function onExplorerHide(key: string, hide: boolean) {
+    if (hide) {
+        var index = showExplorers.findIndex(i => i == key);
+        if (index >= 0) {
+            showExplorers.splice(index, 1);
+        }
+    } else {
+        var index = showExplorers.findIndex(i => i == key);
+        if (index >= 0) {
+
+        } else {
+            if (showExplorers.length > 1) {
+                var del = showExplorers[0];
+                toggleExplorer(del, true);
+                showExplorers.splice(0, 1);
+            }
+
+            showExplorers.push(key);
+            if(key=="property_layer"){
+                //如果是展开层级的话，更新一次层级
+                updateLayersProperty();
+            }  
+        }
+
+    }
+}
+var showExplorers: Array<string> = ["property_theme"];
 var layers: HTMLElement;
 var layout: HTMLElement;
 var theme: HTMLElement;
@@ -93,11 +121,9 @@ var style: HTMLElement;
 var font: HTMLElement;
 function updateLayersProperty() {
     //如果 层级块时 隐藏状态 的话，不更新,
-    if (!isHiddenExplorer("层级")) {
+    if (showExplorers.indexOf("property_layer") >= 0)
         if (layers != undefined) layers.innerHTML = "";
-        renderLayersProperty(layers);
-    }
-
+    renderLayersProperty(layers);
 }
 
 function renderComponentProperty(content: HTMLElement) {
@@ -350,29 +376,74 @@ function loadComponentsProperty(component: IComponent) {
 
     })
 
+    var position = 0;
+    var postionStyle = getComponentStyle(component, "position");
+    if (postionStyle != undefined) {
+        try {
+            position = ["relative", "absolute"].findIndex((i) => i == postionStyle);
+        } catch (error) {
 
-
-    //position
-    var top = "0";
-    var topStyle = getComponentStyle(component, "top","px");
-    if (topStyle != undefined&&topStyle.length>0) {
-        top = topStyle;
+        }
     }
-    //console.log("top",top);
-    formTop.update(top, (value) => {
-        setComponentStyle(component, "top", value+"px");
-        setComponentStyle(component, "position", "relative");
+
+
+    formPosition.update(position, (value) => {
+        setComponentStyle(component, "poition", ["relative", "absolute"][value]);
+
+
+
     })
-    var left = "0";
-    var leftStyle = getComponentStyle(component, "left","px");
-    if (leftStyle != undefined&&leftStyle.length>0) {
-        left = leftStyle;
-    }
+
 
     //position
-    formLeft.update(left, (value) => {
-        setComponentStyle(component, "left", value+"px");
-        setComponentStyle(component, "position", "relative");
+    var top: number;
+    var topStyle = getComponentStyle(component, "top", "px");
+    if (topStyle != undefined && topStyle.length > 0) {
+        top = parseFloat(topStyle);
+    }
+    var left: number;
+    var leftStyle = getComponentStyle(component, "left", "px");
+    if (leftStyle != undefined && leftStyle.length > 0) {
+        left = parseFloat(leftStyle);
+    }
+    var right: number;
+    var rightStyle = getComponentStyle(component, "right", "px");
+    if (rightStyle != undefined && rightStyle.length > 0) {
+        right = parseFloat(rightStyle);
+    }
+    var bottom: number;
+    var bottomStyle = getComponentStyle(component, "bottom", "px");
+    if (bottomStyle != undefined && bottomStyle.length > 0) {
+        bottom = parseFloat(bottomStyle);
+    }
+    formInset.update([top, right, bottom, left], (values) => {
+        if (values[0] != undefined) {
+            setComponentStyle(component, "top", values[0] + "px");
+        }
+        if (values[1] != undefined) {
+            setComponentStyle(component, "right", values[1] + "px");
+        }
+        if (values[2] != undefined) {
+            setComponentStyle(component, "bottom", values[2] + "px");
+        }
+        if (values[3] != undefined) {
+            setComponentStyle(component, "left", values[3] + "px");
+        }
+
+    })
+    var zIndex = 0;
+    var zIndexStr = getComponentStyle(component, "z-index");
+    if (zIndexStr != undefined) {
+        try {
+            zIndex = parseInt(zIndexStr);
+        } catch (error) {
+
+        }
+    }
+
+
+    formZIndex.update(zIndex + "", (value) => {
+        setComponentStyle(component, "z-index", value);
     })
 
     //font
@@ -674,9 +745,9 @@ function loadComponentsProperty(component: IComponent) {
 
 
     //shape 
-    formShape.update(component.shape,(value)=>{
-        component.shape=value;
-        renderComponentShape(component,document.getElementById(component.key));
+    formShape.update(component.shape, (value) => {
+        component.shape = value;
+        renderComponentShape(component, document.getElementById(component.key));
     })
 
 
@@ -1022,17 +1093,17 @@ function renderThemeProperty(context: HTMLElement) {
 
 
     ipcRendererSend("loadPluginsShape");
-    ipcRenderer.on("_loadPluginsShape",(event,args)=>{
-        var ops=[{
-            label:"请选择",value:""
+    ipcRenderer.on("_loadPluginsShape", (event, args) => {
+        var ops = [{
+            label: "请选择", value: ""
         }];
         args.forEach((item: string) => {
             var val = item.replace(".js", "");
             ops.push({ label: val, value: val });
-          });
-        formShape=new FormSelect("形状",ops);
+        });
+        formShape = new FormSelect("形状", ops);
         formShape.render(body);
-    
+
 
     });
 
@@ -1173,8 +1244,10 @@ var formOverFlow: FormIcons;
 var formFlex: HTMLElement;
 var formRotate: FormSolider;
 
-var formTop: FormNumber;
-var formLeft: FormNumber;
+var formInset: FormNumbers;
+var formPosition: FormIcons;
+
+var formZIndex: FormNumber;
 
 function renderLayoutProperty(context: HTMLElement) {
     var body = document.createElement("div");
@@ -1227,15 +1300,16 @@ function renderLayoutProperty(context: HTMLElement) {
     var positionRow = document.createElement("div");
     body.appendChild(positionRow);
 
+    formPosition = new FormIcons("位置", [ "bi bi-layout-sidebar-reverse", "bi bi-layout-sidebar-inset-reverse"]);
+    formPosition.render(body);
 
-    var topDiv = form.createDivRow(positionRow, true);
-    formTop = new FormNumber("距顶");
-    formTop.render(topDiv);
 
-    var leftDiv = form.createDivRow(positionRow, false);
-    formLeft = new FormNumber("距左");
-    formLeft.render(leftDiv);
+    formInset = new FormNumbers("inset", 4);
+    formInset.render(body);
 
+
+    formZIndex = new FormNumber("深度");
+    formZIndex.render(body);
 
 
     // form.createDivBool(body, "可移动", component.isFixed + "", (value: any) => {
@@ -1495,13 +1569,13 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
             }, {
                 id: "delete",
                 label: "删除", icon: "bi bi-trash", onclick: () => {
-                    var del=  document.getElementById("layer_" + component.key);
-                    console.log("del",del);
-                    if(del!=undefined){
+                    var del = document.getElementById("layer_" + component.key);
+                    console.log("del", del);
+                    if (del != undefined) {
                         del.remove();
                     }
                     deleteComponent(component);
-                  
+
 
                 }
             }, {
@@ -1601,9 +1675,9 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
             }, {
                 id: "delete",
                 label: "删除", icon: "bi bi-trash", onclick: () => {
-                    var del=  document.getElementById("layer_" + component.key);
-                    console.log("del",del);
-                    if(del!=undefined){
+                    var del = document.getElementById("layer_" + component.key);
+                    console.log("del", del);
+                    if (del != undefined) {
                         del.remove();
                     }
                     deleteComponent(component);

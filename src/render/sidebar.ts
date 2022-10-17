@@ -64,30 +64,30 @@ export function renderSidebar(content: HTMLElement) {
         }
     }
 
-    ]);
+    ],onExplorerHide);
 
 
 
     //组件
-    var componentsExplorer = renderExplorer("sidebar_component", sidebar, "组件");
+    var componentsExplorer = renderExplorer("sidebar_component", sidebar, "组件",false,undefined,onExplorerHide);
     requestIdleCallback(() => {
         renderComponentsExplorer(componentsExplorer);
     });
 
 
     //图标
-    var iconExplorer = renderExplorer("sidebar_icon", sidebar, "图标", true);
+    var iconExplorer = renderExplorer("sidebar_icon", sidebar, "图标", true,undefined,onExplorerHide);
     requestIdleCallback(() => {
         renderIconExplorers(iconExplorer);
     });
 
 
     //蓝图
-    var blueExplorer = renderExplorer("sidebar_blue", sidebar, "蓝图");
+    var blueExplorer = renderExplorer("sidebar_blue", sidebar, "蓝图", true,undefined,onExplorerHide);
     renderBlueExploer(blueExplorer);
 
     //数据
-    var databaseExplorer = renderExplorer("sidebar_database", sidebar, "数据");
+    var databaseExplorer = renderExplorer("sidebar_database", sidebar, "数据", true,undefined,onExplorerHide);
     databaseExplorer.id = "database_explorer";
 
 
@@ -136,6 +136,30 @@ export function renderSidebar(content: HTMLElement) {
 
 
 }
+
+function onExplorerHide(key:string,hide:boolean){
+    if(hide){
+        var index=showExplorers.findIndex(i=>i==key);
+        if(index>=0){
+            showExplorers.splice(index,1);
+        }
+    }else{
+        var index=showExplorers.findIndex(i=>i==key);
+        if(index>=0){
+          
+        }else{
+            if(showExplorers.length>1){
+                var del=showExplorers[0];
+                toggleExplorer(del,true);
+                showExplorers.splice(0,1);
+            }
+
+            showExplorers.push(key);
+        }
+
+    }
+}
+var showExplorers:Array<string>=["sidebar_catalog","sidebar_component"];
 function findPageByKey(key: string, catalogs: ICatalog[]): ICatalog {
     console.log("find", key, catalogs);
     var index = catalogs.find(c => c.key == key);
@@ -1124,15 +1148,26 @@ function renderComponentsExplorer(content: HTMLElement) {
 
 
 }
-export function isHiddenExplorer(key: string) {
 
-    if (!explorerHideMap.has(key)) {
-        return true;
+export function toggleExplorer(key: string, hide: boolean){
+    var explorer =document.getElementById(key);
+    var title=explorer.getElementsByClassName("explorer_title")[0];
+    var view:any=explorer.getElementsByClassName("explorer_view")[0];
+    var icon=title.getElementsByTagName("i")[0];
+ 
+    if(hide){
+        view.style.display = "none";
+        icon.className = "bi bi-chevron-right";
+    }else{
+
+        view.style.display = "block";
+        icon.className = "bi bi-chevron-down";
     }
-    return explorerHideMap.get(key);
+
+
 }
-var explorerHideMap = new Map<string, boolean>();
-export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[]): HTMLDivElement {
+
+export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[],onHide?:(key:string,hide:boolean)=>void): HTMLDivElement {
     var explorer = document.createElement("div");
     explorer.className = "explorer";
     explorer.id = key;
@@ -1142,6 +1177,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
     title.className = "explorer_title";
 
     var icon = document.createElement("i");
+    icon.className="explorer_icon";
     icon.style.marginLeft = "5px";
     title.appendChild(icon);
 
@@ -1162,10 +1198,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
 
     explorer.appendChild(view);
 
-    var hideMap = explorerHideMap.get(name);
-    if (hideMap != undefined) {
-        hide = hideMap;
-    }
+
 
     if (hide) {
         view.style.display = "none";
@@ -1178,11 +1211,17 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
         if (view.style.display == "none") {
             view.style.display = "block";
             icon.className = "bi bi-chevron-down";
-            explorerHideMap.set(name, false);
+   
+            if(onHide){
+                onHide(key,false);
+            }
         } else {
             view.style.display = "none";
             icon.className = "bi bi-chevron-right";
-            explorerHideMap.set(name, true);
+          
+            if(onHide){
+                onHide(key,true);
+            }
         }
     }
 

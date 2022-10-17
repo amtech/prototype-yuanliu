@@ -10,7 +10,7 @@ import { ipcRendererSend } from "../../preload";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
 import { renderPageLayout } from "../../render/pageLayout";
-import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, renderPageBackground, reRenderPage } from "../../render/workbench";
+import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, renderPageBackground, reRenderPage, updatePageViewScrollH, updatePageViewScrollV } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
 import { saveSimplePage } from "../../render/toolbar";
 import { getProject, openExpand, renderExpand } from "../../render/workspace";
@@ -250,6 +250,7 @@ const panel: IPanel = {
       } else {
         getCurPageContent().style.height = h + "px";
       }
+      updatePageViewScrollV();
       pushHistory(getCurPage());
     });
     formWidth.update(getCurPage().width + "", (value) => {
@@ -261,6 +262,7 @@ const panel: IPanel = {
       } else {
         getCurPageContent().style.width = h + "px";
       }
+      updatePageViewScrollH();
       pushHistory(getCurPage());
     });
     var scale = 100;
