@@ -1607,7 +1607,7 @@ iframe {
 
 .project_expand {
     right: 0;
-    top: 0;
+    top: 32px;
     bottom: 0;
     padding: 0px 10px 0px 10px;
     min-width: 400px;

@@ -172,6 +172,9 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
         fs.mkdirSync(dist);
         terminal("复制文件");
         copyDir(client, dist,terminal);
+        //复制modules：echarts,FileSaver,xlsx.mini.min.js
+        copyModules(dist);
+
         //构建js文件
         terminal("创建JS");
         buildData(wProject,terminal);
@@ -186,6 +189,27 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
         console.log(e);
     }
     return false;
+}
+/**
+ * 复制modules：echarts,FileSaver,xlsx.mini.min.js
+ */
+function copyModules(dist:string){
+
+    var js=path.join(dist,"js");
+
+    var modules= storage.getAppFolderPath("node_modules");
+    console.log(app.getAppPath());
+    console.log("modules",modules);
+
+    var echarts=path.join(modules,"echarts/dist/echarts.js");
+    var fileSaver=path.join(modules,"file-saver/dist/FileSaver.js");
+    var xlsx=path.join(modules,"xlsx/dist/xlsx.full.min.js");
+
+    fs.copyFileSync(echarts,path.join(js,"echarts.js"));
+    fs.copyFileSync(fileSaver,path.join(js,"FileSaver.js"));
+    fs.copyFileSync(xlsx,path.join(js,"xlsx.full.min.js"));
+
+
 }
 
 /**

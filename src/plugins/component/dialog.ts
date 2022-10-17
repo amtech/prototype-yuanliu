@@ -54,6 +54,7 @@ import { IComponent } from "../../common/interfaceDefine"
             gridBg.style.bottom="0";
             gridBg.style.right="0";
             gridBg.style.zIndex="-1";
+   
             var gridContent=document.createElement("div");
             dialog.appendChild(gridBg);
             dialog.appendChild(gridContent);

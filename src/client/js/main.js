@@ -275,10 +275,13 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     //开始新的
     if (pageJson.backgroundType == undefined || pageJson.backgroundType == 0) {
         pg.style.background = "auto";
+        pg.getContext("2d").clearRect(0, 0, pg.clientWidth, pg.clientHeight);
     } else if (pageJson.backgroundType == 1) {
         pg.style.background = pageJson.backgroundColor;
+        pg.getContext("2d").clearRect(0, 0, pg.clientWidth, pg.clientHeight);
     } else if (pageJson.backgroundType == 2) {
         pg.style.background = pageJson.backgroundColor;
+        pg.getContext("2d").clearRect(0, 0, pg.clientWidth, pg.clientHeight);
     } else if (pageJson.backgroundType == 3) {
         //图像
         var bd = background_data.find(b => b.key == pageJson.backgroundColor);

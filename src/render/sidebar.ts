@@ -233,10 +233,10 @@ function getChartCount(text: string, char: string): number {
  * @param catalog 
  */
 
-function createPage(name: string, catalog?: ICatalog,template?:string) {
+function createPage(name: string, catalog?: ICatalog, template?: string) {
     if (catalog == undefined) {
         //level =0
-        var page: ICatalog = { name: name, path: "/" + name + ".json", dir: "/", sort: 0, key: getUUID(),template:template };
+        var page: ICatalog = { name: name, path: "/" + name + ".json", dir: "/", sort: 0, key: getUUID(), template: template };
         if (getProject().catalogs == undefined) {
             getProject().catalogs = [];
         }
@@ -249,7 +249,7 @@ function createPage(name: string, catalog?: ICatalog,template?:string) {
             catalog.children = [];
         }
         //children
-        var page: ICatalog = { key: getUUID(), name: name, path: catalog.path + "/" + name + ".json", dir: catalog.path, sort: catalog.children.length ,template:template};
+        var page: ICatalog = { key: getUUID(), name: name, path: catalog.path + "/" + name + ".json", dir: catalog.path, sort: catalog.children.length, template: template };
         // if(catalog.path=="/"){
         //     page.path = "/" + catalog.name;
         // }
@@ -548,11 +548,31 @@ function renderIconExplorer(content: HTMLElement, filter: string) {
 
 var lastSelected: HTMLElement;
 function renderFileExplorer(content: HTMLElement) {
+
+    var searchDiv = document.createElement("div");
+    searchDiv.style.display = "flex";
+    searchDiv.style.alignItems = "center";
+    searchDiv.style.justifyContent = "center";
+    searchDiv.style.height = "32px";
+    var input = document.createElement("input");
+    input.style.fontSize = "12px";
+    input.style.padding = "2px 5px 2px 5px";
+    searchDiv.appendChild(input);
+
+
+    content.appendChild(searchDiv);
+
     var fileExplorer = document.createElement("div");
     fileExplorer.id = "fileExplorer";
     fileExplorer.className = "fileExplorer";
     fileExplorer.style.minHeight = "100px";
     content.appendChild(fileExplorer);
+
+    renderTap(searchDiv, "", "bi bi-search", () => {
+        var text = input.value;
+        renderCatalog(fileExplorer, getProject().catalogs, 1, text);
+    });
+
 
     // var fileTree = {
     //     name: "dasda",
@@ -588,21 +608,21 @@ function renderFileExplorer(content: HTMLElement) {
     // });
 
 }
-function renderCatalog(content: HTMLElement, catalogs: ICatalog[], level: number) {
+function renderCatalog(content: HTMLElement, catalogs: ICatalog[], level: number, search?: string) {
     if (catalogs != undefined) {
         //  catalogs.sort((a, b) => (a.sort - b.sort));
         // console.log("load Catalog:---")
         logj("load Catalog:---", "sidebar", 569);
-
+        content.innerHTML = "";
         catalogs.forEach((catalog: ICatalog) => {
-            renderFileTree(content, catalog, level);
+            renderFileTree(content, catalog, level, undefined, search);
         });
     }
 
 }
 
 var folderHiddenMap = new Map<string, boolean>();
-function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, parent?: ICatalog) {
+function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, parent?: ICatalog, search?: string) {
     // console.log("renderFileTree", content, catalog);
     if (catalog == undefined) {
         return;
@@ -612,7 +632,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
             id: "newpage",
             label: "新建页面", icon: "bi bi-file-earmark-plus",
             onclick: () => {
-        
+
 
                 createPage("新建页面", getContextMenuArg());
             }
@@ -620,7 +640,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
             id: "newpagebytemp",
             label: "根据模板新建页面", icon: "bi bi-node-plus",
             onclick: () => {
-         
+
 
                 createPageByTemplate(getContextMenuArg());
             }
@@ -628,42 +648,42 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
             id: "newfolder",
             label: "新建文件夹", icon: "bi bi-folder-plus",
             onclick: () => {
-              
+
 
                 createFolder("新建文件夹", getContextMenuArg());
             }
         }, {
             id: "delete",
             label: "删除", icon: "bi bi-trash", onclick: () => {
-               
+
                 deletePage(getContextMenuArg());
             }
         }, {
             id: "rename",
             label: "重命名", icon: "bi bi-pencil", accelerator: "Enter", onclick: () => {
-                var ele=getContextMenuElement();
-               ele.setAttribute("data-edit", "true");
-               ele.getElementsByTagName("input").item(0).focus();
+                var ele = getContextMenuElement();
+                ele.setAttribute("data-edit", "true");
+                ele.getElementsByTagName("input").item(0).focus();
             }
         }];
     var menuItemsPage: Array<IMenuItem> = [{
         id: "delete",
         label: "删除", icon: "bi bi-trash", onclick: () => {
-    
-           deletePage(getContextMenuArg());
+
+            deletePage(getContextMenuArg());
         }
     }, {
         id: "rename",
         label: "重命名", icon: "bi bi-pencil", accelerator: "Enter",
-         onclick: () => {
-           getContextMenuElement().setAttribute("data-edit", "true");
-           getContextMenuElement().getElementsByTagName("input").item(0).focus();
+        onclick: () => {
+            getContextMenuElement().setAttribute("data-edit", "true");
+            getContextMenuElement().getElementsByTagName("input").item(0).focus();
         }
     }, {
         id: "copy",
         label: "复制", icon: "bi bi-files", onclick: () => {
-            var args=getContextMenuArg();
-             copyFile(args.path, args.name, args.name + "_copy");
+            var args = getContextMenuArg();
+            copyFile(args.path, args.name, args.name + "_copy");
         }
     }];
 
@@ -671,7 +691,9 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         var folder = document.createElement("div");
         folder.className = "explorer_folder";
         folder.id = catalog.key;
-        content.appendChild(folder);
+
+        if (search == undefined || search.length == 0)
+            content.appendChild(folder);
 
         var folderTitle = document.createElement("div");
 
@@ -716,10 +738,13 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         folder.appendChild(folderView);
 
         var hidden = folderHiddenMap.get(catalog.path);
-        if (hidden == true) {
+        if (hidden == undefined || hidden) {
             folderView.style.display = "none";
             icon.className = "bi bi-chevron-right";
+        } else {
+
         }
+
 
 
         folderTitle.onclick = (e: MouseEvent) => {
@@ -746,8 +771,8 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         folderTitle.oncontextmenu = (e: MouseEvent) => {
             // folderTitle.setAttribute("selected", "true");
 
-        //    showContextMenu(menuItemsFolder, e.clientX, e.clientY, catalog, folderTitle);
-            openContextMenu(menuItemsFolder,catalog, folderTitle);
+            //    showContextMenu(menuItemsFolder, e.clientX, e.clientY, catalog, folderTitle);
+            openContextMenu(menuItemsFolder, catalog, folderTitle);
         }
         nameInput.onblur = () => {
             if (nameInput.value.length <= 0) return;
@@ -789,9 +814,9 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         folderTitle.ondrop = (e) => {
 
             folderTitle.removeAttribute("data-insert");
-            console.log( dargData.getData("catalog").key);
+            console.log(dargData.getData("catalog").key);
             e.stopPropagation();
-            var dropParent=getCatalogParent(getProject().catalogs, dargData.getData("catalog").key);
+            var dropParent = getCatalogParent(getProject().catalogs, dargData.getData("catalog").key);
             if (dropParent == undefined) {
                 console.log("dropParent is undefined");
                 var old = getProject().catalogs.find(c => c.key == dargData.getData("catalog").key);
@@ -833,7 +858,12 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
 
         catalog.children.forEach((child: any) => {
-            renderFileTree(folderView, child, level + 1, catalog);
+            if(search!=undefined&&search.length>0){
+                renderFileTree(content, child, level + 1, catalog,search);
+            }else{
+                renderFileTree(folderView, child, level + 1, catalog);
+            }
+      
         })
 
 
@@ -841,7 +871,19 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         var page = document.createElement("div");
         page.className = "explorer_file explorer_row";
         page.id = catalog.key;
-        content.appendChild(page);
+
+
+        if (search == undefined || search.length == 0)
+            content.appendChild(page);
+        else {
+          
+            if (catalog.name.indexOf(search) >= 0) {
+                console.log(catalog.name,search);
+                content.appendChild(page);
+            }
+        }
+
+
 
         var indent = document.createElement("div");
         indent.className = "indent";
@@ -884,8 +926,8 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         }
         page.oncontextmenu = (e: MouseEvent) => {
             //    page.setAttribute("selected", "true");
-            openContextMenu(menuItemsPage,catalog,page);
-          //  showContextMenu(menuItemsPage, e.clientX, e.clientY, catalog, page);
+            openContextMenu(menuItemsPage, catalog, page);
+            //  showContextMenu(menuItemsPage, e.clientX, e.clientY, catalog, page);
         }
         page.tabIndex = 1;
         page.onkeydown = (e: KeyboardEvent) => {
@@ -941,11 +983,11 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
             page.removeAttribute("data-insert");
             e.stopPropagation();
-            var dropParent=getCatalogParent(getProject().catalogs, dargData.getData("catalog").key);
+            var dropParent = getCatalogParent(getProject().catalogs, dargData.getData("catalog").key);
             if (dropParent == undefined) {
 
                 console.log("ondrop parent is undefined");
-             
+
                 var ol = getCatalog(getProject().catalogs, dargData.getData("catalog").key);
                 console.log(ol);
                 var olds: ICatalog = ol.caltalog;
@@ -978,7 +1020,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
                 var vs: any = document.getElementById(dropParent.key).getElementsByClassName("explorer_folder_view").item(0);
                 vs.innerHTML = "";
-                var level = getChartCount(dropParent.path, "/")+1;
+                var level = getChartCount(dropParent.path, "/") + 1;
                 console.log("level", level);
                 renderCatalog(vs, dropParent.children, level);
                 ipcRendererSend("saveProject", getProject());
@@ -1009,23 +1051,23 @@ function getCatalog(list: ICatalog[], key: string): { caltalog: ICatalog, index:
         }
     }
 }
-function getCatalogParent(list: ICatalog[], key: string):ICatalog {
+function getCatalogParent(list: ICatalog[], key: string): ICatalog {
     if (list == undefined) {
-    
+
         return;
     }
     var r = list.find(c => c.key == key);
     if (r != undefined) {
-      
+
         return undefined;
     }
-    for(var i=0;i<list.length;i++){
+    for (var i = 0; i < list.length; i++) {
         var c = list[i];
-        var children=c.children;
-        if(children!=undefined){
+        var children = c.children;
+        if (children != undefined) {
             var old = children.find(c => c.key == key);
             if (old != undefined) {
-      
+
                 return c;
             }
         }
@@ -1082,12 +1124,12 @@ function renderComponentsExplorer(content: HTMLElement) {
 
 
 }
-export function isHiddenExplorer(key:string){
-   
-    if(!explorerHideMap.has(key)){
+export function isHiddenExplorer(key: string) {
+
+    if (!explorerHideMap.has(key)) {
         return true;
     }
-    return  explorerHideMap.get(key);
+    return explorerHideMap.get(key);
 }
 var explorerHideMap = new Map<string, boolean>();
 export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[]): HTMLDivElement {
@@ -1150,14 +1192,8 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
         tapsDiv.style.display = "flex";
         title.appendChild(tapsDiv);
         taps.forEach((tap: IMenuItem) => {
-            var tapDiv = document.createElement("div");
-            tapDiv.className = "tool_tap";
-            tapDiv.title = tap.label;
-            var tapIcon = document.createElement("i");
-            tapIcon.className = tap.icon+"";
-            tapDiv.appendChild(tapIcon);
-            tapIcon.onclick = tap.onclick;
-            tapsDiv.appendChild(tapDiv);
+
+            renderTap(tapsDiv, tap.label, tap.icon, tap.onclick);
         });
     }
 
@@ -1171,6 +1207,17 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
     view.appendChild(body);
 
     return body;
+
+}
+export function renderTap(content: HTMLElement, label?: string, icon?: string | Electron.NativeImage, onclick?: () => void) {
+    var tapDiv = document.createElement("div");
+    tapDiv.className = "tool_tap";
+    tapDiv.title = label;
+    var tapIcon = document.createElement("i");
+    tapIcon.className = icon + "";
+    tapDiv.appendChild(tapIcon);
+    tapIcon.onclick = onclick;
+    content.appendChild(tapDiv);
 
 }
 
@@ -1405,12 +1452,12 @@ const templatePages: Array<{
 
 
                 var page = document.createElement("div");
-              
+
 
 
                 var table = document.createElement("div");
                 table.style.height = "100px";
-               
+
                 table.style.backgroundColor = "#f09";
                 table.style.borderRadius = "5px";
                 table.style.opacity = "0.5";
@@ -1497,14 +1544,14 @@ function createPageByTemplate(caltalog?: ICatalog) {
         title.style.fontSize = "18px";
         title.style.fontWeight = "bold";
         title.style.lineHeight = "3";
-        title.style.opacity= "0.9";
+        title.style.opacity = "0.9";
         pageDiv.appendChild(title);
 
         content.appendChild(pageDiv);
 
-        pageDiv.onclick=()=>{
+        pageDiv.onclick = () => {
 
-            createPage(page.label,caltalog,page.key);
+            createPage(page.label, caltalog, page.key);
             rd.root.remove();
         }
     });

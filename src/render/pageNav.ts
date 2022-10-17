@@ -6,10 +6,10 @@ Copyright (c) taoyongwen. All rights reserved.
 import { switchFloatTab } from "./floatPanel";
 
 import { IMenuItem, openContextMenu } from "../common/contextmenu";
-import { getNavItems, getProjectNavJson, setNavItems } from "./workbench";
-import * as dargData from "./DragData";
-import { getProject } from "./workspace";
 import { ipcRendererSend } from "../preload";
+import * as dargData from "./DragData";
+import { getNavItems, getProjectNavJson, setNavItems } from "./workbench";
+import { getProject } from "./workspace";
 
 var lastSelected: any;
 export interface INavItem {
@@ -30,6 +30,8 @@ export function renderNavTrees(content: HTMLElement, nav: INavItem[]) {
         return;
     }
     content.innerHTML = "";
+
+
     content.oncontextmenu = (e: MouseEvent) => {
         // folderTitle.setAttribute("selected", "true");
         var menuItems: Array<IMenuItem> = [

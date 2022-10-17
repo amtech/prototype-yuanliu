@@ -45,6 +45,27 @@ export function getCurViewContent(): HTMLElement {
     var content = document.getElementById("page_view_" + getCurPage().key);
     return content;
 }
+var dragTimerCount:number=0;
+var dragTimer:any;
+export function getDragTimer(){
+    return dragTimerCount;
+}
+export function startDargTimer()
+{
+    clearDargTimer();
+    dragTimer=setInterval(()=>{
+        dragTimerCount++;
+    },100);
+ 
+}
+export function clearDargTimer()
+{
+    dragTimerCount=0;
+    if(dragTimer!=undefined){
+        clearInterval(dragTimer);
+    }
+    
+}
 
 /**
  * 获取当前页面组件
@@ -989,11 +1010,11 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
     };
     //页面 接受 组件 拖拽
     var previewComponent: HTMLElement;
-    page.ondragover = (e: DragEvent) => {
-
+    page.ondragover = (e: any) => {
+        if(getDragTimer()<=3){
+            return;
+        }
         e.preventDefault();
-    }
-    page.ondragenter = (e: any) => {
         var component = dargData.getData("componentTemplate")
         if (e.target.className == "page" && previewComponent == undefined) {
             if (component != undefined)
@@ -1006,20 +1027,28 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
 
         }
 
+
+    }
+    page.ondragenter = (e: any) => {
+        startDargTimer();
+     
     }
     page.ondragleave = (e: DragEvent) => {
+       // clearDargTimer();
         if (previewComponent != undefined) {
             previewComponent.remove();
             previewComponent = undefined;
         }
     }
     page.ondragend = (e: DragEvent) => {
+      
         if (previewComponent != undefined) {
             previewComponent.remove();
             previewComponent = undefined;
         }
     }
     page.ondrop = (e: DragEvent) => {
+        clearDargTimer();
         if (previewComponent != undefined) {
             previewComponent.remove();
             previewComponent = undefined;

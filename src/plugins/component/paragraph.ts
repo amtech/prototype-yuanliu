@@ -3,7 +3,7 @@ import { IBlueProperty, IComponent } from "../../common/interfaceDefine"
 
 const component: IComponent = {
     isTemplate: true, key: "paragraph", label: "para.", icon: "bi bi-text-paragraph", type: "paragraph",
-    style: "font-size:14px;padding:10px;border:0;width:300px;text-indent: 2em;background:transparent;border-radius:5px;",
+    style: "display:inline-block;font-size:14px;padding:10px;border:0;width:300px;text-indent: 2em;background:transparent;border-radius:5px;",
     onPreview: () => {
         var label = document.createElement("div");
         label.innerHTML = "yuanliu-让设计跟接近产品.功能强大、可扩展且功能丰富的,利用预构建的网格系统和组件，并使用强大的JavaScript插件给项目带来生命。";

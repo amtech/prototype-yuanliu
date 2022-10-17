@@ -12,6 +12,7 @@ import { IComponent } from "../../common/interfaceDefine"
                     left:"center"
            
                              },
+                             backgroundColor: "transparent",
                   tooltip: {
                     trigger: 'item',
            

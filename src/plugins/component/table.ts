@@ -19,12 +19,12 @@ const component: IComponent = {
 
         var thead = document.createElement("div");
         thead.style.height = '40px';
-        thead.style.width = '400px';
+        thead.style.width = '200px';
         thead.style.backgroundColor = "#07b";
 
         var tbody = document.createElement("div");
-        tbody.style.height = '200px';
-        tbody.style.width = '400px';
+        tbody.style.height = '100px';
+        tbody.style.width = '200px';
         tbody.style.backgroundColor = "#09f";
         table.appendChild(thead);
         table.appendChild(tbody);

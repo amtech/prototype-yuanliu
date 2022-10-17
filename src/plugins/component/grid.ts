@@ -8,7 +8,7 @@ import { IComponent } from "../../common/interfaceDefine"
     onPreview: () => {
         var gird = document.createElement("div");
         return gird;
-    }, onRender: (component:IComponent,element:HTMLElement) => {
+    }, onRender: (component:IComponent,element:HTMLElement,content?,type?) => {
         var gird:HTMLElement= null;
         if(element!=undefined){
             gird=element;
@@ -28,7 +28,12 @@ import { IComponent } from "../../common/interfaceDefine"
         gird.appendChild(gridContent);
 
         if(component.property!=undefined&&component.property.isHost!=undefined&&component.property.isHost.context=="true"){
-            gird.setAttribute("active", "true");
+            
+            if(type=="product"){
+                gird.setAttribute("active", "true");
+                
+            }
+
             gird.onmouseover=()=>{
                 gird.style.backgroundColor="rgba(175,175,175,0.2)";
                 gird.style.cursor="pointer";

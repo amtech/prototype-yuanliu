@@ -13,8 +13,8 @@ import { pushHistory } from "../render/history";
 import { copyComponents } from "../render/pageTitle";
 import { activePropertyPanel, getComponentStyle, setComponentStyle } from "../render/propertypanel";
 import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
-import { clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine } from "../render/workbench";
-import { getConfig, getProject } from "../render/workspace";
+import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
+import { getConfig, getProject, openExpand } from "../render/workspace";
 import { checkContextMenu, IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
 import { getUUID, IComponent, IComponentProperty, IExtension, IShape } from "./interfaceDefine";
 import { updateStatus } from "../render/statusBar";
@@ -117,12 +117,12 @@ export function renderComponentPreview(content: HTMLElement, component: ICompone
             }
 
         }
+
         preview.style.pointerEvents = "none";
-        preview.ondragover=(e)=>{
-            e.stopPropagation();
-        }
-        if (component.type == "dialog") {
-            getCurPageContent().appendChild(preview);
+   
+        if (component.isExpand) {
+         //   getCurPageContent().appendChild(preview);
+           // openExpand();
 
         } else {
             if (dropIndex != undefined && dropIndex >= 0) {
@@ -409,6 +409,7 @@ export function onSelectComponent(componentPath: string) {
     if (div) div.setAttribute("selected", "true");
 
 }
+var previewParent:string;
 /**
  * 渲染组件
  * @param content 
@@ -625,8 +626,13 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
     };
     eventEle.ondragover = (e: any) => {
-
+        console.log("componentDiv.ondragover ");
         e.stopPropagation();
+
+        if (getDragTimer() <= 3) {
+            return;
+        }
+
         var dragComponent = dargData.getData("component");
         if (dragComponent != undefined) {
             if (dragComponent.key == component.key) {
@@ -653,7 +659,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             //拖拽 商店 内容 至 界面
             if (previewComponent != null) {
                 previewComponent.remove();
-                previewComponent = null;
+                previewComponent = undefined;
             }
             previewComponent = renderStorePreview(body, dragStore, dropIndex)
             e.preventDefault();
@@ -730,14 +736,17 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             if (lastDropIndex != dropIndex) {
                 lastDropIndex = dropIndex;
                 var componentT = dragComponentTemplate;
-                if (previewComponent != null) {
-                    previewComponent.remove();
-                    previewComponent = null;
-                }
+                // if (previewComponent != null) {
+                //     previewComponent.remove();
+                //     previewComponent = null;
+                // }
                 // e.target.className.indexOf("component_canvas") >= 0 
-                if (e.target == eventEle && previewComponent == undefined) {
-                    if (componentT != undefined)
+                if (e.target == eventEle) {
+                    if (componentT != undefined){
+                        previewParent=component.key;
                         previewComponent = renderComponentPreview(body, componentT, dropIndex)
+                    }
+                       
                 }
             }
         }
@@ -746,22 +755,32 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     eventEle.ondragenter = (e: any) => {
         console.log("componentDiv.ondragenter ");
         e.stopPropagation();
+        startDargTimer();
         dropIndex = -1;
         lastDropIndex = undefined;
     }
 
-    eventEle.ondragleave = (e: DragEvent) => {
+    eventEle.ondragleave = (e: any) => {
         e.stopPropagation();
-        console.log("ondragleave");
-        eventEle.setAttribute("dataDrag", "false");
-        if (previewComponent != null) {
-            previewComponent.remove();
-            previewComponent = null;
+        //  clearDargTimer();
+        if(previewParent!=undefined&&previewParent==component.key){
+
+        }else{
+            if (previewComponent != null) {
+                previewComponent.remove();
+                previewComponent = null;
+                previewParent=undefined;
+            }
         }
+     
+       
+
+
+
     }
 
     eventEle.ondrop = (e: DragEvent) => {
-
+        clearDargTimer();
         e.stopPropagation();
 
         //拖拽目录
@@ -841,6 +860,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
                 if (previewComponent != null) {
                     previewComponent.remove();
                     previewComponent = null;
+                    previewParent=undefined;
                 }
                 //如果 组件 自定义了事件，直接返回
                 if (component.onDrop != undefined) {

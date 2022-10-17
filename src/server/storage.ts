@@ -485,7 +485,7 @@ export function getProjectFolderPath(project: any, folder?: "pages" | "images"):
     }
     return undefined;
 }
-export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" | "markdown" | "templates"): string {
+export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" | "markdown" | "templates"|"node_modules"): string {
 
     var appPath = app.getAppPath();
     if (path.basename(appPath) == "dist") {
@@ -505,6 +505,8 @@ export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" |
                 return path.join(root, "src", "client");
             } else if (folder == "templates") {
                 return path.join(root, "templates");
+            }else if(folder=="node_modules"){
+                return path.join(root,"node_modules");
             }
         }
     } else {
@@ -523,6 +525,8 @@ export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" |
                 return path.join(appPath, "src", "client");
             } else if (folder == "templates") {
                 return path.join(appPath, "templates");
+            }else if(folder=="node_modules"){
+                return path.join(appPath,"node_modules");
             }
     }
 

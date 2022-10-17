@@ -116,7 +116,40 @@ function createAction(link, blues, links) {
                             if (expands.findIndex(p => p == toComponent.key) < 0) {
                                 expands.push(toComponent.key);
                             }
-                            toComponent.hidden = true;
+                            // toComponent.hidden = true;
+                            var paths = hasComponentPathEach(toComponent);
+                            setTimeout(() => {
+                                //更新 隐藏部分的blue
+                                getCurPage().blueLinks.forEach(hiddenLink => {
+                                    var hideFrom = hiddenLink.from;
+
+                                    if (hideFrom.type == "event") {
+                                        var hideFromBlue = getCurPage().blues.find(b => b.key == hideFrom.blue);
+
+                                        if (paths.indexOf(hideFromBlue.component) >= 0) {
+
+
+                                            // console.log(getCurPage().children);
+                                            if (hideFromBlue.type == "page") {
+
+                                            } else if (hideFromBlue.type == "project") {
+
+                                            } else if (hideFromBlue.type == "window") {
+
+                                            } else {
+                                                blue_component(hiddenLink, hideFrom, hideFromBlue, getCurPage().blues, getCurPage().blueLinks);
+                                            }
+
+                                        }
+
+
+                                    }
+
+                                })
+
+                                // loadBlueprint(getCurPage().blues, getCurPage().blueLinks);
+
+                            }, 100);
                         }
 
 

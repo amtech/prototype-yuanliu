@@ -3,52 +3,63 @@ import { IComponent } from "../../common/interfaceDefine"
 const component: IComponent = {
     isTemplate: true, key: "button", label: "button", icon: "bi bi-badge-tm", type: "button",
     style: "user-select: none;display: inline-block; cursor:pointer;font-size:13px;padding: 5px 10px 5px 10px;border: 1px solid var(--theme-color);border-radius: 5px;",
-    drop:"component",
+    drop: "component",
     onDrop(component, data) {
-        if(data!=undefined){
-            if(data.type=="icon"){
-                component.property.icon.context=data.icon;
-                component.onRender(component,document.getElementById(component.key));
+        if (data != undefined) {
+            if (data.type == "icon") {
+                component.property.icon.context = data.icon;
+                component.onRender(component, document.getElementById(component.key));
             }
         }
         console.log(data);
     },
     onPreview: () => {
         var button = document.createElement("input");
-        button.type = "button"; 
+        button.type = "button";
         button.value = "按钮";
         return button;
     }, onRender: (component, element, content, type) => {
-        var button:HTMLElement;
-      
-        if (element != undefined)
-           {
+        var button: HTMLElement;
+
+        if (element != undefined) {
             button = element;
-            button.innerHTML="";    
-           }
-        
+            button.innerHTML = "";
+        }
+
         else
             button = document.createElement("div");
+        var bg = document.createElement("div");
+        bg.className = "component_bg";
+        bg.style.position = "absolute";
+        bg.style.top = "0";
+        bg.style.left = "0";
+        bg.style.bottom = "0";
+        bg.style.right = "0";
+        bg.style.zIndex = "-1";
 
-        var body=document.createElement("div");
-        body.style.display="flex";
-        body.style.alignItems="center";
+        button.appendChild(bg);
+        var body = document.createElement("div");
+        body.style.display = "flex";
+        body.style.alignItems = "center";
         button.appendChild(body);
-        
-        if(component.property.icon!=undefined&& component.property.icon.context.length>1){
-            var icon=document.createElement("i");
-            icon.className=component.property.icon.context;
-            icon.style.paddingRight="5px";
+
+        if (component.property.icon != undefined && component.property.icon.context.length > 1) {
+            var icon = document.createElement("i");
+            icon.className = component.property.icon.context;
+            icon.style.paddingRight = "5px";
             body.appendChild(icon);
         }
-        
-        var label=document.createElement("div");
+
+        var label = document.createElement("div");
         body.appendChild(label);
         //新的
         label.innerText = component.property.text.context;
-        button.setAttribute("hover", "true");
-        button.setAttribute("active", "true");
-        
+        if (type == "product") {
+            button.setAttribute("hover", "true");
+            button.setAttribute("active", "true");
+        }
+
+
         if (type != "product") {
             label.ondblclick = () => {
                 var input = document.createElement("input");
