@@ -178,6 +178,7 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
         //构建js文件
         terminal("创建JS");
         buildData(wProject,terminal);
+        buildMaps(wProject);
         //webpack index.js
         terminal("打包项目");
         packge(dist,terminal);
@@ -362,6 +363,20 @@ function buildData(wProject: any,terminal?:(log:any)=>void) {
         terminal("buildData success");
     }
     console.log("buildData success");
+}
+function buildMaps(wProject:IProject){
+    var rs="export default {";
+    storage.loadMapCatalog().forEach(item=>{
+
+       var map=  storage.loadMap(item);
+
+       rs+=item.replace(".json","")+":"+JSON.stringify(map)+",";
+
+    })
+
+    rs+="}";
+
+    fs.writeFileSync(path.join(app.getPath("home"), ".prototyping", "build", wProject.name, "js", "map.js"), rs);
 }
 function buildPluginsBackground(wProject:IProject){
     var rs="export default [";
