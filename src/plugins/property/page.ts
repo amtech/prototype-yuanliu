@@ -18,6 +18,7 @@ import { showStatusLoadding } from "../../render/statusBar";
 
 
 var image: HTMLImageElement;
+var imageBgDiv:HTMLElement;
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
 var formScale: forms.FormSolider;
@@ -41,28 +42,7 @@ const panel: IPanel = {
   key: "page", name: "页面", hidden: true, sort: 0,
   render: (content: HTMLElement) => {
 
-    var setting = document.createElement("div");
-    setting.style.flex = "1";
-    setting.style.marginLeft = "10px";
-    setting.style.marginRight = "10px";
-    setting.style.display = "block";
-    content.appendChild(setting);
-
-    var pageLayout = document.createElement("div");
-    pageLayout.style.margin = "10px";
-    pageLayout.style.borderRadius = "5px";
-    pageLayout.style.overflow = "hidden";
-    pageLayout.style.width = (content.clientWidth - 20) + "px";
-    pageLayout.style.minHeight = "200px";
-    pageLayout.id = "pageLayout";
-    content.appendChild(pageLayout);
-
-    pageLayout.ondblclick = () => {
-      requestIdleCallback(() => {
-        renderPageLayout();
-      });
-    }
-
+    
 
     //image
 
@@ -70,11 +50,20 @@ const panel: IPanel = {
     imageDiv.style.textAlign = "center";
     imageDiv.style.paddingTop = "20px";
     imageDiv.style.paddingBottom = "20px";
-
+    // imageDiv.style.position="relative";
     imageDiv.style.overflow = "hidden";
-    setting.appendChild(imageDiv);
+    content.appendChild(imageDiv);
+
+    imageBgDiv=document.createElement("div");
+    imageBgDiv.style.width="100";
+    imageBgDiv.style.position="absolute";
+    imageBgDiv.style.inset="0px 0px 0px 0px";
+    imageBgDiv.style.filter="blur(20px)";
+    imageBgDiv.style.opacity="0.2";
+    imageDiv.appendChild(imageBgDiv);
 
     image = document.createElement("img");
+    image.style.position="relative";
     image.style.maxWidth = "200px";
     image.style.maxHeight = "200px";
     image.style.borderRadius="5px";
@@ -101,6 +90,31 @@ const panel: IPanel = {
       });
 
     }
+
+
+    var setting = document.createElement("div");
+    setting.style.position="relative";
+    setting.style.flex = "1";
+    setting.style.marginLeft = "10px";
+    setting.style.marginRight = "10px";
+    setting.style.display = "block";
+    content.appendChild(setting);
+
+    var pageLayout = document.createElement("div");
+    pageLayout.style.margin = "10px";
+    pageLayout.style.borderRadius = "5px";
+    pageLayout.style.overflow = "hidden";
+    pageLayout.style.width = (content.clientWidth - 20) + "px";
+    pageLayout.style.minHeight = "200px";
+    pageLayout.id = "pageLayout";
+    content.appendChild(pageLayout);
+
+    pageLayout.ondblclick = () => {
+      requestIdleCallback(() => {
+        renderPageLayout();
+      });
+    }
+
 
 
     var row = document.createElement("div");
@@ -241,6 +255,7 @@ const panel: IPanel = {
     }
 
     image.src = getProject().work + "/images/" + getCurPage().key + ".jpeg";
+    imageBgDiv.style.background ="url("+ getProject().work + "/images/" + getCurPage().key + ".jpeg)";
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
       getCurPage().height = parseFloat(value);
