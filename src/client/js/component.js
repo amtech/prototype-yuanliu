@@ -38,11 +38,11 @@ export function findCurPageComponent(path) {
             rs = page.children.find(c => c.key == keys[0]);
 
         } else {
-            console.log(page);
+
             var parent = page;
             keys.forEach(key => {
                 if (parent != undefined) {
-                    console.log(parent.children, key);
+
                     parent = parent.children.find((c) => c.key == key);
 
                 }

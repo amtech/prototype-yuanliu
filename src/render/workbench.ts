@@ -567,6 +567,9 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     var workbench = document.createElement("div");
     workbench.className = "workbench";
     content.appendChild(workbench);
+    workbench.onclick=()=>{
+        activePropertyPanel("page");
+    }
     var ruler_show = true;
     var ruler_width = 20;
     var title_display: boolean = titleJson.display;
@@ -700,7 +703,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     }
 
     //页面滚动，标尺跟着滚动
-
+    var propertyPanelBGImage:any=document.getElementById("propertyPanelBGImage");
     var sroll_h = document.createElement("div");
     sroll_h.className = "sroll_h";
     workbench.appendChild(sroll_h);
@@ -728,6 +731,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                     le = content.clientWidth - sroll_h_block.clientWidth;
                 }
                 page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
+                propertyPanelBGImage.style.right= (window.innerWidth-240-page_parent.clientWidth- (100 - le * sroll_h_rate)) + 'px';
                 sroll_h_block.style.left = le + "px";
                 if (ruler_view != undefined) {
                     ruler_view.style.left = page_parent.style.left;
@@ -780,6 +784,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                     te = content.clientHeight - sroll_v_block.clientHeight;
                 }
                 page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
+                propertyPanelBGImage.style.top= (100 - te * sroll_v_rate+32) + 'px';
                 sroll_v_block.style.top = te + "px";
                 if (ruler_view1 != undefined) {
                     ruler_view1.style.top = ((100 - te * sroll_v_rate) - ruler_width) + "px";
@@ -789,6 +794,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 } else {
                     document.getElementById("workbench_row").className = "";
                 }
+             
+           
             }
         }
         document.onmouseup = (eu) => {
@@ -804,7 +811,9 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     }
     page_view.onwheel = (e: any) => {
         {
-            var sroll_h_rate = ((p.width + 200) - content.clientWidth) / (content.clientWidth - sroll_h_block.clientWidth);
+            var sroll_h_block_hh=parseFloat(sroll_h_block.style.width.replace("px",""));
+            var view_w=content.clientWidth;
+            var sroll_h_rate = ((p.width + 200) - view_w) / (view_w- sroll_h_block_hh);
 
             var lb = parseFloat(sroll_h_block.style.left.replace("px", ""));
             var le = e.deltaX / 5 + lb;
@@ -812,10 +821,13 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             if (le <= 0) {
                 le = 0;
             }
-            if (le > content.clientWidth - sroll_h_block.clientWidth) {
-                le = content.clientWidth - sroll_h_block.clientWidth;
+       
+            if (le > view_w - sroll_h_block_hh) {
+                le = view_w -sroll_h_block_hh;
             }
+         
             page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
+            propertyPanelBGImage.style.right= (window.innerWidth-240-page_parent.clientWidth- (100 - le * sroll_h_rate)) + 'px';
             sroll_h_block.style.left = le + "px";
             if (ruler_view != undefined) {
                 ruler_view.style.left = page_parent.style.left;
@@ -828,17 +840,22 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
 
         }
         {
-            var sroll_v_rate = ((p.height + 200) - content.clientHeight) / (content.clientHeight - sroll_v_block.clientHeight);
+            var sroll_v_block_hh=parseFloat(sroll_v_block.style.height.replace("px",""));
+            var view_h=content.clientHeight;
+    
+            var sroll_v_rate = ((p.height + 200) -view_h) / (view_h - sroll_v_block_hh);
             var tb = parseFloat(sroll_v_block.style.top.replace("px", ""));
 
             var te = e.deltaY / 5 + tb;
             if (te <= 0) {
                 te = 0;
             }
-            if (te > content.clientHeight - sroll_v_block.clientHeight) {
-                te = content.clientHeight - sroll_v_block.clientHeight;
+            if (te > view_h - sroll_v_block_hh) {
+                te = view_h - sroll_v_block_hh;
             }
+
             page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
+            propertyPanelBGImage.style.top= (100 - te * sroll_v_rate+32) + 'px';
             sroll_v_block.style.top = te + "px";
             if (ruler_view1 != undefined) {
                 ruler_view1.style.top = ((100 - te * sroll_v_rate) - ruler_width) + "px";
@@ -901,10 +918,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 select = false;
                 selectCover.remove();
             }
-            setTimeout(() => {
+         
                 //右侧面板
                 activePropertyPanel("page");
-            }, 500);
+      
         }
     }
     console.log("renderPage---", Date.now() - start);
@@ -1232,6 +1249,7 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                                 if (parent != undefined) {
                                     ct.sort = position;
                                     parent.children.splice(position, 0, ct);
+                                    //TODO  存在问题，需要修改
                                     renderComponent(document.getElementById(parent.key), ct, position);
                                 }
                             }

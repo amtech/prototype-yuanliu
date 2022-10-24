@@ -388,7 +388,7 @@ function loadComponentsProperty(component: IComponent) {
 
 
     formPosition.update(position, (value) => {
-        setComponentStyle(component, "poition", ["relative", "absolute"][value]);
+        setComponentStyle(component, "position", ["relative", "absolute"][value]);
 
 
 
@@ -582,6 +582,69 @@ function loadComponentsProperty(component: IComponent) {
             formBackgroundSolidPanel.style.display = "none";
             formBackgroundGradientPanel.style.display = "none";
             formBackgroundImagePanel.style.display = "block";
+            var gl1="rgba(255, 255, 255, 0.01)";
+            var gl2="rgba(255, 255, 255, 0.85)";
+            var gl3="rgba(220, 50, 10, 0.5)";
+            var gl4="rgba(120, 0, 30, 0.5)";
+            var gl5="rgba(30, 8, 2, 0.5)";
+            var gl6="rgba(123, 11, 9, 0.5)";
+
+            var bgStyle=getComponentStyle(component,"background");
+            console.log("bgStyle",bgStyle);
+            if(bgStyle!=undefined&&bgStyle.split("rgba").length==7){
+                var sp=bgStyle.split("rgba(");
+                 gl1="rgba("+sp[1].split(")")[0]+")";
+                 gl2="rgba("+sp[2].split(")")[0]+")";
+                 gl3="rgba("+sp[3].split(")")[0]+")";
+                 gl4="rgba("+sp[4].split(")")[0]+")";
+                 gl5="rgba("+sp[5].split(")")[0]+")";
+                 gl6="rgba("+sp[6].split(")")[0]+")";
+            }
+          
+            formBackgroundGLColor1.update(gl1,(color)=>{
+                gl1=color;
+                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
+                setComponentStyle(component,"background",gl);
+
+            });
+
+            formBackgroundGLColor2.update(gl2,(color)=>{
+                gl2=color;
+                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
+                setComponentStyle(component,"background",gl);
+
+            });
+
+            formBackgroundGLColor3.update(gl3,(color)=>{
+                gl3=color;
+                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
+                setComponentStyle(component,"background",gl);
+
+            });
+
+            formBackgroundGLColor4.update(gl4,(color)=>{
+                gl4=color;
+                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
+                setComponentStyle(component,"background",gl);
+
+            });
+            formBackgroundGLColor5.update(gl5,(color)=>{
+                gl5=color;
+                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
+                setComponentStyle(component,"background",gl);
+
+            });
+        
+            formBackgroundGLColor6.update(gl6,(color)=>{
+                gl6=color;
+                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
+                setComponentStyle(component,"background",gl);
+
+            });
+
+        
+
+
         }
     }
 
@@ -978,6 +1041,13 @@ var formBackgroundGradientPanelType: FormIcons;
 var formBackgroundGradientPanelAngle: FormSolider;
 var formBackgroundGradientPanelPosition: FormSolider;
 
+var formBackgroundGLColor1:FormColor;
+var formBackgroundGLColor2:FormColor;
+var formBackgroundGLColor3:FormColor;
+var formBackgroundGLColor4:FormColor;
+var formBackgroundGLColor5:FormColor;
+var formBackgroundGLColor6:FormColor;
+
 var formBorderPanel: HTMLElement;
 var formBorderPanelType: FormIcons;
 var formBorderPanelWidth: FormNumber;
@@ -995,7 +1065,7 @@ function renderThemeProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
     context.appendChild(body);
-    formBackgroundType = new FormIcons("背景", ["bi bi-slash-circle", "bi bi-palette", "bi bi-circle-half", "bi bi-image"]);
+    formBackgroundType = new FormIcons("背景", ["bi bi-slash-circle","bi bi-paint-bucket", "bi bi-circle-half", "bi bi-palette"]);
     formBackgroundType.render(body);
     //bg
     formBackgroundPanel = document.createElement("div");
@@ -1038,6 +1108,35 @@ function renderThemeProperty(context: HTMLElement) {
     formBackgroundImagePanel = document.createElement("div");
     formBackgroundImagePanel.style.display = "none";
     formBackgroundPanel.appendChild(formBackgroundImagePanel);
+
+
+    var formBackgroundGLRow1=document.createElement("div");
+    formBackgroundImagePanel.appendChild(formBackgroundGLRow1);
+    var formBackgroundGLColor1Div=forms.createDivRow(formBackgroundGLRow1,true);
+    formBackgroundGLColor1=new FormColor("背景1");
+    formBackgroundGLColor1.render(formBackgroundGLColor1Div);
+    var formBackgroundGLColor2Div=forms.createDivRow(formBackgroundGLRow1);
+    formBackgroundGLColor2=new FormColor("背景2");
+    formBackgroundGLColor2.render(formBackgroundGLColor2Div);
+
+    var formBackgroundGLRow2=document.createElement("div");
+    formBackgroundImagePanel.appendChild(formBackgroundGLRow2);
+    var formBackgroundGLColor3Div=forms.createDivRow(formBackgroundGLRow2,true);
+    formBackgroundGLColor3=new FormColor("前景1");
+    formBackgroundGLColor3.render(formBackgroundGLColor3Div);
+    var formBackgroundGLColor4Div=forms.createDivRow(formBackgroundGLRow2);
+    formBackgroundGLColor4=new FormColor("前景2");
+    formBackgroundGLColor4.render(formBackgroundGLColor4Div);
+
+
+    var formBackgroundGLRow3=document.createElement("div");
+    formBackgroundImagePanel.appendChild(formBackgroundGLRow3);
+    var formBackgroundGLColor5Div=forms.createDivRow(formBackgroundGLRow3,true);
+    formBackgroundGLColor5=new FormColor("前景3");
+    formBackgroundGLColor5.render(formBackgroundGLColor5Div);
+    var formBackgroundGLColor6Div=forms.createDivRow(formBackgroundGLRow3);
+    formBackgroundGLColor6=new FormColor("前景4");
+    formBackgroundGLColor6.render(formBackgroundGLColor6Div);
 
 
     // //[none,color,gradient,image]

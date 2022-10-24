@@ -27,6 +27,8 @@ export function loadBlueprint(blues, links) {
 
                 } else if (fromBlue.type == "window") {
 
+                } else if (fromBlue.type == "lines") {
+
                 } else {
                     blue_component(link, from, fromBlue, blues, links);
                 }
@@ -35,6 +37,112 @@ export function loadBlueprint(blues, links) {
             console.error(error);
         }
     });
+    renderLines(links, blues);
+}
+
+function renderLines(links, blues) {
+    console.log("renderLines");
+    var pageView = document.getElementById("pageView");
+    var page = pageView.children.item(0);
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.style.position = "absolute";
+    svg.style.top = "0";
+    svg.style.left = "0";
+    svg.style.pointerEvents = "none";
+    svg.style.height = page.clientHeight + "px";
+    svg.style.width = page.clientWidth + "px";
+    svg.style.zIndex = "-1";
+    page.appendChild(svg);
+
+    blues.forEach(blue => {
+        if (blue.type == "lines") {
+            //计算一个连线
+            var points = [];
+            var lineLinks = links.filter(l => l.from.blue == blue.key);
+            console.log("lineLinks", lineLinks);
+            lineLinks.forEach(lineLink => {
+                var blue = blues.find(b => b.key == lineLink.to.blue)
+                if (blue != undefined) {
+                    var compt = findCurPageComponent(blue.component);
+                    if (compt != undefined) {
+                        var comptDiv = document.getElementById(compt.key);
+
+                        var point = [comptDiv.getBoundingClientRect().left, comptDiv.getBoundingClientRect().top, comptDiv.clientWidth, comptDiv.clientHeight];
+                        points.push(point);
+                    }
+                }
+            });
+
+            //排序
+            points.sort((a, b) => a[1] - b[1]);
+            console.log(points);
+            //开始绘制
+            for (var i = 0; i < points.length - 1; i++) {
+                var start = points[i];
+                var end = points[i + 1];
+                var startX = start[0] + start[2] / 2;
+                var startY = start[1] + start[3] + 10;
+
+                var endX = end[0] + end[2] / 2;
+                var endY = end[1] - 10;
+                var rate = 0.2;
+
+                var pointAX = startX;
+                var pointAY = (endY - startY) * (1 - rate);
+                var pointBX = endX;
+                var pointBY = (endY - startY) * (1 - rate);
+
+                var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+
+                var d = "M" + startX + " " + startY + "L" + pointAX + " " + pointAY + " " + pointBX + " " + pointBY + " " + endX + " " + endY;
+
+                var stroke = "var(--theme-color)";
+                path.setAttribute("d", d);
+                path.setAttribute("style", "fill:none;stroke:" + stroke + ";stroke-width:1px;stroke-linejoin:round;");
+
+                svg.appendChild(path);
+
+
+            }
+            //绘制端点
+            {
+                var start = points[0];
+                var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                var startX = start[0] + start[2] / 2;
+                var startY = start[1] + start[3] + 10;
+
+                var stroke = "var(--theme-color)";
+                circle.setAttribute("cx", startX);
+                circle.setAttribute("cy", startY);
+                circle.setAttribute("r", 5);
+                circle.setAttribute("style", "fill:" + stroke + ";stroke:" + stroke + ";stroke-width:1px;");
+
+                svg.appendChild(circle);
+            } {
+                var end = points[points.length - 1];
+                var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                var endX = end[0] + end[2] / 2;
+                var endY = end[1] - 10;
+                var stroke = "var(--theme-color)";
+                circle.setAttribute("cx", endX);
+                circle.setAttribute("cy", endY);
+                circle.setAttribute("r", 5);
+                circle.setAttribute("style", "fill:" + stroke + ";stroke:" + stroke + ";stroke-width:1px;");
+
+                svg.appendChild(circle);
+            }
+
+        }
+
+    });
+
+
+
+
+
+
+
 }
 
 function blue_page(link, from, fromBlue, blues, links) {

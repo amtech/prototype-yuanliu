@@ -344,7 +344,7 @@ export interface IBluePoint {
 export interface IBlue {
     component: string;
     key: string;
-    type: "title"|"link" | "hub" | "page" | "project" | "component" | "method" | "variable" | "window" | "disabled" | "catalog" | "matrix" | "database"|"upload"|"download"|"date"|"loadding";
+    type: "title"|"link" | "hub" | "page" | "project" | "component" | "method" | "variable" | "window" | "disabled" | "catalog" | "matrix" | "database"|"upload"|"download"|"date"|"loadding"|"lines";
     name: string,
     icon?: string;
     events?: IBluePoint[];

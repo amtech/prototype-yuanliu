@@ -18,7 +18,7 @@ import { showStatusLoadding } from "../../render/statusBar";
 
 
 var image: HTMLImageElement;
-var imageBgDiv:HTMLElement;
+
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
 var formScale: forms.FormSolider;
@@ -54,13 +54,7 @@ const panel: IPanel = {
     imageDiv.style.overflow = "hidden";
     content.appendChild(imageDiv);
 
-    imageBgDiv=document.createElement("div");
-    imageBgDiv.style.width="100";
-    imageBgDiv.style.position="absolute";
-    imageBgDiv.style.inset="0px 0px 0px 0px";
-    imageBgDiv.style.filter="blur(20px)";
-    imageBgDiv.style.opacity="0.2";
-    imageDiv.appendChild(imageBgDiv);
+
 
     image = document.createElement("img");
     image.style.position="relative";
@@ -255,7 +249,9 @@ const panel: IPanel = {
     }
 
     image.src = getProject().work + "/images/" + getCurPage().key + ".jpeg";
-    imageBgDiv.style.background ="url("+ getProject().work + "/images/" + getCurPage().key + ".jpeg)";
+  //  document.getElementById("propertyPanelBG").style.background="url("+    image.src+")";
+    var panelBgImage:any=document.getElementById("propertyPanelBGImage");
+    panelBgImage.src=image.src;
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
       getCurPage().height = parseFloat(value);

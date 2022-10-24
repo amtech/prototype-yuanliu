@@ -358,9 +358,11 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
         if (pageJson.guides != undefined && pageJson.guides.length > 0)
             renderGuide(pageJson.guides);
         loadBlueprint(pageJson.blues, pageJson.blueLinks);
+
     }, 100);
 
 }
+
 var guidesIndex = 0;
 
 function renderGuide(guides) {
@@ -644,7 +646,7 @@ export function renderComponent(content, component, parent, index, self) {
             if (layer == -1 || layer == -2) {
                 //层级
                 if (index == 0) {
-                    root.style.position = "relative";
+                    root.style.position = "absolute";
                     root.style.top = "0px";
                     root.style.right = "0px";
                     root.style.left = "0px";

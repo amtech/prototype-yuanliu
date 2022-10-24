@@ -22,33 +22,43 @@ import { IComponent } from "../../common/interfaceDefine"
         gridBg.style.left="0";
         gridBg.style.bottom="0";
         gridBg.style.right="0";
-        gridBg.style.zIndex="-1";
+        gridBg.style.zIndex="0";
         var gridContent=document.createElement("div");
         gird.appendChild(gridBg);
         gird.appendChild(gridContent);
+        if(type=="product"){
+          
+            gridContent.style.height="100%";
+        }
 
         if(component.property!=undefined&&component.property.isHost!=undefined&&component.property.isHost.context=="true"){
             
             if(type=="product"){
                 gird.setAttribute("active", "true");
+              
+                gird.onmouseover=()=>{
+                    gird.style.backgroundColor="rgba(175,175,175,0.2)";
+                    gird.style.cursor="pointer";
+    
+                };
+                gird.onmouseleave=()=>{
+                    if(component.shape!=undefined)
+                       {
+                        gird.style.backgroundColor="";
+                       }else{
+                        gird.style.cssText=component.style;
+                       }
+                }
+                gird.onclick = () => {
+                    if (component.blue.event.click.on != undefined) {
+                        component.blue.event.click.on();
+                    }
+        
+                }
                 
             }
 
-            gird.onmouseover=()=>{
-                gird.style.backgroundColor="rgba(175,175,175,0.2)";
-                gird.style.cursor="pointer";
-
-            };
-            gird.onmouseleave=()=>{
-
-                gird.style.cssText=component.style;
-            }
-            gird.onclick = () => {
-                if (component.blue.event.click.on != undefined) {
-                    component.blue.event.click.on();
-                }
-    
-            }
+          
     
 
        //     gird.setAttribute("data-hot",component.property.isHost.context);

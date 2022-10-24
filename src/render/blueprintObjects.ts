@@ -76,7 +76,13 @@ export const blueObjects:IBlue[]=[
             { label: "关闭", name: "close" }
         ]
     }
-
+    ,{
+        component: "lines", key: "blue_hub_lines", name: "连线", icon: "bi bi-sign-turn-slight-right", type: "lines",
+        events: [
+            {label:"连线",name:"onLine"}
+        ],
+        methods:[]
+    }
     
  ]
 export function getBlueMethods():IMenuItem[]{
