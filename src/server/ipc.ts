@@ -151,6 +151,7 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
         notification.show();
         bw.webContents.send("_savePage", null);
     });
+
     ipcMain.on("startPreview_" + wId, (event: any, arg: any) => {
         startPreview(wProject);
 

@@ -103,7 +103,7 @@ function renderActivities(left:HTMLElement,right:HTMLElement,plugins:IStatusBarA
             right.appendChild(root);
         }
         plugin.onRender(root,getConfig(),getProject());
-        if(root.children.length==0){
+        if(root.innerHTML.length==0){
             root.style.display="none";
         }else{
             root.style.display="flex";

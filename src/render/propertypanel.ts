@@ -84,23 +84,6 @@ export function renderPropertyPanel(content: HTMLElement) {
     propertyPanel.id = "propertyPanel";
     content.appendChild(propertyPanel);
 
-    var  panelBg=document.createElement("div");
-    panelBg.style.position="absolute";
-    panelBg.id="propertyPanelBG";
-    panelBg.style.inset="0px 0px 0px 0px";
-    //panelBg.style.background="url(/Users/taoyongwen/.prototyping/work/profile/images/u051955921.jpeg)"
-    panelBg.style.opacity="0.2";
-    panelBg.style.filter="blur(20px)";
-    panelBg.style.backgroundPositionX="center";
-    panelBg.style.overflow="hidden";
-    propertyPanel.appendChild(panelBg);
-
-    var panelBgImage=document.createElement("img");
-    panelBgImage.style.position="absolute";
-    panelBgImage.style.top="132px";
-    panelBgImage.style.right="0px";
-    panelBgImage.id="propertyPanelBGImage";
-    panelBg.appendChild(panelBgImage);
 
 
     var tabsBar = document.createElement("div");
@@ -235,7 +218,7 @@ export function getComponentStyle(component: IComponent, property: string, repla
     }
     return "";
 }
-export function setComponentStyle(component: IComponent, property: string, value: string) {
+export function setComponentStyle(component: IComponent, property: string, value: string,isUpdate?:boolean) {
 
     var style = component.style;
     if (style != undefined) {
@@ -261,7 +244,8 @@ export function setComponentStyle(component: IComponent, property: string, value
         component.styles["root"] = style.replace(/; /g, ";");
         component.styles["root"]= style.replace(/  /g, "");
     }
-    updateComponentsStyle([component]);
+    if(isUpdate==undefined||isUpdate)
+        updateComponentsStyle([component]);
 }
 export function cal_gradient(colors: string[], angle: number, type: number, position: number): string {
     var s = 50 - position / 2;

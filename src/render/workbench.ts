@@ -19,7 +19,7 @@ import * as dargData from "./DragData";
 import { pushHistory } from "./history";
 import { INavItem, renderNavTrees } from "./pageNav";
 import { renderTitleBar } from "./pageTitle";
-import { activePropertyPanel } from "./propertypanel";
+import { activePropertyPanel, setComponentStyle } from "./propertypanel";
 import { updateStatus } from "./statusBar";
 import { saveSimplePage } from "./toolbar";
 import { getProject, openExpand, renderExpand, renderRecent } from "./workspace";
@@ -367,6 +367,10 @@ export function renderPage(page: IPage) {
             openContextMenu(menuList);
         }
 
+        //
+        var app_bg_img:any=document.getElementById("app_bg_img");
+        app_bg_img.style.left="340px";
+        app_bg_img.style.top="164px";
 
         //tab close
         var close = document.createElement("i");
@@ -703,7 +707,8 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     }
 
     //页面滚动，标尺跟着滚动
-    var propertyPanelBGImage:any=document.getElementById("propertyPanelBGImage");
+    var app_bg_img:any=document.getElementById("app_bg_img");
+
     var sroll_h = document.createElement("div");
     sroll_h.className = "sroll_h";
     workbench.appendChild(sroll_h);
@@ -731,7 +736,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                     le = content.clientWidth - sroll_h_block.clientWidth;
                 }
                 page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
-                propertyPanelBGImage.style.right= (window.innerWidth-240-page_parent.clientWidth- (100 - le * sroll_h_rate)) + 'px';
+                app_bg_img.style.left=(100 - le * sroll_h_rate+240)+"px";
                 sroll_h_block.style.left = le + "px";
                 if (ruler_view != undefined) {
                     ruler_view.style.left = page_parent.style.left;
@@ -784,7 +789,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                     te = content.clientHeight - sroll_v_block.clientHeight;
                 }
                 page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
-                propertyPanelBGImage.style.top= (100 - te * sroll_v_rate+32) + 'px';
+                app_bg_img.style.top=(100 - te * sroll_v_rate+64)+"px";
                 sroll_v_block.style.top = te + "px";
                 if (ruler_view1 != undefined) {
                     ruler_view1.style.top = ((100 - te * sroll_v_rate) - ruler_width) + "px";
@@ -827,7 +832,10 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             }
          
             page_parent.style.left = (100 - le * sroll_h_rate) + 'px';
-            propertyPanelBGImage.style.right= (window.innerWidth-240-page_parent.clientWidth- (100 - le * sroll_h_rate)) + 'px';
+
+            app_bg_img.style.left=(100 - le * sroll_h_rate+240)+"px";
+          
+
             sroll_h_block.style.left = le + "px";
             if (ruler_view != undefined) {
                 ruler_view.style.left = page_parent.style.left;
@@ -855,7 +863,9 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             }
 
             page_parent.style.top = (100 - te * sroll_v_rate) + 'px';
-            propertyPanelBGImage.style.top= (100 - te * sroll_v_rate+32) + 'px';
+            app_bg_img.style.top=(100 - te * sroll_v_rate+64)+"px";
+          
+
             sroll_v_block.style.top = te + "px";
             if (ruler_view1 != undefined) {
                 ruler_view1.style.top = ((100 - te * sroll_v_rate) - ruler_width) + "px";
@@ -871,59 +881,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
 
     }
 
-    //渲染 页面 选择效果
-    page_view.onmousedown = (e: any) => {
-        if (e.button != 0) {
-            return;
-        }
-        checkContextMenu();
-        if (e.target.className == "page_view" || e.target.className == "component" || e.target.className == "page" || e.target.className == "grid") {
-            e.stopPropagation();
-            var selectCover = document.createElement("div");
-            selectCover.className = "selectCover";
-            selectCover.id = "selectCover";
-            selectCover.style.pointerEvents = "none";
-            selectComponents.forEach(s => {
-                var div = document.getElementById(getPathKey(s));
-                if (div) div.removeAttribute("selected");
-            })
-            selectComponents = [];
-
-            var x = e.clientX;
-            var y = e.clientY;
-            var h = 0;
-            var w = 0;
-            var select = true;
-            selectCover.style.left = x + "px";
-            selectCover.style.top = y + "px";
-            page_view.onmousemove = (e) => {
-                if (!select) return;
-                if (!document.getElementById("selectCover")) { document.body.appendChild(selectCover); }
-                w = e.clientX - x;
-                h = e.clientY - y;
-                if (w >= 0) {
-                    selectCover.style.width = w + "px";
-                } else {
-                    selectCover.style.left = e.clientX + "px";
-                    selectCover.style.width = (x - e.clientX) + "px";
-                }
-                if (h >= 0) {
-                    selectCover.style.height = h + "px";
-                } else {
-                    selectCover.style.top = e.clientY + "px";
-                    selectCover.style.height = (y - e.clientY) + "px";
-                }
-            };
-            document.onmouseup = () => {
-                select = false;
-                selectCover.remove();
-            }
-         
-                //右侧面板
-                activePropertyPanel("page");
-      
-        }
-    }
+   
     console.log("renderPage---", Date.now() - start);
 }
 function renderTitleBody(title_bar: HTMLElement, titleJson: any, pageHeight: number) {
@@ -1092,6 +1050,11 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
             previewComponent = renderStorePreview(page, dragStore)
 
         }
+        if(getCurPage().mode=="fixed"){
+            previewComponent.style.position="absolute";
+            previewComponent.style.left=e.clientX+"px";
+            previewComponent.style.top=e.clientY+"px";
+        }
 
 
     }
@@ -1136,7 +1099,17 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
                 renderExpand(component);
 
             } else {
-                renderComponent(page, component);
+               var div= renderComponent(page, component);
+
+                if(getCurPage().mode=="fixed"){
+                    div.style.position="absolute";
+                    div.style.left=e.clientX+"px";
+                    div.style.top=e.clientY+"px";
+                    setComponentStyle(component,"position","absolute",false);
+                    setComponentStyle(component,"left",div.style.left,false);
+                    setComponentStyle(component,"top", div.style.top,false);
+
+                }
             }
 
 

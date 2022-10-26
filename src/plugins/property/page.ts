@@ -13,8 +13,9 @@ import { renderPageLayout } from "../../render/pageLayout";
 import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, renderPageBackground, reRenderPage, updatePageViewScrollH, updatePageViewScrollV } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
 import { saveSimplePage } from "../../render/toolbar";
-import { getProject, openExpand, renderExpand } from "../../render/workspace";
+import { getProject, openExpand, renderExpand, showMessageBox } from "../../render/workspace";
 import { showStatusLoadding } from "../../render/statusBar";
+import { mode } from "d3";
 
 
 var image: HTMLImageElement;
@@ -38,6 +39,7 @@ var formBackgroundImageDiv: HTMLElement;
 var formInfo: forms.FormPragraph;
 var component_list: HTMLElement;
 var hiddenMap = new Map();
+var formMode:forms.FormIcons;
 const panel: IPanel = {
   key: "page", name: "页面", hidden: true, sort: 0,
   render: (content: HTMLElement) => {
@@ -225,6 +227,9 @@ const panel: IPanel = {
 
 
     })
+    //mode 
+    formMode=new forms.FormIcons("设计模式",["bi bi-columns-gap","bi bi-pin-angle"]);
+    formMode.render(setting);
 
 
     //
@@ -249,9 +254,11 @@ const panel: IPanel = {
     }
 
     image.src = getProject().work + "/images/" + getCurPage().key + ".jpeg";
-  //  document.getElementById("propertyPanelBG").style.background="url("+    image.src+")";
-    var panelBgImage:any=document.getElementById("propertyPanelBGImage");
-    panelBgImage.src=image.src;
+    var app_bg_img:any=document.getElementById("app_bg_img");
+    app_bg_img.src=image.src;
+    
+
+
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
       getCurPage().height = parseFloat(value);
@@ -510,6 +517,24 @@ const panel: IPanel = {
         })
       }
     }
+
+    //mode
+
+    var mode=0;
+    if(getCurPage().mode!=undefined){
+      mode=["flex","fixed"].indexOf(getCurPage().mode);
+    }
+    formMode.update(mode,(val)=>{
+      console.log(getCurPage().children);
+      if(getCurPage().children.length==0){
+        getCurPage().mode=val==0?"flex":"fixed";
+        reRenderPage();
+      }else{
+        showMessageBox("不能修改该页面模式，请先删除页面所有组价。","info");
+
+      }
+     
+    })
 
     //component_list  展示隐藏的组件
     requestIdleCallback(() => {

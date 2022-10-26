@@ -118,7 +118,7 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
 
 
         var icon = document.createElement("i");
-        icon.className = "bi bi-chevron-down";
+        icon.className = "explorer_icon bi bi-chevron-right";
         folderTitle.appendChild(icon);
 
         var name = document.createElement("div");
@@ -134,8 +134,10 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
 
         if (nav.isExtend) {
             folderView.style.display = "block";
+            icon.style.transform="rotate(90deg)";
         } else {
             folderView.style.display = "none";
+            icon.style.transform="rotate(0deg)";
         }
 
 
@@ -143,10 +145,10 @@ export function renderNavTree(content: HTMLElement, nav: INavItem, level: number
             // folderTitle.setAttribute("selected", "true");
             if (folderView.style.display == "none") {
                 folderView.style.display = "block";
-                icon.className = "bi bi-chevron-down";
+                icon.style.transform="rotate(90deg)";
             } else {
                 folderView.style.display = "none";
-                icon.className = "bi bi-chevron-right";
+                icon.style.transform="rotate(0deg)";
             }
             e.stopPropagation();
         }

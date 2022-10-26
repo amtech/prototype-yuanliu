@@ -14,6 +14,20 @@ body {
     height: 100%;
 }
 
+#app_bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.2;
+    filter: blur(30px);
+    overflow: hidden;
+}
+
+#app_bg_img {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
 input {
     border: 0;
     outline: none;
@@ -70,7 +84,7 @@ select {
 
 .page {
     outline: none;
-    overflow: auto;
+    overflow: hidden;
     position: relative;
 }
 
@@ -95,6 +109,10 @@ select {
     opacity: 0.8;
     z-index: 300;
     user-select: none;
+}
+
+.explorer_icon {
+    transition: transform 0.3s cubic-bezier(.62, -0.14, .62, 1.25);
 }
 
 .ruler_left {
@@ -169,6 +187,7 @@ select {
     font-size: 14px;
     line-height: 28px;
     transition: transform 0.3s;
+    position: relative;
 }
 
 .component:active {
@@ -190,17 +209,25 @@ select {
     }
 }
 
-.component:hover i {
-    display: none;
+.component_content {
+    transition: top 0.3s;
+    position: relative;
+    height: 56px;
+    width: 40px;
+    display: block;
+}
+
+.component_content:hover {
+    top: -28px;
+}
+
+.component i {
+    display: block;
 }
 
 .component span {
     font-size: 10px;
     white-space: nowrap;
-    display: none;
-}
-
-.component:hover span {
     display: block;
 }
 
@@ -211,10 +238,12 @@ select {
 
 .selectCover {
     position: fixed;
-    background-color: rgba(0, 175, 255, 0.2);
+    background-color: var(--light-color);
     border: 1px solid var(--theme-color);
     text-align: right;
-    font-size: 10px;
+    user-select: none;
+    pointer-events: none;
+    border-radius: 5px;
 }
 
 .sidebar_title {
@@ -431,6 +460,17 @@ select {
     /* border-bottom: 2px solid var(--theme-color); */
 }
 
+.tab:hover::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    width: 60%;
+    left: 20%;
+    height: 2px;
+    background-color: var(--light-color);
+    animation: show 0.5s;
+}
+
 .tab[selected=true]::after {
     content: "";
     position: absolute;
@@ -631,8 +671,9 @@ textarea {
 
 .tool_tap:hover {
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 2px;
+    background-color: var(--theme-color);
+    box-shadow: 1px 1px 2px var(--light-color);
+    border-radius: 5px;
 }
 
 i[data-rotate]::before {
@@ -758,7 +799,7 @@ i[data-rotate]::before {
 .silderBarBlockV {
     position: absolute;
     bottom: 0;
-    top: 0;
+    top: 24px;
     left: 0;
     width: inherit;
     cursor: ew-resize;
@@ -1063,6 +1104,10 @@ iframe {
     color: #fff;
 }
 
+.guide_list {
+    border-radius: 5px;
+}
+
 .guide_list::before {
     content: "拖拽页面组件至此，开始绘制指引。";
     color: #afafaf80;
@@ -1172,10 +1217,16 @@ iframe {
 
 .page_tab {
     height: 32px;
-    background-color: #f1f1f1;
     font-size: 12px;
     cursor: pointer;
     position: relative;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding-left: 5px;
+}
+
+.page_tab .bi-file-earmark {
+    padding-left: 5px;
 }
 
 .page_tab .bi-x {
@@ -1193,9 +1244,7 @@ iframe {
 }
 
 .page_tab[selected=true] {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    box-shadow: 0px -1px 2px #999;
+    /* box-shadow: 0px -1px 2px var(--theme-color); */
     margin-top: 2px;
 }
 
@@ -1486,6 +1535,7 @@ iframe {
 
 #main {
     border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     overflow: hidden;
 }
 
@@ -1597,8 +1647,7 @@ iframe {
     right: 0;
     bottom: 0;
     user-select: none;
-    background-color: rgba(157, 157, 157, 0.2);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(100px);
 }
 
 .project_recent>div {
@@ -1778,4 +1827,8 @@ iframe {
 
 .page {
     backdrop-filter: blur(2px);
+}
+
+.ace_editor {
+    border-radius: 5px;
 }

@@ -74,13 +74,13 @@ body {
     user-select: none;
 }
 
-.dark[data-platform=win32] .side_bar {
-    background-color: rgba(0, 0, 0, 0.9);
+.dark .side_bar {
+    background-color: rgba(0, 0, 0, 1);
     backdrop-filter: blur(10px);
 }
 
-.light[data-platform=win32] .side_bar {
-    background-color: rgba(255, 255, 255, 0.9);
+.light .side_bar {
+    background-color: rgb(225, 220, 216);
     backdrop-filter: blur(10px);
 }
 

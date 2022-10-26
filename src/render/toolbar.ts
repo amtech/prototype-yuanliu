@@ -158,7 +158,7 @@ export function saveSimplePage(page: IPage) {
    
             requestIdleCallback(() => {
 
-                domToImage.toJpeg(target, { quality: 0.1})
+                domToImage.toJpeg(target, { quality: 0.002})
                     .then((jpeg: any) => {
 
                         ipcRendererSend("savePageJpeg", { key: page.key, data: jpeg });

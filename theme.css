@@ -3,13 +3,13 @@ Copyright (c) taoyongwen. All rights reserved.
 ***************************************************************************** */
 
 .dark {
-    /* background: #000; */
+    background: #272829;
     color: #ccc;
     border-color: #999;
 }
 
 .light {
-    /* background: #fff; */
+    background: rgb(245, 240, 236);
     color: #222;
     border-color: #999;
 }
@@ -77,11 +77,11 @@ Copyright (c) taoyongwen. All rights reserved.
 }
 
 .light .page_parent {
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); */
 }
 
 .dark .page_parent {
-    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+    /* box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1); */
 }
 
 .workbench .dark {
@@ -184,40 +184,20 @@ button {
     color: #222;
 }
 
-.light[data-platform=win32] .sidebar {
-    background-color: rgb(236, 231, 227);
-    backdrop-filter: blur(10px);
-}
-
-.dark[data-platform=win32] .sidebar {
-    background-color: #333;
-    backdrop-filter: blur(10px);
-}
-
-.light[data-platform=win32] .toolBar {
-    background-color: rgb(236, 231, 227);
-    backdrop-filter: blur(10px);
-}
-
-.dark[data-platform=win32] .toolBar {
-    background-color: #333;
-    backdrop-filter: blur(10px);
-}
-
 .light #workbench {
-    background-color: rgb(236, 231, 227);
+    /* background-color: rgb(236, 231, 227); */
 }
 
 .dark #workbench {
-    background-color: #000;
+    /* background-color: #000; */
 }
 
 .page_view .light {
-    background-color: #fff;
+    /* background-color: #fff; */
 }
 
 .page_view .dark {
-    background-color: #333;
+    /* background-color: #333; */
 }
 
 .light .component {
@@ -228,13 +208,14 @@ button {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.light .component:hover {
+
+/* .light .component:hover {
     border: 1px solid rgba(0, 0, 0, 0.5);
 }
 
 .dark .component:hover {
     border: 1px solid rgba(255, 255, 255, 0.5);
-}
+} */
 
 .light .explorer {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -303,19 +284,19 @@ button {
 }
 
 .light #edgePanel {
-    background-color: rgb(245, 240, 236);
+    /* background-color: rgb(245, 240, 236); */
 }
 
 .dark #edgePanel {
-    background-color: #222;
+    /* background-color: #222; */
 }
 
 .light .floatPanel {
-    background-color: rgb(245, 240, 236);
+    /* background-color: rgb(245, 240, 236); */
 }
 
 .dark .floatPanel {
-    background-color: #222;
+    /* background-color: #222; */
 }
 
 .light .silderBarBlock {
@@ -594,7 +575,7 @@ button {
 }
 
 .dark .scroll_shadow {
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.3);
+    /* box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.3); */
     position: relative;
     z-index: 9999;
     transition: box-shadow 0.5s;

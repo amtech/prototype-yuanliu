@@ -493,7 +493,8 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             }
 
         }
-    }
+    } 
+
     //控制层级 layer
     if (parent != undefined && index != undefined) {
         if (parent.onChild != undefined) {
@@ -601,7 +602,336 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     }
     ////////////
     //组件拖拽事件
+    //页面fixed模式下禁止拖拽事件
     ////////////
+    if(getCurPage().mode!="fixed"){
+        componentOnDrags(eventEle,component,body);
+    }else{
+        componentOnMove(eventEle,component,body);
+    }
+
+    ////////////
+    //组件右键菜单
+    //快捷键
+    //鼠标事件
+    ////////////
+   
+    componentOnMenuAndKey(eventEle,component,body);
+    
+    componentOnMouse(eventEle,component,body);
+
+    return root;
+}
+/**
+ * 组件鼠标事件
+ * @param eventEle 
+ * @param component 
+ * @param body 
+ */
+function componentOnMouse(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+
+    eventEle.onmouseenter = (e: MouseEvent) => {
+        var selectCover = document.getElementById("selectCover");
+        if (selectCover != undefined) {
+            console.log("select add ", component.key);
+            if (getSelectComponents().indexOf(component.path) < 0) {
+                getSelectComponents().push(component.path);
+                document.getElementById(getPathKey(component.key)).setAttribute("selected", "true");
+            }
+        
+
+        }
+    }
+    if (component.edge != undefined && component.edge.length > 0) {
+        //悬停
+        var mouseTime: number = 0;
+        var mouseX: number = 0;
+        var mouseY: number = 0;
+        eventEle.onmousemove = (e: MouseEvent) => {
+            if (getSelectComponents().indexOf(component.path) >= 0) {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }
+        };
+        eventEle.onmouseover = (e: MouseEvent) => {
+            mouseTime = Date.now();
+            setTimeout(() => {
+                if (getSelectComponents().indexOf(component.path) >= 0) {
+                    if (Date.now() - mouseTime > 2000) {
+                        //悬停
+                        console.log("悬停", component.key, component.edge);
+                        showComponentContextMenu(component.edge, mouseX, mouseY);
+                        //  activePropertyPanel(component);
+                    }
+                }
+            }, 3000);
+        };
+        eventEle.onmouseout = (e: MouseEvent) => {
+            mouseTime = 0;
+        }
+    }
+}
+/**
+ * 组件的 菜单和快捷键
+ * @param eventEle 
+ */
+function componentOnMenuAndKey(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+    eventEle.oncontextmenu = (e: MouseEvent) => {
+        // folderTitle.setAttribute("selected", "true");
+        var menuItems: Array<IMenuItem> = [{
+            id: "delete",
+            label: "删除", icon: "bi bi-trash", accelerator: "Backspace", onclick: () => {
+                getSelectComponents().forEach((path: string) => {
+                    var cmpt = findCurPageComponent(path);
+                    deleteComponent(cmpt);
+                });
+
+            }
+        }, {
+            id: "copy",
+            label: "复制", icon: "bi bi-files", accelerator: "Command/control+c", onclick: () => {
+                console.log("copy", getSelectComponents());
+                var _selectComponents: IComponent[] = [];
+                getSelectComponents().forEach((path: string) => {
+                    var cmpt = findCurPageComponent(path);
+                    if (cmpt != undefined) {
+                        _selectComponents.push(cmpt);
+                    }
+                });
+                var __selectComponents_ = copyComponents(_selectComponents, true);
+                clipboard.writeText("[selectComponents]" + JSON.stringify(__selectComponents_));
+            }
+        }, {
+            id: "paste",
+            label: "粘贴", icon: "bi bi-clipboard", accelerator: "Command/control+v", onclick: () => {
+                clipboardPaste(body, component);
+
+            }
+        }, {
+
+            type: "separator"
+        } , {
+            id: "gotop",
+
+            label: "上移一层", icon: "bi bi-layout-wtf", accelerator: "",
+            onclick: () => {
+               
+            }
+        }, {
+            id: "bottom",
+            label: "下移一层", icon: "bi bi-card-image", accelerator: "", onclick: () => {
+               
+            }
+        }
+            , {
+            id: "gotop",
+
+            label: "置于顶层", icon: "bi bi-layout-wtf", accelerator: "",
+            onclick: () => {
+               
+            }
+        }, {
+            id: "gobottom",
+            label: "置于低层", icon: "bi bi-card-image", accelerator: "", onclick: () => {
+                setTimeout(() => {
+                    ipcRendererSend("insertImage");
+                }, 1);
+            }
+        }, {
+
+            type: "separator"
+        }
+            , {
+            id: "insert",
+
+            label: "插入组件", icon: "bi bi-layout-wtf", accelerator: "i",
+            onclick: () => {
+                setTimeout(() => {
+                    shortcutInsertComponent(e.clientX, e.clientY, component);
+                }, 1);
+            }
+        }, {
+            id: "insertimg",
+            label: "插入图片", icon: "bi bi-card-image", accelerator: "i", onclick: () => {
+                setTimeout(() => {
+                    ipcRendererSend("insertImage");
+                }, 1);
+            }
+        }];
+        openContextMenu(menuItems);
+        e.stopPropagation();
+    }
+    ////////////
+    //组件快捷键
+    ////////////
+    eventEle.onkeydown = (e: KeyboardEvent) => {
+
+        if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            if (e.key == "s") {
+                var h = getComponentStyle(component, "height", "px");
+                var nh = parseFloat(h) + 2;
+                setComponentStyle(component, "height", nh + "px");
+            } else if (e.key == "w") {
+                var h = getComponentStyle(component, "height", "px");
+                var nh = parseFloat(h) - 2;
+                setComponentStyle(component, "height", nh + "px");
+            } else if (e.key == "d") {
+                var h = getComponentStyle(component, "width", "px");
+                var nh = parseFloat(h) + 2;
+                setComponentStyle(component, "width", nh + "px");
+            } else if (e.key == "a") {
+                var h = getComponentStyle(component, "width", "px");
+                var nh = parseFloat(h) - 2;
+                setComponentStyle(component, "width", nh + "px");
+            } else if (e.key == "t") {
+
+                setComponentStyle(component, "background-color", "transparent");
+            } else if (e.key == "r") {
+                if (getCurPage().theme == "dark") {
+                    setComponentStyle(component, "background-color", "#000");
+                } else {
+                    setComponentStyle(component, "background-color", "#fff");
+                }
+            } else if (e.key == "m") {
+                setComponentStyle(component, "margin", "0");
+            } else if (e.key == "p") {
+
+                setComponentStyle(component, "padding", "0");
+            } else if (e.key == "f") {
+                setComponentStyle(component, "min-width", "");
+                setComponentStyle(component, "max-width", "");
+                setComponentStyle(component, "width", "auto");
+            } else if (e.key == "h") {
+                setComponentStyle(component, "min-height", "");
+                setComponentStyle(component, "max-height", "");
+                setComponentStyle(component, "height", "auto");
+            } else if (e.key == "Backspace") {
+                deleteComponent(component);
+            } else if (e.key == "b") {
+                var b = getComponentStyle(component, "font-weight", "");
+                if (b == "") {
+                    setComponentStyle(component, "font-weight", "bolder");
+                } else {
+                    setComponentStyle(component, "font-weight", "");
+                }
+            } else if (e.key == "l") {
+                var b = getComponentStyle(component, "border", "");
+                if (b == "") {
+                    setComponentStyle(component, "border", "1px solid rgba(175,175,175,0.5)");
+                } else {
+                    setComponentStyle(component, "border", "");
+                }
+            } else if (e.key == "i") {
+                shortcutInsertComponent(getMousePosition().x, getMousePosition().y, component);
+            } else if (e.key == "u") {
+                shortcutInsertComponent(getMousePosition().x, getMousePosition().y, component, component.sort);
+            } else if (e.key == "v") {
+                showComponentsOutLine();
+            } else if (e.key == "y") {
+                //隐藏组件
+                component.hidden = true;
+                if (component.toogle != undefined) {
+                    component.toogle(document.getElementById(component.key), component.hidden);
+                } else {
+                    document.getElementById(component.key).style.display = "none";
+                }
+
+
+            }
+            e.stopPropagation();
+        }
+    }
+    //shortcut
+    eventEle.onkeyup = (e: KeyboardEvent) => {
+
+        if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            if (e.key == "v") {
+                hideComponentsOutLine();
+            }
+            e.stopPropagation();
+        }
+
+    };
+}
+/**
+ * 移动组件
+ * @param eventEle 
+ * @param component 
+ * @param body 
+ */
+function componentOnMove(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+
+    eventEle.style.position="absolute";
+     //move
+     eventEle.onmousedown = (ed) => {
+
+        if(ed.button==2){
+            return;
+        }
+        console.log(ed);
+
+      
+        var startY = ed.clientY;
+        var startX = ed.clientX;
+        var blueTop =0;
+        if(eventEle.style.top!=undefined&&eventEle.style.top.length>0){
+            blueTop= parseFloat(eventEle.style.top.replace("px", ""));
+        }
+       
+     
+        var blueLeft =0;
+        if(eventEle.style.left!=undefined&&eventEle.style.left.length>0){
+            blueLeft =parseFloat(eventEle.style.left.replace("px", ""));
+        }
+   
+       
+
+        var move: boolean = true;
+   
+        document.onmousemove = (em: MouseEvent) => {
+            if (move) {
+                console.log(blueTop,em.clientY,startY);
+                var top = blueTop + em.clientY - startY;
+                var left = blueLeft + em.clientX - startX;
+                if (top < 10) {
+                    top = 0;
+                }
+                if (left < 10) {
+                    left = 0;
+                }
+                if(left>getCurPage().width){
+                    left=getCurPage().width-2;
+                }
+                if(top>getCurPage().height){
+                    top=getCurPage().height-2;
+                }
+         
+                eventEle.style.top=top+"px";
+                eventEle.style.left=left+"px";
+                setComponentStyle(component,"position","absolute",false);
+                setComponentStyle(component,"left",eventEle.style.left,false);
+                setComponentStyle(component,"top", eventEle.style.top,false);
+
+              
+            }
+
+
+        }
+        document.onmouseup = () => {
+            move = false;
+            // updateBlueLinks();
+        }
+
+    };
+
+}
+/**
+ * 组件拖拽事件
+ * @param eventEle 
+ * @param component 
+ */
+function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+
     var previewComponent: HTMLElement = null;//组件拖拽过程中的预览
     var dropIndex: number = -1;//组件插入时的位置
     var lastDropIndex: number;//组件插入时的位置
@@ -903,203 +1233,8 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         pushHistory(getCurPage());
 
     }
-
-    ////////////
-    //组件右键菜单
-    ////////////
-    eventEle.oncontextmenu = (e: MouseEvent) => {
-        // folderTitle.setAttribute("selected", "true");
-        var menuItems: Array<IMenuItem> = [{
-            id: "delete",
-            label: "删除", icon: "bi bi-trash", accelerator: "Backspace", onclick: () => {
-                getSelectComponents().forEach((path: string) => {
-                    var cmpt = findCurPageComponent(path);
-                    deleteComponent(cmpt);
-                });
-
-            }
-        }, {
-            id: "copy",
-            label: "复制", icon: "bi bi-files", accelerator: "Command/control+c", onclick: () => {
-                console.log("copy", getSelectComponents());
-                var _selectComponents: IComponent[] = [];
-                getSelectComponents().forEach((path: string) => {
-                    var cmpt = findCurPageComponent(path);
-                    if (cmpt != undefined) {
-                        _selectComponents.push(cmpt);
-                    }
-                });
-                var __selectComponents_ = copyComponents(_selectComponents, true);
-                clipboard.writeText("[selectComponents]" + JSON.stringify(__selectComponents_));
-            }
-        }, {
-            id: "paste",
-            label: "粘贴", icon: "bi bi-clipboard", accelerator: "Command/control+v", onclick: () => {
-                clipboardPaste(body, component);
-
-            }
-        }, {
-
-            type: "separator"
-        }
-            , {
-            id: "insert",
-
-            label: "插入组件", icon: "bi bi-layout-wtf", accelerator: "i",
-            onclick: () => {
-                setTimeout(() => {
-                    shortcutInsertComponent(e.clientX, e.clientY, component);
-                }, 1);
-            }
-        }, {
-            id: "insertimg",
-            label: "插入图片", icon: "bi bi-card-image", accelerator: "i", onclick: () => {
-                setTimeout(() => {
-                    ipcRendererSend("insertImage");
-                }, 1);
-            }
-        }];
-        openContextMenu(menuItems);
-        e.stopPropagation();
-    }
-    ////////////
-    //组件快捷键
-    ////////////
-    eventEle.onkeydown = (e: KeyboardEvent) => {
-
-        if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-            if (e.key == "s") {
-                var h = getComponentStyle(component, "height", "px");
-                var nh = parseFloat(h) + 2;
-                setComponentStyle(component, "height", nh + "px");
-            } else if (e.key == "w") {
-                var h = getComponentStyle(component, "height", "px");
-                var nh = parseFloat(h) - 2;
-                setComponentStyle(component, "height", nh + "px");
-            } else if (e.key == "d") {
-                var h = getComponentStyle(component, "width", "px");
-                var nh = parseFloat(h) + 2;
-                setComponentStyle(component, "width", nh + "px");
-            } else if (e.key == "a") {
-                var h = getComponentStyle(component, "width", "px");
-                var nh = parseFloat(h) - 2;
-                setComponentStyle(component, "width", nh + "px");
-            } else if (e.key == "t") {
-
-                setComponentStyle(component, "background-color", "transparent");
-            } else if (e.key == "r") {
-                if (getCurPage().theme == "dark") {
-                    setComponentStyle(component, "background-color", "#000");
-                } else {
-                    setComponentStyle(component, "background-color", "#fff");
-                }
-            } else if (e.key == "m") {
-                setComponentStyle(component, "margin", "0");
-            } else if (e.key == "p") {
-
-                setComponentStyle(component, "padding", "0");
-            } else if (e.key == "f") {
-                setComponentStyle(component, "min-width", "");
-                setComponentStyle(component, "max-width", "");
-                setComponentStyle(component, "width", "auto");
-            } else if (e.key == "h") {
-                setComponentStyle(component, "min-height", "");
-                setComponentStyle(component, "max-height", "");
-                setComponentStyle(component, "height", "auto");
-            } else if (e.key == "Backspace") {
-                deleteComponent(component);
-            } else if (e.key == "b") {
-                var b = getComponentStyle(component, "font-weight", "");
-                if (b == "") {
-                    setComponentStyle(component, "font-weight", "bolder");
-                } else {
-                    setComponentStyle(component, "font-weight", "");
-                }
-            } else if (e.key == "l") {
-                var b = getComponentStyle(component, "border", "");
-                if (b == "") {
-                    setComponentStyle(component, "border", "1px solid rgba(175,175,175,0.5)");
-                } else {
-                    setComponentStyle(component, "border", "");
-                }
-            } else if (e.key == "i") {
-                shortcutInsertComponent(getMousePosition().x, getMousePosition().y, component);
-            } else if (e.key == "u") {
-                shortcutInsertComponent(getMousePosition().x, getMousePosition().y, component, component.sort);
-            } else if (e.key == "v") {
-                showComponentsOutLine();
-            } else if (e.key == "y") {
-                //隐藏组件
-                component.hidden = true;
-                if (component.toogle != undefined) {
-                    component.toogle(document.getElementById(component.key), component.hidden);
-                } else {
-                    document.getElementById(component.key).style.display = "none";
-                }
-
-
-            }
-            e.stopPropagation();
-        }
-    }
-    //shortcut
-    eventEle.onkeyup = (e: KeyboardEvent) => {
-
-        if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-            if (e.key == "v") {
-                hideComponentsOutLine();
-            }
-            e.stopPropagation();
-        }
-
-    };
-    ///////////////
-    ////鼠标事件
-    /////////////
-    //select 
-    eventEle.onmouseenter = (e: MouseEvent) => {
-        var selectCover = document.getElementById("selectCover");
-        if (selectCover != undefined) {
-            console.log("select add ", component.key);
-            if (getSelectComponents().indexOf(component.path) < 0) {
-                getSelectComponents().push(component.path);
-                document.getElementById(getPathKey(component.key)).setAttribute("selected", "true");
-            }
-            selectCover.innerText = getSelectComponents().length.toString();
-
-        }
-    }
-    if (component.edge != undefined && component.edge.length > 0) {
-        //悬停
-        var mouseTime: number = 0;
-        var mouseX: number = 0;
-        var mouseY: number = 0;
-        eventEle.onmousemove = (e: MouseEvent) => {
-            if (getSelectComponents().indexOf(component.path) >= 0) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            }
-        };
-        eventEle.onmouseover = (e: MouseEvent) => {
-            mouseTime = Date.now();
-            setTimeout(() => {
-                if (getSelectComponents().indexOf(component.path) >= 0) {
-                    if (Date.now() - mouseTime > 2000) {
-                        //悬停
-                        console.log("悬停", component.key, component.edge);
-                        showComponentContextMenu(component.edge, mouseX, mouseY);
-                        //  activePropertyPanel(component);
-                    }
-                }
-            }, 3000);
-        };
-        eventEle.onmouseout = (e: MouseEvent) => {
-            mouseTime = 0;
-        }
-    }
-
-    return root;
 }
+
 export function renderComponentShape(component?: IComponent, root?: HTMLElement) {
 
     var bgs = root.getElementsByClassName("component_bg");

@@ -23,6 +23,9 @@ export function renderFloatPanel(content: HTMLElement) {
     floatPanel.className = "floatPanel";
     content.appendChild(floatPanel);
 
+
+
+
     renderSilderBar(floatPanel);
 
     ipcRendererSend("loadPluginsPanel");

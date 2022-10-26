@@ -733,7 +733,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
 
         var icon = document.createElement("i");
-        icon.className = "bi bi-chevron-down";
+        icon.className = "explorer_icon bi bi-chevron-right";
         folderTitle.appendChild(icon);
 
         // var name = document.createElement("div");
@@ -764,9 +764,9 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         var hidden = folderHiddenMap.get(catalog.path);
         if (hidden == undefined || hidden) {
             folderView.style.display = "none";
-            icon.className = "bi bi-chevron-right";
+            icon.style.transform="rotate(0deg)";
         } else {
-
+            icon.style.transform="rotate(90deg)";
         }
 
 
@@ -775,11 +775,11 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
             // folderTitle.setAttribute("selected", "true");
             if (folderView.style.display == "none") {
                 folderView.style.display = "block";
-                icon.className = "bi bi-chevron-down";
+                icon.style.transform="rotate(90deg)";
                 folderHiddenMap.set(catalog.path, false);
             } else {
                 folderView.style.display = "none";
-                icon.className = "bi bi-chevron-right";
+                icon.style.transform="rotate(0deg)";
                 folderHiddenMap.set(catalog.path, true);
             }
         }
@@ -1177,7 +1177,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
     title.className = "explorer_title";
 
     var icon = document.createElement("i");
-    icon.className="explorer_icon";
+    icon.className="explorer_icon bi bi-chevron-right";
     icon.style.marginLeft = "5px";
     title.appendChild(icon);
 
@@ -1197,27 +1197,27 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
     view.className = "explorer_view";
 
     explorer.appendChild(view);
-
+  
 
 
     if (hide) {
         view.style.display = "none";
-        icon.className = "bi bi-chevron-right";
+        icon.style.transform="rotate(0deg)";
     } else {
-        icon.className = "bi bi-chevron-down";
+        icon.style.transform="rotate(90deg)";
     }
 
     label.onclick = (e: MouseEvent) => {
         if (view.style.display == "none") {
             view.style.display = "block";
-            icon.className = "bi bi-chevron-down";
+            icon.style.transform="rotate(90deg)";
    
             if(onHide){
                 onHide(key,false);
             }
         } else {
             view.style.display = "none";
-            icon.className = "bi bi-chevron-right";
+            icon.style.transform="rotate(0deg)";
           
             if(onHide){
                 onHide(key,true);
@@ -1291,8 +1291,11 @@ function renderComponents(components: Array<IComponent>, base: HTMLElement, layo
             label.innerText = component.label;
             var componentDiv = document.createElement("div");
             componentDiv.className = "component";
-            componentDiv.appendChild(icon);
-            componentDiv.appendChild(label);
+            var componentContent=document.createElement("div");
+            componentContent.className="component_content";
+            componentDiv.appendChild(componentContent);
+            componentContent.appendChild(icon);
+            componentContent.appendChild(label);
             componentDiv.draggable = true;
             if (component.group == undefined || component.group == "base") {
                 base.appendChild(componentDiv);

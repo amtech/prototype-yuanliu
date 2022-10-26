@@ -24,7 +24,7 @@ function createWindow(project: any) {
       preload: path.join(__dirname, "preload.js"),
     },
     titleBarStyle: "hidden",
-    transparent: process.platform === "darwin"?true:false,
+   // transparent: process.platform === "darwin"?true:false,
     show: false,
     minWidth:1000,
     minHeight:600,
@@ -83,7 +83,7 @@ function createWindow(project: any) {
 
 
   if (process.platform === "darwin") {
-    mainWindow.setVibrancy(vib);
+   // mainWindow.setVibrancy(vib);
     touchBarEditor(mainWindow);
   }
 
@@ -109,7 +109,7 @@ function createHub() {
     },
     width: 900,
     titleBarStyle: "hidden",
-     transparent: process.platform === "darwin"?true:false,
+    // transparent: process.platform === "darwin"?true:false,
   });
   hub = mainWindow;
   // and load the index.html of the app.
@@ -149,7 +149,7 @@ function createHub() {
      */
 
     if (process.platform === "darwin") {
-      mainWindow.setVibrancy(vib);
+     // mainWindow.setVibrancy(vib);
 
     }
     ipcMain.on("saveConfig_hub", (event: any, arg: any) => {
@@ -160,7 +160,7 @@ function createHub() {
         vib = "sidebar";
       }
       if (process.platform === "darwin") {
-        mainWindow.setVibrancy(vib);
+       // mainWindow.setVibrancy(vib);
 
 
 

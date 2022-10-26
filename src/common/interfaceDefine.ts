@@ -270,6 +270,7 @@ export interface IPage {
     styles?: any;
     change?:boolean;
     scale?:number;
+    mode?:"flex"|"fixed";//流式 固定
 
 }
 /**

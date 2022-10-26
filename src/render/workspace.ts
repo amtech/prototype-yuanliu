@@ -4,8 +4,8 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染主窗口
 ***************************************************************************** */
 import { IpcMain, ipcRenderer } from "electron";
-import { renderComponent } from "../common/components";
-import { onContextMenu } from "../common/contextmenu";
+import { getPathKey, renderComponent } from "../common/components";
+import { checkContextMenu, onContextMenu } from "../common/contextmenu";
 import { getUUID, ICatalog, IComponent, IPage, IProject } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
 import { renderFloatPanel } from "../render/floatPanel";
@@ -14,7 +14,7 @@ import { renderPropertyPanel, activePropertyPanel } from "./propertypanel";
 import { renderSidebar, updateSidebar } from "./sidebar";
 import { renderStatusBar } from "./statusBar";
 import { renderToolbar, updateToolbar } from "./toolbar";
-import { findCurPageComponent, getCurPage, getCurPageContent, getLayers, getSelectComponents, loadProjectTitleNav, renderPage, updatePageViewScrollH, updatePageViewScrollV } from "./workbench";
+import { findCurPageComponent, getCurPage, getCurPageContent, getLayers, getSelectComponents, loadProjectTitleNav, renderPage, setSelectComponents, updatePageViewScrollH, updatePageViewScrollV } from "./workbench";
 var project: IProject;
 export function getProject(): IProject {
     return project;
@@ -60,7 +60,7 @@ export function renderWorkSpace(app: HTMLElement) {
         project = arg;
         //  render(app);
         //切换主题色
-        document.body.style.cssText = "--theme-color:" + getProject().themeColor+";"+ "--light-color:" + getProject().lightColor;
+        document.body.style.cssText = "--theme-color:" + getProject().themeColor + ";" + "--light-color:" + getProject().lightColor;
 
         requestIdleCallback(() => {
             updateToolbar();
@@ -245,6 +245,9 @@ function layout(app: HTMLElement) {
     workbench.appendChild(row);
     workbench.appendChild(pages);
 
+    //
+    onSelect(pages);
+
     //最近使用页面
     var recent = document.createElement("div");
     recent.className = "project_recent";
@@ -355,7 +358,7 @@ function renderRightSilderBar(content: HTMLElement, h: number) {
  * @param type 
  */
 export function showMessageBox(message: string, type: "info" | "error" | "warning" | "question" | "none") {
-    ipcRendererSend("show-notification_", message);
+    ipcRendererSend("show-notification", message);
 }
 export function hideRecent() {
     //最近使用页面
@@ -377,6 +380,8 @@ export function renderRecent() {
     title.style.lineHeight = "30px";
     title.style.fontSize = "10px";
     title.className = "project_recent_title"
+    title.style.color="var(--theme-color)";
+    title.style.borderBottom="1px solid var(--theme-color)";
     content.appendChild(title);
 
     var list = document.createElement("div");
@@ -410,11 +415,13 @@ export function renderRecent() {
                     imageDiv.style.backgroundImage = "url(" + getProject().work + "/images/" + pg.key + ".jpeg" + ")";
                     imageDiv.style.backgroundSize = "cover";
                     imageDiv.style.pointerEvents = "none";
+                    imageDiv.style.borderRadius="2px";
 
                     var pageTitle = document.createElement("div");
                     pageTitle.innerHTML = pg.name;
                     pageTitle.style.lineHeight = "30px";
-                    pageTitle.style.fontSize = "13px";
+                    pageTitle.style.fontSize = "12px";
+                    pageTitle.style.textAlign="center";
                     pageTitle.style.pointerEvents = "none";
                     page.appendChild(pageTitle);
 
@@ -468,7 +475,7 @@ export function renderExpand(component: IComponent) {
     var project_expand = document.getElementById("project_expand");
     expandContent.innerHTML = "";
     requestIdleCallback(() => {
-        var root= renderComponent(expandContent, component);
+        var root = renderComponent(expandContent, component);
         expandContent.style.width = (root.clientWidth + 20) + "px";
         project_expand.style.width = (root.clientWidth + 20) + "px";
     })
@@ -479,7 +486,7 @@ export function renderExpand(component: IComponent) {
  */
 export function openExpand() {
     var layers = getLayers();
-    if (layers == undefined||layers.length==0) return;
+    if (layers == undefined || layers.length == 0) return;
     var expand = document.getElementById("project_expand");
     expand.style.display = "block";
     var expandCatalog = document.getElementById("expandCatalog");
@@ -524,4 +531,60 @@ function renderLayersTree(layer: IComponent, expandCatalog: HTMLElement) {
     }
 
 
+}
+
+function onSelect(pages: HTMLElement) {
+    //渲染 页面 选择效果
+    pages.onmousedown = (e: any) => {
+        if (e.button != 0) {
+            return;
+        }
+        checkContextMenu();
+        if (e.target.className == "workbench"||e.target.className == "page_view" || e.target.className == "component" || e.target.className == "page" || e.target.className == "grid"){
+            e.stopPropagation();
+            var selectCover = document.createElement("div");
+            selectCover.className = "selectCover";
+            selectCover.id = "selectCover";
+            selectCover.style.pointerEvents = "none";
+            getSelectComponents().forEach(s => {
+                var div = document.getElementById(getPathKey(s));
+                if (div) div.removeAttribute("selected");
+            })
+            setSelectComponents([]);
+
+            var x = e.clientX;
+            var y = e.clientY;
+            var h = 0;
+            var w = 0;
+            var select = true;
+            selectCover.style.left = x + "px";
+            selectCover.style.top = y + "px";
+            pages.onmousemove = (e) => {
+                if (!select) return;
+                if (!document.getElementById("selectCover")) { document.body.appendChild(selectCover); }
+                w = e.clientX - x;
+                h = e.clientY - y;
+                if (w >= 0) {
+                    selectCover.style.width = w + "px";
+                } else {
+                    selectCover.style.left = e.clientX + "px";
+                    selectCover.style.width = (x - e.clientX) + "px";
+                }
+                if (h >= 0) {
+                    selectCover.style.height = h + "px";
+                } else {
+                    selectCover.style.top = e.clientY + "px";
+                    selectCover.style.height = (y - e.clientY) + "px";
+                }
+            };
+            document.onmouseup = () => {
+                select = false;
+                selectCover.remove();
+            }
+
+            //右侧面板
+            activePropertyPanel("page");
+
+        }
+    }
 }
