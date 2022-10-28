@@ -54,8 +54,16 @@ export function init() {
                 clipboardPaste(getCurPageContent());
             } else {
                 var cmp = findCurPageComponent(ls[0]);
-                if(cmp!=undefined)
-                    clipboardPaste(document.getElementById(cmp.key), cmp);
+                if(cmp!=undefined){
+                    var root=document.getElementById(cmp.key);
+                    if(root.getElementsByClassName("component_bg").length>0){
+                        var body:any=root.children.item(1);
+                        clipboardPaste(body, cmp);
+                    }else{
+                        clipboardPaste(root, cmp);
+                    }
+                }
+                   
             }
 
         } else if ((e.metaKey || e.ctrlKey) && e.key == "z" && getCurPage() != undefined) {

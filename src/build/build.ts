@@ -174,7 +174,8 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
         copyDir(client, dist,terminal);
         //复制modules：echarts,FileSaver,xlsx.mini.min.js
         copyModules(dist);
-
+        //
+        copyBootstrap(dist);
         //构建js文件
         terminal("创建JS");
         buildData(wProject,terminal);
@@ -191,6 +192,21 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
     }
     return false;
 }
+function copyBootstrap(dist:string){
+    var css=path.join(dist,"css");
+    var font=path.join(css,"fonts");
+    var modules= storage.getAppFolderPath("node_modules");
+    var icons=path.join(modules,"bootstrap-icons/font/bootstrap-icons.css");
+    var font1=path.join(modules,"bootstrap-icons/font/fonts/bootstrap-icons.woff");
+    var font2=path.join(modules,"bootstrap-icons/font/fonts/bootstrap-icons.woff2");
+   
+    fs.copyFileSync(icons,path.join(css,"bootstrap-icons.css"));
+
+    fs.copyFileSync(font1,path.join(font,"bootstrap-icons.woff"));
+
+    fs.copyFileSync(font2,path.join(font,"bootstrap-icons.woff2"));
+
+}
 /**
  * 复制modules：echarts,FileSaver,xlsx.mini.min.js
  */
@@ -199,9 +215,6 @@ function copyModules(dist:string){
     var js=path.join(dist,"js");
 
     var modules= storage.getAppFolderPath("node_modules");
-    console.log(app.getAppPath());
-    console.log("modules",modules);
-
     var echarts=path.join(modules,"echarts/dist/echarts.js");
     var fileSaver=path.join(modules,"file-saver/dist/FileSaver.js");
     var xlsx=path.join(modules,"xlsx/dist/xlsx.full.min.js");

@@ -445,6 +445,14 @@ function loadComponentsProperty(component: IComponent) {
     formZIndex.update(zIndex + "", (value) => {
         setComponentStyle(component, "z-index", value);
     })
+    var flexNum=0;
+    var flexStyle=getComponentStyle(component,"flex");
+    if(flexStyle!=undefined&&flexStyle.length>0){
+        flexNum=parseFloat(flexStyle);
+    }
+    formFlexNum.update(flexNum,(value)=>{
+        setComponentStyle(component, "flex", value+"");
+    })
 
     //font
     formFontFamily.update(getComponentStyle(component, "font-family", ""), (value) => {
@@ -805,6 +813,18 @@ function loadComponentsProperty(component: IComponent) {
         setComponentStyle(component, "opacity", nop + "");
 
     })
+    var bdBlur=0;
+    var bd=getComponentStyle(component,"backdrop-filter");
+    if(bd!=undefined&&bd.indexOf("blur")>=0){
+        bdBlur=parseInt(bd.replace("blur(","").replace("px)","").trim());
+    }
+
+    //
+    formBackdrop.update(bdBlur,(value)=>{
+        //	backdrop-filter: blur(1px);
+        setComponentStyle(component, "backdrop-filter",  "blur("+value+"px)");
+
+    });
 
 
     //shape 
@@ -1061,6 +1081,8 @@ var formOpacity: FormSolider;
 
 var formShape: FormSelect;
 
+var formBackdrop:FormSolider;
+
 function renderThemeProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
@@ -1189,6 +1211,10 @@ function renderThemeProperty(context: HTMLElement) {
 
     formOpacity = new FormSolider("透明", 100, 0, "%");
     formOpacity.render(body);
+
+    //
+    formBackdrop=new FormSolider("模糊", 20, 0, "px");
+    formBackdrop.render(body);
 
 
     ipcRendererSend("loadPluginsShape");
@@ -1342,6 +1368,7 @@ var formMargin: FormNumbers;
 var formOverFlow: FormIcons;
 var formFlex: HTMLElement;
 var formRotate: FormSolider;
+var formFlexNum: FormSolider;
 
 var formInset: FormNumbers;
 var formPosition: FormIcons;
@@ -1409,6 +1436,9 @@ function renderLayoutProperty(context: HTMLElement) {
 
     formZIndex = new FormNumber("深度");
     formZIndex.render(body);
+
+    formFlexNum=new FormSolider("flex",0,10);
+    formFlexNum.render(body);
 
 
     // form.createDivBool(body, "可移动", component.isFixed + "", (value: any) => {

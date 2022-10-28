@@ -1223,7 +1223,16 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                                     ct.sort = position;
                                     parent.children.splice(position, 0, ct);
                                     //TODO  存在问题，需要修改
-                                    renderComponent(document.getElementById(parent.key), ct, position);
+                                    {
+                                        var root=document.getElementById(parent.key);
+                                        if(root.getElementsByClassName("component_bg").length>0){
+                                            var body:any=root.children.item(1);
+                                            renderComponent(body, ct,position);
+                                        }else{
+                                            renderComponent(root, ct,position);
+                                        }
+                                    }
+                                   
                                 }
                             }
                         }
