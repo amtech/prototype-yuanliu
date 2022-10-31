@@ -268,6 +268,7 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     if (pageJson == undefined) {
         return;
     }
+    document.title = pageJson.name;
     //清除之前的
     clearExpands();
     var pg = document.getElementById("page_bg");
@@ -279,6 +280,10 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     } else if (pageJson.backgroundType == 1) {
         pg.style.background = pageJson.backgroundColor;
         pg.getContext("2d").clearRect(0, 0, pg.clientWidth, pg.clientHeight);
+
+
+
+
     } else if (pageJson.backgroundType == 2) {
         pg.style.background = pageJson.backgroundColor;
         pg.getContext("2d").clearRect(0, 0, pg.clientWidth, pg.clientHeight);
@@ -346,6 +351,7 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
     page.className = "page";
 
     app.appendChild(page);
+
 
     var theme = "light";
     if (pageJson.theme)
@@ -849,6 +855,34 @@ function renderSetting(settingContent) {
     pageinfo.style.padding = "10px";
     pageinfo.style.maxWidth = "400px";
     settingContent.appendChild(pageinfo);
+    //tools
+    var tools = document.createElement("div");
+    tools.style.padding = "10px";
+    settingContent.appendChild(tools);
+
+    var toolScreenShotBg = document.createElement("input");
+    toolScreenShotBg.type = "text";
+    toolScreenShotBg.color = "#fff";
+    toolScreenShotBg.value = "#fff";
+    tools.appendChild(toolScreenShotBg);
+
+    var toolScreenShot = document.createElement("button");
+    toolScreenShot.innerHTML = "截图";
+    tools.appendChild(toolScreenShot);
+
+    toolScreenShot.onclick = () => {
+
+
+        domtoimage.toJpeg(document.getElementById('pageView').children.item(0), { quality: 1, bgcolor: toolScreenShotBg.value })
+            .then(function(dataUrl) {
+                var link = document.createElement('a');
+                link.download = document.title + '.jpeg';
+                link.href = dataUrl;
+                link.click();
+            });
+
+
+    }
 
 
 
@@ -935,6 +969,7 @@ function renderCatalogTree(content, nav, level) {
         page.onclick = (e) => {
             e.stopPropagation();
             window.location.hash = nav.key;
+
             renderPageByCatalogKey(nav.key);
             updateBlueView();
         }

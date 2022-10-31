@@ -101,13 +101,10 @@ select {
 }
 
 .ruler_top {
-    position: absolute;
-    top: 0;
-    left: 0px;
-    right: 0;
+    position: fixed;
     height: 20px;
     opacity: 0.8;
-    z-index: 300;
+    z-index: 200;
     user-select: none;
 }
 
@@ -116,10 +113,7 @@ select {
 }
 
 .ruler_left {
-    position: absolute;
-    top: 0px;
-    left: 0;
-    bottom: 0;
+    position: fixed;
     width: 20px;
     opacity: 0.8;
     user-select: none;
@@ -155,10 +149,6 @@ select {
     vertical-align: text-top;
     font-size: 8px;
     /* border-bottom: 1px solid rgba(175, 175, 175, 0.5); */
-}
-
-#edgePanel {
-    width: 300px;
 }
 
 .propertyPanel {
@@ -294,7 +284,6 @@ select {
     line-height: 2;
     /* font-weight: bold; */
     overflow: auto;
-    max-height: 400px;
     overflow-x: hidden;
 }
 
@@ -302,7 +291,7 @@ select {
     font-size: 12px;
     line-height: 2;
     /* font-weight: bold; */
-    padding-bottom: 10px;
+    /* padding-bottom: 10px; */
 }
 
 .explorer_folder {
@@ -341,9 +330,10 @@ select {
     transition: transform 0.3s;
 }
 
-.explorer_row:active {
+
+/* .explorer_row:active {
     transform: scale(0.9);
-}
+} */
 
 .contextMenu {
     position: fixed;
@@ -548,10 +538,14 @@ table {
 .textField .label {}
 
 .sidebar_icon {
-    display: inline-block;
-    padding: 5px;
-    margin: 2px;
     font-size: 14px;
+    flex: 1;
+}
+
+.sidebat_icon_row {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 .components {
@@ -766,7 +760,7 @@ i[data-rotate]::before {
 }
 
 .silderBar {
-    position: relative;
+    position: fixed;
     height: 1px;
     width: 100%;
     overflow: visible;
@@ -789,17 +783,17 @@ i[data-rotate]::before {
 }
 
 .silderBarV {
-    position: relative;
-    height: 200px;
+    position: fixed;
     width: 1px;
     overflow: visible;
+    z-index: 1000;
     user-select: none;
 }
 
 .silderBarBlockV {
     position: absolute;
     bottom: 0;
-    top: 24px;
+    top: 0px;
     left: 0;
     width: inherit;
     cursor: ew-resize;
@@ -1292,7 +1286,6 @@ iframe {
 
 .picker {
     position: fixed;
-    right: 300px;
     top: 500px;
     width: 280px;
     background: #fff;
@@ -1309,6 +1302,7 @@ iframe {
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 9000;
 }
 
 .picker_title {
@@ -1641,11 +1635,6 @@ iframe {
 }
 
 .project_recent {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     user-select: none;
     backdrop-filter: blur(100px);
 }
@@ -1658,14 +1647,10 @@ iframe {
 }
 
 .project_expand {
-    right: 0;
-    top: 32px;
-    bottom: 0;
     padding: 0px 10px 0px 10px;
     min-width: 400px;
     background-color: rgba(157, 157, 157, 0.3);
     backdrop-filter: blur(5px);
-    position: absolute;
     display: none;
     box-shadow: 0px 0px 5px rgba(157, 157, 157, 0.3);
 }
@@ -1731,9 +1716,9 @@ iframe {
 .sroll_h {
     width: 100%;
     height: 14px;
-    position: absolute;
-    bottom: 0;
+    position: fixed;
     user-select: none;
+    z-index: 300;
 }
 
 .sroll_h:hover .sroll_h_block {
@@ -1759,10 +1744,9 @@ iframe {
 
 .sroll_v {
     width: 14px;
-    height: 100%;
-    position: absolute;
-    right: 0;
+    position: fixed;
     user-select: none;
+    z-index: 300;
 }
 
 .sroll_v:hover .sroll_v_block {
@@ -1831,4 +1815,21 @@ iframe {
 
 .ace_editor {
     border-radius: 5px;
+}
+
+.explorer_tree {
+    overflow: hidden;
+    position: relative;
+}
+
+.explorer_tree_view {
+    position: relative;
+}
+
+.explorer_tree .explorer_row {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding-right: 10px;
 }

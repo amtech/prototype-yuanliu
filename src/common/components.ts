@@ -13,11 +13,12 @@ import { pushHistory } from "../render/history";
 import { copyComponents } from "../render/pageTitle";
 import { activePropertyPanel, getComponentStyle, setComponentStyle } from "../render/propertypanel";
 import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
-import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
-import { getConfig, getProject, openExpand } from "../render/workspace";
-import { checkContextMenu, IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
+import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getLayers, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
+import { getConfig, getProject, getViewPosition, openExpand } from "../render/workspace";
+import { IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
 import { getUUID, IComponent, IComponentProperty, IExtension, IShape } from "./interfaceDefine";
 import { updateStatus } from "../render/statusBar";
+import { changeLayers } from "../render/propertyLayers";
 export function getComponentTempateByType(type: string): IComponent {
     if (componentsTemplate == undefined || componentsTemplate.length == 0) {
         console.log("componentsTemplate is undefined");
@@ -119,10 +120,10 @@ export function renderComponentPreview(content: HTMLElement, component: ICompone
         }
 
         preview.style.pointerEvents = "none";
-   
+
         if (component.isExpand) {
-         //   getCurPageContent().appendChild(preview);
-           // openExpand();
+            //   getCurPageContent().appendChild(preview);
+            // openExpand();
 
         } else {
             if (dropIndex != undefined && dropIndex >= 0) {
@@ -278,7 +279,85 @@ function commentTypeCountMap(type: string): number {
     _commentTypeCountMap.set(type, count + 1);
     return count + 1;
 };
+/**
+ * 渲染多个组件：渲染根组件
+ * 并安装存储时丢失的方法
+ * @param content 
+ * @param components 
+ */
+export function renderRootComponents(content: HTMLElement, components: IComponent[]) {
+    var page_parent = document.getElementById("page_parent_" + getCurPage().key);
+    var viewPosition=getViewPosition();
+    var viewHeigh=window.innerHeight-viewPosition.top-viewPosition.bottom;
+    components.forEach((component, index) => {
 
+        component.isRoot = true;
+
+        if (component.isRemoved == undefined && !component.isRemoved) {
+            if (component.onRender == undefined) {
+                try {
+                    installComponent(component);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            if (component.onRender != undefined && component.onPreview != undefined) {
+                try {
+
+                    //兼容旧的dialog
+                    if (component.type == "dialog")
+                        component.isExpand = true;
+
+                    if (component.isExpand) {
+                        //初始化时，不渲染 扩展内容
+                    } else {
+                        var cpmt = renderComponent(content, component, undefined, index, undefined, undefined, true);
+                        var root=cpmt.root;;
+                        var body=cpmt.body;
+                        requestIdleCallback(() => {
+                        
+
+                            if (root.offsetTop >viewHeigh -parseFloat(page_parent.style.top.replace("px",""))+viewPosition.top+100) {
+                            
+                                body.innerHTML="";
+                            }else if (root.offsetTop + root.clientHeight<-( parseFloat(page_parent.style.top.replace("px",""))+viewPosition.top+100)) {
+                                body.innerHTML="";
+                            }  else {
+                                var db= root.getAttribute("data-background");
+                                if(db!=undefined){
+                                    root.style.background=db;
+                                }
+                             
+
+                                //渲染形状背景
+                                if (component.shape != undefined && component.shape.length > 0 ) {
+                                    requestIdleCallback(() => {
+                                        setTimeout(() => {
+                                            renderComponentShape(component, root)
+                                        }, 100);
+                                    })
+                                }
+
+                                if (component.children != undefined && component.children.length > 0 ) {
+                                    setTimeout(() => {
+                                        //渲染子组件
+                                        renderComponents(body, component.children, component);
+                                    }, 0);
+                                }
+
+
+                            }
+
+                        });
+
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+    })
+}
 /**
  * 渲染多个组件
  * 并安装存储时丢失的方法
@@ -287,6 +366,7 @@ function commentTypeCountMap(type: string): number {
  */
 export function renderComponents(content: HTMLElement, components: IComponent[], parent: IComponent) {
     components.forEach((component, index) => {
+        component.isRoot = false;
         if (component.isRemoved == undefined && !component.isRemoved) {
             if (component.onRender == undefined) {
                 try {
@@ -409,7 +489,7 @@ export function onSelectComponent(componentPath: string) {
     if (div) div.setAttribute("selected", "true");
 
 }
-var previewParent:string;
+var previewParent: string;
 /**
  * 渲染组件
  * @param content 
@@ -417,7 +497,10 @@ var previewParent:string;
  * @param dropIndex 
  * @returns 
  */
-export function renderComponent(content: HTMLElement, component: IComponent, dropIndex?: number, index?: number, parent?: IComponent, self?: HTMLElement): HTMLElement {
+export function renderComponent(content: HTMLElement, component: IComponent, dropIndex?: number, index?: number, parent?: IComponent, self?: HTMLElement, hideReal?: boolean): {
+    root:HTMLElement,
+    body:HTMLElement
+} {
 
 
     //如果隐藏，不渲染。
@@ -472,6 +555,10 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     root.setAttribute("component_group", component.group);
     root.setAttribute("component_type", component.type);
     root.id = component.key;
+    if(body!=root){
+        body.id="_"+component.key;
+        root.setAttribute("data-body","true");
+    }
     //设置组件样式
     if (root.style != undefined && root.style.cssText.length <= 0) {
         if (component.styles != undefined && component.styles["root"] != undefined) {
@@ -479,6 +566,11 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         } else if (component.style != undefined) {
             root.style.cssText += component.style;
         }
+        if(hideReal){
+            root.setAttribute("data-background",root.style.background+"");
+            root.style.background="";
+        }
+
     }
     if (component.hidden) {
         if (component.toogle != undefined) {
@@ -493,7 +585,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
             }
 
         }
-    } 
+    }
 
     //控制层级 layer
     if (parent != undefined && index != undefined) {
@@ -519,7 +611,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         }
     }
     //渲染形状背景
-    if (component.shape != undefined && component.shape.length > 0) {
+    if (component.shape != undefined && component.shape.length > 0 && !hideReal) {
         requestIdleCallback(() => {
             setTimeout(() => {
                 renderComponentShape(component, root)
@@ -555,9 +647,9 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         eventEle.style.position = "fixed";
     }
 
-    if (component.children != undefined && component.children.length > 0) {
+    if (component.children != undefined && component.children.length > 0 && !hideReal) {
         setTimeout(() => {
-            //选择子组件
+            //渲染子组件
             renderComponents(body, component.children, component);
         }, 0);
     }
@@ -577,21 +669,19 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     //     e.stopPropagation();
     // }
 
+
     //单击选择组件
-    eventEle.onclick = (e: any) => {
-        if (!getShiftKeyDown()) {
+    eventEle.onclick = (e) => {
 
-            getSelectComponents().forEach(s => {
-                var div = document.getElementById(getPathKey(s));
-                if (div) div.removeAttribute("selected");
-            })
-            setSelectComponents([]);
-        }
-        getSelectComponents().push(component.path);
+
+        getSelectComponents().forEach(s => {
+            var div = document.getElementById(getPathKey(s));
+            if (div) div.removeAttribute("selected");
+        });
+        setSelectComponents([component.path]);
         eventEle.setAttribute("selected", "true");
-
         e.stopPropagation();
-        checkContextMenu();
+
         //右侧面板
         activePropertyPanel(component);
         //底部面板
@@ -604,10 +694,10 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     //组件拖拽事件
     //页面fixed模式下禁止拖拽事件
     ////////////
-    if(getCurPage().mode!="fixed"){
-        componentOnDrags(eventEle,component,body);
-    }else{
-        componentOnMove(eventEle,component,body);
+    if (getCurPage().mode != "fixed") {
+        componentOnDrags(eventEle, component, body);
+    } else {
+        componentOnMove(eventEle, component, body);
     }
 
     ////////////
@@ -615,12 +705,12 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     //快捷键
     //鼠标事件
     ////////////
-   
-    componentOnMenuAndKey(eventEle,component,body);
-    
-    componentOnMouse(eventEle,component,body);
 
-    return root;
+    componentOnMenuAndKey(eventEle, component, body);
+
+    componentOnMouse(eventEle, component, body);
+
+    return {root:root,body:body};
 }
 /**
  * 组件鼠标事件
@@ -628,7 +718,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
  * @param component 
  * @param body 
  */
-function componentOnMouse(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+function componentOnMouse(eventEle: HTMLElement, component: IComponent, body: HTMLElement) {
 
     eventEle.onmouseenter = (e: MouseEvent) => {
         var selectCover = document.getElementById("selectCover");
@@ -638,7 +728,7 @@ function componentOnMouse(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                 getSelectComponents().push(component.path);
                 document.getElementById(getPathKey(component.key)).setAttribute("selected", "true");
             }
-        
+
 
         }
     }
@@ -675,10 +765,22 @@ function componentOnMouse(eventEle:HTMLElement,component:IComponent,body:HTMLEle
  * 组件的 菜单和快捷键
  * @param eventEle 
  */
-function componentOnMenuAndKey(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+function componentOnMenuAndKey(eventEle: HTMLElement, component: IComponent, body: HTMLElement) {
     eventEle.oncontextmenu = (e: MouseEvent) => {
         // folderTitle.setAttribute("selected", "true");
         var menuItems: Array<IMenuItem> = [{
+            id: "refresh",
+            label: "重绘 " + component.label, icon: "bi bi-arrow-clockwise", accelerator: "", onclick: () => {
+
+                var path = getSelectComponents()[0];
+                var cmpt = findCurPageComponent(path);
+                renderComponent(undefined, cmpt, undefined, undefined, undefined, document.getElementById(cmpt.key));
+
+            }
+        }, {
+
+            type: "separator"
+        }, {
             id: "delete",
             label: "删除", icon: "bi bi-trash", accelerator: "Backspace", onclick: () => {
                 getSelectComponents().forEach((path: string) => {
@@ -710,17 +812,17 @@ function componentOnMenuAndKey(eventEle:HTMLElement,component:IComponent,body:HT
         }, {
 
             type: "separator"
-        } , {
+        }, {
             id: "gotop",
 
             label: "上移一层", icon: "bi bi-layout-wtf", accelerator: "",
             onclick: () => {
-               
+
             }
         }, {
             id: "bottom",
             label: "下移一层", icon: "bi bi-card-image", accelerator: "", onclick: () => {
-               
+
             }
         }
             , {
@@ -728,7 +830,7 @@ function componentOnMenuAndKey(eventEle:HTMLElement,component:IComponent,body:HT
 
             label: "置于顶层", icon: "bi bi-layout-wtf", accelerator: "",
             onclick: () => {
-               
+
             }
         }, {
             id: "gobottom",
@@ -859,38 +961,38 @@ function componentOnMenuAndKey(eventEle:HTMLElement,component:IComponent,body:HT
  * @param component 
  * @param body 
  */
-function componentOnMove(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+function componentOnMove(eventEle: HTMLElement, component: IComponent, body: HTMLElement) {
 
-    eventEle.style.position="absolute";
-     //move
-     eventEle.onmousedown = (ed) => {
+    eventEle.style.position = "absolute";
+    //move
+    eventEle.onmousedown = (ed) => {
 
-        if(ed.button==2){
+        if (ed.button == 2) {
             return;
         }
         console.log(ed);
 
-      
+
         var startY = ed.clientY;
         var startX = ed.clientX;
-        var blueTop =0;
-        if(eventEle.style.top!=undefined&&eventEle.style.top.length>0){
-            blueTop= parseFloat(eventEle.style.top.replace("px", ""));
+        var blueTop = 0;
+        if (eventEle.style.top != undefined && eventEle.style.top.length > 0) {
+            blueTop = parseFloat(eventEle.style.top.replace("px", ""));
         }
-       
-     
-        var blueLeft =0;
-        if(eventEle.style.left!=undefined&&eventEle.style.left.length>0){
-            blueLeft =parseFloat(eventEle.style.left.replace("px", ""));
+
+
+        var blueLeft = 0;
+        if (eventEle.style.left != undefined && eventEle.style.left.length > 0) {
+            blueLeft = parseFloat(eventEle.style.left.replace("px", ""));
         }
-   
-       
+
+
 
         var move: boolean = true;
-   
+
         document.onmousemove = (em: MouseEvent) => {
             if (move) {
-                console.log(blueTop,em.clientY,startY);
+                console.log(blueTop, em.clientY, startY);
                 var top = blueTop + em.clientY - startY;
                 var left = blueLeft + em.clientX - startX;
                 if (top < 10) {
@@ -899,20 +1001,20 @@ function componentOnMove(eventEle:HTMLElement,component:IComponent,body:HTMLElem
                 if (left < 10) {
                     left = 0;
                 }
-                if(left>getCurPage().width){
-                    left=getCurPage().width-2;
+                if (left > getCurPage().width) {
+                    left = getCurPage().width - 2;
                 }
-                if(top>getCurPage().height){
-                    top=getCurPage().height-2;
+                if (top > getCurPage().height) {
+                    top = getCurPage().height - 2;
                 }
-         
-                eventEle.style.top=top+"px";
-                eventEle.style.left=left+"px";
-                setComponentStyle(component,"position","absolute",false);
-                setComponentStyle(component,"left",eventEle.style.left,false);
-                setComponentStyle(component,"top", eventEle.style.top,false);
 
-              
+                eventEle.style.top = top + "px";
+                eventEle.style.left = left + "px";
+                setComponentStyle(component, "position", "absolute", false);
+                setComponentStyle(component, "left", eventEle.style.left, false);
+                setComponentStyle(component, "top", eventEle.style.top, false);
+
+
             }
 
 
@@ -930,7 +1032,7 @@ function componentOnMove(eventEle:HTMLElement,component:IComponent,body:HTMLElem
  * @param eventEle 
  * @param component 
  */
-function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLElement){
+function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HTMLElement) {
 
     var previewComponent: HTMLElement = null;//组件拖拽过程中的预览
     var dropIndex: number = -1;//组件插入时的位置
@@ -956,7 +1058,7 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
 
     };
     eventEle.ondragover = (e: any) => {
-        console.log("componentDiv.ondragover ");
+        // console.log("componentDiv.ondragover ");
         e.stopPropagation();
 
         if (getDragTimer() <= 3) {
@@ -1018,7 +1120,7 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                                 //水平布局、垂直布局
                                 if (component.type == "row") {
                                     var left = childDiv.getBoundingClientRect().left;
-                                    console.log("left", left, e.clientX);
+                                    // console.log("left", left, e.clientX);
                                     if (e.clientX > left) {
                                         break;
                                     }
@@ -1026,7 +1128,7 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                                     lastKey = child.key;
                                 } else {
                                     var top = childDiv.getBoundingClientRect().top;
-                                    console.log("top", top, e.clientY);
+                                    // console.log("top", top, e.clientY);
                                     if (e.clientY > top) {
                                         break;
                                     }
@@ -1042,14 +1144,14 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                     //水平布局、垂直布局
                     if (component.type == "row") {
                         var left = childDiv.getBoundingClientRect().left;
-                        console.log("left", left, e.clientX);
+                        // console.log("left", left, e.clientX);
                         if (e.clientX < left) {
                             dropIndex = 0;
                             //  lastKey = child.key;
                         }
                     } else {
                         var top = childDiv.getBoundingClientRect().top;
-                        console.log("top", top, e.clientY);
+                        // console.log("top", top, e.clientY);
                         if (e.clientY < top) {
                             dropIndex = 0;
                             //  lastKey = child.key;
@@ -1072,11 +1174,11 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                 // }
                 // e.target.className.indexOf("component_canvas") >= 0 
                 if (e.target == eventEle) {
-                    if (componentT != undefined){
-                        previewParent=component.key;
+                    if (componentT != undefined) {
+                        previewParent = component.key;
                         previewComponent = renderComponentPreview(body, componentT, dropIndex)
                     }
-                       
+
                 }
             }
         }
@@ -1093,17 +1195,17 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
     eventEle.ondragleave = (e: any) => {
         e.stopPropagation();
         //  clearDargTimer();
-        if(previewParent!=undefined&&previewParent==component.key){
+        if (previewParent != undefined && previewParent == component.key) {
 
-        }else{
+        } else {
             if (previewComponent != null) {
                 previewComponent.remove();
                 previewComponent = null;
-                previewParent=undefined;
+                previewParent = undefined;
             }
         }
-     
-       
+
+
 
 
 
@@ -1190,7 +1292,7 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                 if (previewComponent != null) {
                     previewComponent.remove();
                     previewComponent = null;
-                    previewParent=undefined;
+                    previewParent = undefined;
                 }
                 //如果 组件 自定义了事件，直接返回
                 if (component.onDrop != undefined) {
@@ -1221,6 +1323,7 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
                     // activePropertyPanel();
                     renderComponent(body, subComponent, dropIndex);
 
+
                 }
             }
         }
@@ -1231,6 +1334,8 @@ function componentOnDrags(eventEle:HTMLElement,component:IComponent,body:HTMLEle
         }
         //操作历史记录
         pushHistory(getCurPage());
+        //更新层级后台
+        changeLayers(getLayers());
 
     }
 }
@@ -1295,6 +1400,8 @@ export function deleteComponent(component: IComponent) {
     //  activePropertyPanel();
     // updateBlueView();
     pushHistory(getCurPage());
+    //更新层级后台
+    changeLayers(getLayers());
 
 }
 /**

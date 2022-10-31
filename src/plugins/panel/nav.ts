@@ -11,9 +11,8 @@ import * as form from "../../render/form";
 import * as forms from "../../render/forms";
 import { ipcRendererSend } from "../../preload";
 import { getTitleBar } from "../../render/pageTitle";
+import { Editor } from "../../editor/editor";
 var editor: any;
-var editorComponent: any;
-var editorChange: boolean = false;
 const panel: IPanel = {
     key: "nav", name: "导航", hidden: true,sort:0,
     render: (content: HTMLElement) => {
@@ -36,42 +35,16 @@ const panel: IPanel = {
         panel.style.flex = "1";
         row.appendChild(panel);
 
-        const ace = require("ace-builds/src/ace.js");
-        require("ace-builds/src/mode-json.js");
-        require("ace-builds/src/ext-language_tools.js");
-        require("ace-builds/src/theme-tomorrow_night.js");
-        require("ace-builds/src/theme-tomorrow.js");
-        
-        editor = ace.edit(nav);
-        editor.setOption({
-            // 默认:false
-            model: "ace/mode/json",
-            wrap: true, // 换行
-            autoScrollEditorIntoView: false, // 自动滚动编辑器视图
-            enableLiveAutocompletion: true, // 智能补全
-            enableBasicAutocompletion: true, // 启用基本完成 不推荐使用
-            showPrintMargin: false
-        });
-        
-        if (document.getElementById("app").className == "dark")
-            editor.setTheme("ace/theme/tomorrow_night");
-        else
-            editor.setTheme("ace/theme/tomorrow");
 
-        editor.getSession().on('change', (e: any) => {
-            var lines = editor.getSession().doc.$lines;
-            var code = "";
-            lines.forEach((line: any) => {
-                code += line + "\n";
-            })
-            // console.log("nav change ",code);
+
+        editor=new Editor(nav,(lines)=>{
             var pageC=getCurViewContent();
             var bars=pageC.getElementsByClassName("nav_bar");
             // console.log(bars);
             var nav_bar:any= bars[0];
-            if (nav_bar != undefined && editorChange) {
+            if (nav_bar != undefined ) {
                 try {
-                    var navJson = eval(code);//JSON.parse(code);
+                    var navJson = eval(lines);//JSON.parse(code);
                     setNavItems(navJson);
                     renderNavTrees(nav_bar, navJson);
                     ipcRendererSend("saveNav", JSON.stringify(getNavBar()));
@@ -80,21 +53,21 @@ const panel: IPanel = {
                 }
             }
 
-        });
+
+        })
+        
+        
     }, 
     update: () => {      
         var nav = getNavItems();
         // console.log(JSON.stringify(nav, null, 4));
         editor.setValue(JSON.stringify(nav, null, 4));
-        editor.gotoLine(0);
         editor.resize();
-        editorChange = true;
 
 
-        console.log("navPanel");
         var navPanel = document.getElementById("navPanel");
         navPanel.innerHTML = "";
-        console.log("navPanel", navPanel);
+    
         if (navPanel == undefined || navPanel == null) return;
         navPanel.style.padding = "0px 20px 0px 20px";
 

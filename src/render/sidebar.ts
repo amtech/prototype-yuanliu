@@ -3,6 +3,7 @@ Copyright (c) taoyongwen. All rights reserved.
 
 渲染侧边栏
 ***************************************************************************** */
+import { max } from "d3";
 import { clipboard, ipcRenderer } from "electron";
 import { setComponentsTemplate } from "../common/components";
 import { getContextMenuArg, getContextMenuElement, IMenuItem, openContextMenu } from "../common/contextmenu";
@@ -15,6 +16,8 @@ import { blueMethods } from "./blueprintMethods";
 import { blueObjects } from "./blueprintObjects";
 import { showCustomComponent } from "./customComponent";
 import * as dargData from "./DragData";
+import { changeCatalogs, renderCatalogs, updateCatalogs } from "./sidebarCatalog";
+import { renderIcons } from "./sideBarIcons";
 import { findCurPageComponent, getCurPageContent, getSelectComponents } from "./workbench";
 import { getConfig, getProject } from "./workspace";
 export function updateSidebar() {
@@ -42,7 +45,7 @@ export function renderSidebar(content: HTMLElement) {
     // layoutBar.appendChild(layoutBarIcon);
 
 
-
+    var explorerViewMaxHeight=(window.innerHeight-78-24*5);
 
     //目录
     fileExplorer = renderExplorer("sidebar_catalog", sidebar, "[sidebarcataloglabel]", false, [{
@@ -64,30 +67,30 @@ export function renderSidebar(content: HTMLElement) {
         }
     }
 
-    ],onExplorerHide);
+    ],onExplorerHide,explorerViewMaxHeight);
 
 
 
     //组件
-    var componentsExplorer = renderExplorer("sidebar_component", sidebar, "组件",false,undefined,onExplorerHide);
+    var componentsExplorer = renderExplorer("sidebar_component", sidebar, "组件",false,undefined,onExplorerHide,explorerViewMaxHeight);
     requestIdleCallback(() => {
         renderComponentsExplorer(componentsExplorer);
     });
 
 
     //图标
-    var iconExplorer = renderExplorer("sidebar_icon", sidebar, "图标", true,undefined,onExplorerHide);
+    var iconExplorer = renderExplorer("sidebar_icon", sidebar, "图标", true,undefined,onExplorerHide,explorerViewMaxHeight);
     requestIdleCallback(() => {
         renderIconExplorers(iconExplorer);
     });
 
 
     //蓝图
-    var blueExplorer = renderExplorer("sidebar_blue", sidebar, "蓝图", true,undefined,onExplorerHide);
+    var blueExplorer = renderExplorer("sidebar_blue", sidebar, "蓝图", true,undefined,onExplorerHide,explorerViewMaxHeight);
     renderBlueExploer(blueExplorer);
 
     //数据
-    var databaseExplorer = renderExplorer("sidebar_database", sidebar, "数据", true,undefined,onExplorerHide);
+    var databaseExplorer = renderExplorer("sidebar_database", sidebar, "数据", true,undefined,onExplorerHide,explorerViewMaxHeight);
     databaseExplorer.id = "database_explorer";
 
 
@@ -107,10 +110,12 @@ export function renderSidebar(content: HTMLElement) {
     });
     ipcRenderer.on("_deletePage", (event, arg: ICatalog) => {
         //
-        var catalogDiv = document.getElementById(arg.key);
-        catalogDiv.remove();
+        
+       
         deletePageByKey(arg.key, getProject().catalogs);
         ipcRendererSend("saveProject", getProject());
+        changeCatalogs(getProject().catalogs);
+        updateCatalogs();
 
     });
     ipcRenderer.on("_renameFile", (event, arg: { catalog: ICatalog, oldName: string, newName: string }) => {
@@ -200,7 +205,7 @@ function deletePage(catalog: ICatalog) {
     ipcRendererSend("deletePage", catalog);
 
 }
-function renameFile(catalog: ICatalog, oldName: string, newName: string) {
+export function renameFile(catalog: ICatalog, oldName: string, newName: string) {
     console.log("renameFile", catalog, oldName, newName);
     ipcRendererSend("renameFile", {
         catalog: catalog,
@@ -226,7 +231,10 @@ function createFolder(name: string, catalog?: ICatalog) {
         }
         getProject().catalogs.push(page);
 
-        renderFileTree(document.getElementById("fileExplorer"), page, 1);
+       // renderFileTree(document.getElementById("fileExplorer"), page, 1);
+
+       changeCatalogs( getProject().catalogs);
+       updateCatalogs();
 
     } else {
 
@@ -241,7 +249,7 @@ function createFolder(name: string, catalog?: ICatalog) {
 /**
  * char count
  */
-function getChartCount(text: string, char: string): number {
+export function getChartCount(text: string, char: string): number {
     var count = 0;
     for (var i = 0; i < text.length; i++) {
         if (text[i] == char) {
@@ -266,7 +274,8 @@ function createPage(name: string, catalog?: ICatalog, template?: string) {
         }
         getProject().catalogs.push(page);
 
-        renderFileTree(document.getElementById("fileExplorer"), page, 1);
+        changeCatalogs( getProject().catalogs);
+        updateCatalogs();
 
     } else {
         if (catalog.children == undefined) {
@@ -278,9 +287,10 @@ function createPage(name: string, catalog?: ICatalog, template?: string) {
         //     page.path = "/" + catalog.name;
         // }
         catalog.children.push(page);
-        var context: any = document.getElementById(catalog.key).getElementsByClassName("explorer_folder_view").item(0);
-        var level = getChartCount(catalog.path, "/") + 1;
-        renderFileTree(context, page, level);
+       
+        changeCatalogs( getProject().catalogs);
+        updateCatalogs();
+        
 
 
     }
@@ -461,113 +471,18 @@ function renderIconExplorers(content: HTMLElement) {
     iconExplorer.className = "iconExplorer";
 
     content.appendChild(iconExplorer);
-    renderIconExplorer(iconExplorer, "");
+   // renderIconExplorer(iconExplorer, "");
+
+    renderIcons(iconExplorer,"");
 
     searchButton.onclick = (e: MouseEvent) => {
         e.stopPropagation();
         var searchText = searchInput.value;
-        renderIconExplorer(iconExplorer, searchText);
+        renderIcons(iconExplorer, searchText);
 
     };
 
 }
-function renderIconExplorer(content: HTMLElement, filter: string) {
-
-    content.innerHTML = "";
-
-    var list = icons.filter(icon => icon.indexOf(filter) >= 0);
-
-    for (var i = 0; i < list.length; i++) {
-        var icon = list[i];
-
-        var iconDiv = document.createElement("div");
-        iconDiv.setAttribute("icon", "bi bi-" + icon);
-        iconDiv.className = "sidebar_icon";
-
-        var iconIcon = document.createElement("i");
-
-        iconIcon.className = "bi bi-" + icon;
-        iconIcon.title = icon;
-        iconDiv.appendChild(iconIcon);
-
-        content.appendChild(iconDiv);
-
-        iconDiv.draggable = true;
-        iconDiv.ondragstart = (e: any) => {
-            var icon_e = e.target.getAttribute("icon");
-            var component: IComponent = {
-                type: "icon",
-                isTemplate: true,
-                key: getUUID(),
-                icon: icon_e,
-                label: icon_e,
-                style: "display:inline-block;",
-
-                onPreview: () => {
-                    var pi = document.createElement("i");
-                    pi.className = icon_e;
-                    return pi;
-                }, onRender: (component, element) => {
-                    var pi;
-                    if (element != undefined)
-                        pi = element;
-                    else
-                        pi = document.createElement("div");
-                    //    if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
-                    pi.setAttribute("icon_hover", "true");
-                    pi.innerHTML = "<i class='" + icon_e + "'></i>"
-                    pi.onclick = () => {
-                        if (component.blue.event.click.on != undefined) {
-                            component.blue.event.click.on();
-                        }
-
-                    }
-                    // pi.className = "bi bi-" + icon;
-                    return { root: pi, content: pi }
-                },
-                blue: {
-                    event: {
-                        click: {
-                            label: "单击"
-                        }
-                    }
-                }
-            };
-            dargData.setData("componentTemplate", component);
-
-
-        };
-        iconDiv.ondblclick = (e: any) => {
-            // console.log(e.target.className,icon);
-            clipboard.writeText(e.target.className);
-
-        };
-        iconDiv.onclick = (e: any) => {
-            var sl = getSelectComponents();
-            console.log(sl);
-            if (sl.length == 1) {
-                var sc = findCurPageComponent(sl[0]);
-
-                if (sc != undefined && sc.type == "icon") {
-                    var icon_e = e.target.className;
-                    if (icon_e != undefined && icon_e.length > 0) {
-
-                        sc.icon = icon_e;
-
-                        document.getElementById(sc.key).innerHTML = "<i class='" + icon_e + "'></i>";
-                    }
-
-                }
-            }
-        }
-
-    };
-
-
-
-
-}
-
 
 
 var lastSelected: HTMLElement;
@@ -591,6 +506,8 @@ function renderFileExplorer(content: HTMLElement) {
     fileExplorer.className = "fileExplorer";
     fileExplorer.style.minHeight = "100px";
     content.appendChild(fileExplorer);
+
+    renderCatalogs(fileExplorer);
 
     renderTap(searchDiv, "", "bi bi-search", () => {
         var text = input.value;
@@ -618,7 +535,7 @@ function renderFileExplorer(content: HTMLElement) {
     //         },
     //     ]
     // };
-    renderCatalog(fileExplorer, getProject().catalogs, 1);
+ //   renderCatalog(fileExplorer, getProject().catalogs, 1);
 
     // ipcRendererSend("readPageCatalog");
     // ipcRenderer.on("_readPageCatalog", (event, arg) => {
@@ -645,52 +562,32 @@ function renderCatalog(content: HTMLElement, catalogs: ICatalog[], level: number
 
 }
 
-var folderHiddenMap = new Map<string, boolean>();
-function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, parent?: ICatalog, search?: string) {
-    // console.log("renderFileTree", content, catalog);
-    if (catalog == undefined) {
-        return;
-    }
-    var menuItemsFolder: Array<IMenuItem> = [
-        {
-            id: "newpage",
-            label: "新建页面", icon: "bi bi-file-earmark-plus",
-            onclick: () => {
+export  const menuItemsFolder: Array<IMenuItem> = [
+    {
+        id: "newpage",
+        label: "新建页面", icon: "bi bi-file-earmark-plus",
+        onclick: () => {
 
 
-                createPage("新建页面", getContextMenuArg());
-            }
-        }, {
-            id: "newpagebytemp",
-            label: "根据模板新建页面", icon: "bi bi-node-plus",
-            onclick: () => {
+            createPage("新建页面", getContextMenuArg());
+        }
+    }, {
+        id: "newpagebytemp",
+        label: "根据模板新建页面", icon: "bi bi-node-plus",
+        onclick: () => {
 
 
-                createPageByTemplate(getContextMenuArg());
-            }
-        }, {
-            id: "newfolder",
-            label: "新建文件夹", icon: "bi bi-folder-plus",
-            onclick: () => {
+            createPageByTemplate(getContextMenuArg());
+        }
+    }, {
+        id: "newfolder",
+        label: "新建文件夹", icon: "bi bi-folder-plus",
+        onclick: () => {
 
 
-                createFolder("新建文件夹", getContextMenuArg());
-            }
-        }, {
-            id: "delete",
-            label: "删除", icon: "bi bi-trash", onclick: () => {
-
-                deletePage(getContextMenuArg());
-            }
-        }, {
-            id: "rename",
-            label: "重命名", icon: "bi bi-pencil", accelerator: "Enter", onclick: () => {
-                var ele = getContextMenuElement();
-                ele.setAttribute("data-edit", "true");
-                ele.getElementsByTagName("input").item(0).focus();
-            }
-        }];
-    var menuItemsPage: Array<IMenuItem> = [{
+            createFolder("新建文件夹", getContextMenuArg());
+        }
+    }, {
         id: "delete",
         label: "删除", icon: "bi bi-trash", onclick: () => {
 
@@ -698,19 +595,41 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
         }
     }, {
         id: "rename",
-        label: "重命名", icon: "bi bi-pencil", accelerator: "Enter",
-        onclick: () => {
-            getContextMenuElement().setAttribute("data-edit", "true");
-            getContextMenuElement().getElementsByTagName("input").item(0).focus();
-        }
-    }, {
-        id: "copy",
-        label: "复制", icon: "bi bi-files", onclick: () => {
-            var args = getContextMenuArg();
-            copyFile(args.path, args.name, args.name + "_copy");
+        label: "重命名", icon: "bi bi-pencil", accelerator: "Enter", onclick: () => {
+            var ele = getContextMenuElement();
+            ele.setAttribute("data-edit", "true");
+            ele.getElementsByTagName("input").item(0).focus();
         }
     }];
+export  const menuItemsPage: Array<IMenuItem> = [{
+    id: "delete",
+    label: "删除", icon: "bi bi-trash", onclick: () => {
 
+        deletePage(getContextMenuArg());
+    }
+}, {
+    id: "rename",
+    label: "重命名", icon: "bi bi-pencil", accelerator: "Enter",
+    onclick: () => {
+        getContextMenuElement().setAttribute("data-edit", "true");
+        getContextMenuElement().getElementsByTagName("input").item(0).focus();
+    }
+}, {
+    id: "copy",
+    label: "复制", icon: "bi bi-files", onclick: () => {
+        var args = getContextMenuArg();
+        copyFile(args.path, args.name, args.name + "_copy");
+    }
+}];
+
+var folderHiddenMap = new Map<string, boolean>();
+function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, parent?: ICatalog, search?: string) {
+    // console.log("renderFileTree", content, catalog);
+    if (catalog == undefined) {
+        return;
+    }
+
+    
     if (catalog.children != undefined) {
         var folder = document.createElement("div");
         folder.className = "explorer_folder";
@@ -1058,7 +977,7 @@ function renderFileTree(content: HTMLElement, catalog: ICatalog, level: number, 
 
 
 }
-function getCatalog(list: ICatalog[], key: string): { caltalog: ICatalog, index: number } {
+export function getCatalog(list: ICatalog[], key: string): { caltalog: ICatalog, index: number } {
     if (list == undefined) {
         return;
     }
@@ -1075,7 +994,7 @@ function getCatalog(list: ICatalog[], key: string): { caltalog: ICatalog, index:
         }
     }
 }
-function getCatalogParent(list: ICatalog[], key: string): ICatalog {
+export function getCatalogParent(list: ICatalog[], key: string): ICatalog {
     if (list == undefined) {
 
         return;
@@ -1167,7 +1086,7 @@ export function toggleExplorer(key: string, hide: boolean){
 
 }
 
-export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[],onHide?:(key:string,hide:boolean)=>void): HTMLDivElement {
+export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[],onHide?:(key:string,hide:boolean)=>void,maxHeight?:number): HTMLDivElement {
     var explorer = document.createElement("div");
     explorer.className = "explorer";
     explorer.id = key;
@@ -1195,7 +1114,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
     explorer.appendChild(title);
     var view = document.createElement("div");
     view.className = "explorer_view";
-
+    view.style.maxHeight=maxHeight+"px";
     explorer.appendChild(view);
   
 

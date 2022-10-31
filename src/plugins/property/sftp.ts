@@ -54,6 +54,8 @@ const  panel:IPanel={
         context.appendChild(document.createElement("br"));
         log=document.createElement("div");
         log.style.fontSize="12px";
+        log.style.maxHeight="400px";
+        log.style.overflow="auto";
         context.appendChild(log);
     
         ipcRenderer.on("_sftp",(eve,arg)=>{

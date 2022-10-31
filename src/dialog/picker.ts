@@ -10,13 +10,13 @@ function toString(selectColor: { r: number, g: number, b: number, a: number }) {
     return "rgba(" + selectColor.r + "," + selectColor.g + "," + selectColor.b + "," + selectColor.a + ")";
 }
 var recentColors:string[]=["#09f","#9f0","#f09","#f90","#90f","#0f9","#99f","#f99"];
-var selectColor = { r: 255, g: 0, b: 0, a: 1 };
+var selectColor = { r: 255, g: 255, b: 255, a: 1 };
 export function renderColorPicker(ele: HTMLElement, color: string, onPicker: (color: string) => void) {
 
     console.log("renderColorPicker",color);
     isCapture=false;
     var pickerTop= getDivClientTop(ele) + 20;
-    var pickerLeft = getDivClientLeft(ele) - 300;
+    var pickerLeft =ele.getBoundingClientRect().left - 200;
     var baseColor = { r: 255, g: 0, b: 0 };
 
     if(pickerTop>window.innerHeight-400){

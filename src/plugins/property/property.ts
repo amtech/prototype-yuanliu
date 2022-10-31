@@ -19,6 +19,9 @@ import { cal_gradient, getComponentStyle, setComponentStyle } from "../../render
 import { renderExplorer, toggleExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
 
+import { Editor } from "../../editor/editor";
+import { renderLayers, updateLayers } from "../../render/propertyLayers";
+var lastComponentKey:string;
 const panel: IPanel = {
     key: "property", name: "属性", hidden: true, sort: 0,
     render: (content: HTMLElement) => {
@@ -28,15 +31,19 @@ const panel: IPanel = {
         //console.log("update property");
         if (args != undefined) {
             var component: IComponent = args;
-            loadComponentsProperty(component);
-            requestIdleCallback(() => {
-                updateLayersProperty();
-                loadLayersProperty(component);
-            });
+            if(lastComponentKey==undefined||component.key!=lastComponentKey){
+                console.log("property:",component.key);
+                loadComponentsProperty(component);
+                lastComponentKey=component.key;
+            }
+           
         } else {
-            updateLayersProperty();
+          
             clearComponentsProperty();
         }
+        requestIdleCallback(() => {
+            updateLayersProperty();
+        });
 
 
     }
@@ -58,25 +65,26 @@ function renderPropertypanel(content: HTMLElement) {
     content.appendChild(propertyPanel);
 
 
+    var explorerViewMaxHeight = (window.innerHeight - 78 - 24 * 7);
 
-    layers = renderExplorer("property_layer", propertyPanel, "层级", true, undefined, onExplorerHide);
-    renderLayersProperty(layers);
-    base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide);
+    layers = renderExplorer("property_layer", propertyPanel, "层级", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    renderLayers(layers);
+    base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide, explorerViewMaxHeight);
     renderBaseProperty(base);
-    layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide);
+    layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide, explorerViewMaxHeight);
     renderLayoutProperty(layout);
 
-    theme = renderExplorer("property_theme", propertyPanel, "填充", false, undefined, onExplorerHide);
+    theme = renderExplorer("property_theme", propertyPanel, "填充", false, undefined, onExplorerHide, explorerViewMaxHeight);
     renderThemeProperty(theme);
 
 
-    font = renderExplorer("property_font", propertyPanel, "字体&段落", true, undefined, onExplorerHide);
+    font = renderExplorer("property_font", propertyPanel, "字体&段落", true, undefined, onExplorerHide, explorerViewMaxHeight);
     renderFontProperty(font);
 
-    style = renderExplorer("property_style", propertyPanel, "样式", true, undefined, onExplorerHide);
+    style = renderExplorer("property_style", propertyPanel, "样式", true, undefined, onExplorerHide, explorerViewMaxHeight);
     renderComponentStyle(style);
 
-    var shortcuts = renderExplorer("property_panel", propertyPanel, "快捷键", true, undefined, onExplorerHide);
+    var shortcuts = renderExplorer("property_panel", propertyPanel, "快捷键", true, undefined, onExplorerHide, explorerViewMaxHeight);
     renderShortcutsProperty(shortcuts);
 
     layout.style.display = "none";
@@ -104,10 +112,10 @@ function onExplorerHide(key: string, hide: boolean) {
             }
 
             showExplorers.push(key);
-            if(key=="property_layer"){
+            if (key == "property_layer") {
                 //如果是展开层级的话，更新一次层级
                 updateLayersProperty();
-            }  
+            }
         }
 
     }
@@ -121,42 +129,24 @@ var style: HTMLElement;
 var font: HTMLElement;
 function updateLayersProperty() {
     //如果 层级块时 隐藏状态 的话，不更新,
-    if (showExplorers.indexOf("property_layer") >= 0)
-        if (layers != undefined) layers.innerHTML = "";
-    renderLayersProperty(layers);
+    // if (showExplorers.indexOf("property_layer") >= 0)
+    //     if (layers != undefined) layers.innerHTML = "";
+    updateLayers();
 }
 
-function renderComponentProperty(content: HTMLElement) {
 
-}
-function clearComponentsProperty() {
+export function clearComponentsProperty() {
 
     layout.style.display = "none";
     theme.style.display = "none";
     style.style.display = "none";
     font.style.display = "none";
     base.style.display = "none";
-    formStyleEditorPanel.innerHTML = "";
+   
 }
 
-function loadLayersProperty(component: IComponent) {
 
-    var id = "layer_" + component.key;
-    var layerItem = document.getElementById(id);
-    if (layerItem != undefined) {
-        if (lastSelected == undefined || lastSelected != layerItem) {
-            if (lastSelected != undefined)
-                lastSelected.setAttribute("selected", "false");
-            layerItem.setAttribute("selected", "true");
-            layerItem.scrollIntoView();
-            lastSelected = layerItem;
-        }
-    }
-
-
-
-}
-function loadComponentsProperty(component: IComponent) {
+export function loadComponentsProperty(component: IComponent) {
 
 
     layout.style.display = "block";
@@ -165,7 +155,7 @@ function loadComponentsProperty(component: IComponent) {
 
     base.style.display = "block";
 
-    formStyleEditorPanel.innerHTML = "";
+ 
 
     if (component.group == "chart" || component.group == "layout") {
         font.style.display = "none";
@@ -180,12 +170,6 @@ function loadComponentsProperty(component: IComponent) {
 
     });
     updateBaseProperty(component);
-
-
-
-
-
-
     formWidth.update(getComponentStyle(component, "width", "px"), (value) => {
         if (value == "") value = "auto";
         if (component.type == "grid") {
@@ -445,13 +429,13 @@ function loadComponentsProperty(component: IComponent) {
     formZIndex.update(zIndex + "", (value) => {
         setComponentStyle(component, "z-index", value);
     })
-    var flexNum=0;
-    var flexStyle=getComponentStyle(component,"flex");
-    if(flexStyle!=undefined&&flexStyle.length>0){
-        flexNum=parseFloat(flexStyle);
+    var flexNum = 0;
+    var flexStyle = getComponentStyle(component, "flex");
+    if (flexStyle != undefined && flexStyle.length > 0) {
+        flexNum = parseFloat(flexStyle);
     }
-    formFlexNum.update(flexNum,(value)=>{
-        setComponentStyle(component, "flex", value+"");
+    formFlexNum.update(flexNum, (value) => {
+        setComponentStyle(component, "flex", value + "");
     })
 
     //font
@@ -590,67 +574,67 @@ function loadComponentsProperty(component: IComponent) {
             formBackgroundSolidPanel.style.display = "none";
             formBackgroundGradientPanel.style.display = "none";
             formBackgroundImagePanel.style.display = "block";
-            var gl1="rgba(255, 255, 255, 0.01)";
-            var gl2="rgba(255, 255, 255, 0.85)";
-            var gl3="rgba(220, 50, 10, 0.5)";
-            var gl4="rgba(120, 0, 30, 0.5)";
-            var gl5="rgba(30, 8, 2, 0.5)";
-            var gl6="rgba(123, 11, 9, 0.5)";
+            var gl1 = "rgba(255, 255, 255, 0.01)";
+            var gl2 = "rgba(255, 255, 255, 0.85)";
+            var gl3 = "rgba(220, 50, 10, 0.5)";
+            var gl4 = "rgba(120, 0, 30, 0.5)";
+            var gl5 = "rgba(30, 8, 2, 0.5)";
+            var gl6 = "rgba(123, 11, 9, 0.5)";
 
-            var bgStyle=getComponentStyle(component,"background");
-            console.log("bgStyle",bgStyle);
-            if(bgStyle!=undefined&&bgStyle.split("rgba").length==7){
-                var sp=bgStyle.split("rgba(");
-                 gl1="rgba("+sp[1].split(")")[0]+")";
-                 gl2="rgba("+sp[2].split(")")[0]+")";
-                 gl3="rgba("+sp[3].split(")")[0]+")";
-                 gl4="rgba("+sp[4].split(")")[0]+")";
-                 gl5="rgba("+sp[5].split(")")[0]+")";
-                 gl6="rgba("+sp[6].split(")")[0]+")";
+            var bgStyle = getComponentStyle(component, "background");
+            // console.log("bgStyle", bgStyle);
+            if (bgStyle != undefined && bgStyle.split("rgba").length == 7) {
+                var sp = bgStyle.split("rgba(");
+                gl1 = "rgba(" + sp[1].split(")")[0] + ")";
+                gl2 = "rgba(" + sp[2].split(")")[0] + ")";
+                gl3 = "rgba(" + sp[3].split(")")[0] + ")";
+                gl4 = "rgba(" + sp[4].split(")")[0] + ")";
+                gl5 = "rgba(" + sp[5].split(")")[0] + ")";
+                gl6 = "rgba(" + sp[6].split(")")[0] + ")";
             }
-          
-            formBackgroundGLColor1.update(gl1,(color)=>{
-                gl1=color;
-                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
-                setComponentStyle(component,"background",gl);
+
+            formBackgroundGLColor1.update(gl1, (color) => {
+                gl1 = color;
+                var gl = "linear-gradient(" + gl1 + ", " + gl2 + "), radial-gradient(at left top, " + gl3 + ", transparent 50%),  radial-gradient(at right top," + gl4 + ", transparent 50%),   radial-gradient(at right center, " + gl5 + ", transparent 50%),   radial-gradient(at left center," + gl6 + ", transparent 50%)";
+                setComponentStyle(component, "background", gl);
 
             });
 
-            formBackgroundGLColor2.update(gl2,(color)=>{
-                gl2=color;
-                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
-                setComponentStyle(component,"background",gl);
+            formBackgroundGLColor2.update(gl2, (color) => {
+                gl2 = color;
+                var gl = "linear-gradient(" + gl1 + ", " + gl2 + "), radial-gradient(at left top, " + gl3 + ", transparent 50%),  radial-gradient(at right top," + gl4 + ", transparent 50%),   radial-gradient(at right center, " + gl5 + ", transparent 50%),   radial-gradient(at left center," + gl6 + ", transparent 50%)";
+                setComponentStyle(component, "background", gl);
 
             });
 
-            formBackgroundGLColor3.update(gl3,(color)=>{
-                gl3=color;
-                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
-                setComponentStyle(component,"background",gl);
+            formBackgroundGLColor3.update(gl3, (color) => {
+                gl3 = color;
+                var gl = "linear-gradient(" + gl1 + ", " + gl2 + "), radial-gradient(at left top, " + gl3 + ", transparent 50%),  radial-gradient(at right top," + gl4 + ", transparent 50%),   radial-gradient(at right center, " + gl5 + ", transparent 50%),   radial-gradient(at left center," + gl6 + ", transparent 50%)";
+                setComponentStyle(component, "background", gl);
 
             });
 
-            formBackgroundGLColor4.update(gl4,(color)=>{
-                gl4=color;
-                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
-                setComponentStyle(component,"background",gl);
+            formBackgroundGLColor4.update(gl4, (color) => {
+                gl4 = color;
+                var gl = "linear-gradient(" + gl1 + ", " + gl2 + "), radial-gradient(at left top, " + gl3 + ", transparent 50%),  radial-gradient(at right top," + gl4 + ", transparent 50%),   radial-gradient(at right center, " + gl5 + ", transparent 50%),   radial-gradient(at left center," + gl6 + ", transparent 50%)";
+                setComponentStyle(component, "background", gl);
 
             });
-            formBackgroundGLColor5.update(gl5,(color)=>{
-                gl5=color;
-                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
-                setComponentStyle(component,"background",gl);
-
-            });
-        
-            formBackgroundGLColor6.update(gl6,(color)=>{
-                gl6=color;
-                var gl="linear-gradient("+gl1+", "+gl2+"), radial-gradient(at left top, "+gl3+", transparent 50%),  radial-gradient(at right top,"+gl4+", transparent 50%),   radial-gradient(at right center, "+gl5+", transparent 50%),   radial-gradient(at left center,"+gl6+", transparent 50%)";
-                setComponentStyle(component,"background",gl);
+            formBackgroundGLColor5.update(gl5, (color) => {
+                gl5 = color;
+                var gl = "linear-gradient(" + gl1 + ", " + gl2 + "), radial-gradient(at left top, " + gl3 + ", transparent 50%),  radial-gradient(at right top," + gl4 + ", transparent 50%),   radial-gradient(at right center, " + gl5 + ", transparent 50%),   radial-gradient(at left center," + gl6 + ", transparent 50%)";
+                setComponentStyle(component, "background", gl);
 
             });
 
-        
+            formBackgroundGLColor6.update(gl6, (color) => {
+                gl6 = color;
+                var gl = "linear-gradient(" + gl1 + ", " + gl2 + "), radial-gradient(at left top, " + gl3 + ", transparent 50%),  radial-gradient(at right top," + gl4 + ", transparent 50%),   radial-gradient(at right center, " + gl5 + ", transparent 50%),   radial-gradient(at left center," + gl6 + ", transparent 50%)";
+                setComponentStyle(component, "background", gl);
+
+            });
+
+
 
 
         }
@@ -731,9 +715,8 @@ function loadComponentsProperty(component: IComponent) {
             alert("请选择合适的母版");
             return false;
         }
-    }, () => {
-        renderComponentStyleEditor(component);
-    })
+    });
+    renderComponentStyleEditor(component);
     //font ...
     formFontBolder.update(getComponentStyle(component, "font-weight") == "bolder", (value) => {
         setComponentStyle(component, "font-weight", value ? "bolder" : "normal");
@@ -813,16 +796,16 @@ function loadComponentsProperty(component: IComponent) {
         setComponentStyle(component, "opacity", nop + "");
 
     })
-    var bdBlur=0;
-    var bd=getComponentStyle(component,"backdrop-filter");
-    if(bd!=undefined&&bd.indexOf("blur")>=0){
-        bdBlur=parseInt(bd.replace("blur(","").replace("px)","").trim());
+    var bdBlur = 0;
+    var bd = getComponentStyle(component, "backdrop-filter");
+    if (bd != undefined && bd.indexOf("blur") >= 0) {
+        bdBlur = parseInt(bd.replace("blur(", "").replace("px)", "").trim());
     }
 
     //
-    formBackdrop.update(bdBlur,(value)=>{
+    formBackdrop.update(bdBlur, (value) => {
         //	backdrop-filter: blur(1px);
-        setComponentStyle(component, "backdrop-filter",  "blur("+value+"px)");
+        setComponentStyle(component, "backdrop-filter", "blur(" + value + "px)");
 
     });
 
@@ -1061,12 +1044,12 @@ var formBackgroundGradientPanelType: FormIcons;
 var formBackgroundGradientPanelAngle: FormSolider;
 var formBackgroundGradientPanelPosition: FormSolider;
 
-var formBackgroundGLColor1:FormColor;
-var formBackgroundGLColor2:FormColor;
-var formBackgroundGLColor3:FormColor;
-var formBackgroundGLColor4:FormColor;
-var formBackgroundGLColor5:FormColor;
-var formBackgroundGLColor6:FormColor;
+var formBackgroundGLColor1: FormColor;
+var formBackgroundGLColor2: FormColor;
+var formBackgroundGLColor3: FormColor;
+var formBackgroundGLColor4: FormColor;
+var formBackgroundGLColor5: FormColor;
+var formBackgroundGLColor6: FormColor;
 
 var formBorderPanel: HTMLElement;
 var formBorderPanelType: FormIcons;
@@ -1081,13 +1064,13 @@ var formOpacity: FormSolider;
 
 var formShape: FormSelect;
 
-var formBackdrop:FormSolider;
+var formBackdrop: FormSolider;
 
 function renderThemeProperty(context: HTMLElement) {
     var body = document.createElement("div");
     body.style.padding = "0px 10px 10px 10px";
     context.appendChild(body);
-    formBackgroundType = new FormIcons("背景", ["bi bi-slash-circle","bi bi-paint-bucket", "bi bi-circle-half", "bi bi-palette"]);
+    formBackgroundType = new FormIcons("背景", ["bi bi-slash-circle", "bi bi-paint-bucket", "bi bi-circle-half", "bi bi-palette"]);
     formBackgroundType.render(body);
     //bg
     formBackgroundPanel = document.createElement("div");
@@ -1132,32 +1115,32 @@ function renderThemeProperty(context: HTMLElement) {
     formBackgroundPanel.appendChild(formBackgroundImagePanel);
 
 
-    var formBackgroundGLRow1=document.createElement("div");
+    var formBackgroundGLRow1 = document.createElement("div");
     formBackgroundImagePanel.appendChild(formBackgroundGLRow1);
-    var formBackgroundGLColor1Div=forms.createDivRow(formBackgroundGLRow1,true);
-    formBackgroundGLColor1=new FormColor("背景1");
+    var formBackgroundGLColor1Div = forms.createDivRow(formBackgroundGLRow1, true);
+    formBackgroundGLColor1 = new FormColor("背景1");
     formBackgroundGLColor1.render(formBackgroundGLColor1Div);
-    var formBackgroundGLColor2Div=forms.createDivRow(formBackgroundGLRow1);
-    formBackgroundGLColor2=new FormColor("背景2");
+    var formBackgroundGLColor2Div = forms.createDivRow(formBackgroundGLRow1);
+    formBackgroundGLColor2 = new FormColor("背景2");
     formBackgroundGLColor2.render(formBackgroundGLColor2Div);
 
-    var formBackgroundGLRow2=document.createElement("div");
+    var formBackgroundGLRow2 = document.createElement("div");
     formBackgroundImagePanel.appendChild(formBackgroundGLRow2);
-    var formBackgroundGLColor3Div=forms.createDivRow(formBackgroundGLRow2,true);
-    formBackgroundGLColor3=new FormColor("前景1");
+    var formBackgroundGLColor3Div = forms.createDivRow(formBackgroundGLRow2, true);
+    formBackgroundGLColor3 = new FormColor("前景1");
     formBackgroundGLColor3.render(formBackgroundGLColor3Div);
-    var formBackgroundGLColor4Div=forms.createDivRow(formBackgroundGLRow2);
-    formBackgroundGLColor4=new FormColor("前景2");
+    var formBackgroundGLColor4Div = forms.createDivRow(formBackgroundGLRow2);
+    formBackgroundGLColor4 = new FormColor("前景2");
     formBackgroundGLColor4.render(formBackgroundGLColor4Div);
 
 
-    var formBackgroundGLRow3=document.createElement("div");
+    var formBackgroundGLRow3 = document.createElement("div");
     formBackgroundImagePanel.appendChild(formBackgroundGLRow3);
-    var formBackgroundGLColor5Div=forms.createDivRow(formBackgroundGLRow3,true);
-    formBackgroundGLColor5=new FormColor("前景3");
+    var formBackgroundGLColor5Div = forms.createDivRow(formBackgroundGLRow3, true);
+    formBackgroundGLColor5 = new FormColor("前景3");
     formBackgroundGLColor5.render(formBackgroundGLColor5Div);
-    var formBackgroundGLColor6Div=forms.createDivRow(formBackgroundGLRow3);
-    formBackgroundGLColor6=new FormColor("前景4");
+    var formBackgroundGLColor6Div = forms.createDivRow(formBackgroundGLRow3);
+    formBackgroundGLColor6 = new FormColor("前景4");
     formBackgroundGLColor6.render(formBackgroundGLColor6Div);
 
 
@@ -1213,7 +1196,7 @@ function renderThemeProperty(context: HTMLElement) {
     formOpacity.render(body);
 
     //
-    formBackdrop=new FormSolider("模糊", 20, 0, "px");
+    formBackdrop = new FormSolider("模糊", 20, 0, "px");
     formBackdrop.render(body);
 
 
@@ -1426,7 +1409,7 @@ function renderLayoutProperty(context: HTMLElement) {
     var positionRow = document.createElement("div");
     body.appendChild(positionRow);
 
-    formPosition = new FormIcons("位置", [ "bi bi-layout-sidebar-reverse", "bi bi-layout-sidebar-inset-reverse"]);
+    formPosition = new FormIcons("位置", ["bi bi-layout-sidebar-reverse", "bi bi-layout-sidebar-inset-reverse"]);
     formPosition.render(body);
 
 
@@ -1437,7 +1420,7 @@ function renderLayoutProperty(context: HTMLElement) {
     formZIndex = new FormNumber("深度");
     formZIndex.render(body);
 
-    formFlexNum=new FormSolider("flex",0,10);
+    formFlexNum = new FormSolider("flex", 10, 0);
     formFlexNum.render(body);
 
 
@@ -1547,20 +1530,17 @@ function updateBaseProperty(component: IComponent) {
 }
 
 function renderLayersProperty(context: HTMLElement) {
-    //console.log("renderLayersProperty");
-    var layers = getLayers();
-    if (layers == undefined) return;
-    // //console.log("layers", layers);
-    layers.forEach((layer: any) => {
+ 
 
-        renderLayersTree(context, layer, 1);
+  
+  
 
-    });
 
 
 
 
 }
+
 var lastSelected: HTMLElement;
 var treeExtend: Map<string, boolean> = new Map();
 function renderLayersTree(content: HTMLElement, component: IComponent, level: number) {
@@ -1831,66 +1811,43 @@ function renderLayersTree(content: HTMLElement, component: IComponent, level: nu
 }
 
 var formStyleMaster: FormComponent;
-var formStyleEditorPanel: HTMLElement;
 function renderComponentStyle(content: HTMLElement) {
     var masterDiv = document.createElement("div");
     masterDiv.style.padding = "0px 10px 0px 10px";
     //master
     formStyleMaster = new FormComponent("模板");
-    formStyleMaster.render(masterDiv, "bi bi-filetype-css");
+    formStyleMaster.render(masterDiv);
 
     content.appendChild(masterDiv);
     //editor
-    formStyleEditorPanel = document.createElement("div");
-    content.appendChild(formStyleEditorPanel);
-}
-var editorComponent: any;
-var editorChange: boolean = false;
-function renderComponentStyleEditor(component: IComponent) {
-    if (formStyleEditorPanel != undefined) {
-        formStyleEditorPanel.innerHTML = "";
-
-    } else {
-        return;
-    }
-    editorChange = true;
-    editorComponent = component;
-    ////console.log("renderComponentStyle");
 
     var codeEdior = document.createElement("div");
     codeEdior.style.height = (300 - 50) + "px";
     codeEdior.style.margin = "10px";
-    formStyleEditorPanel.appendChild(codeEdior);
+    content.appendChild(codeEdior);
+    editor = new Editor(codeEdior, (lines) => {
+        var component = editorComponent;
+        if (component.styles != undefined) {
+            lines.match(/[A-z]+{[^{]+}/g).forEach((key) => {
+                var cssName = key.match(/[A-z]+/)[0];
+                var cssText = key.match(/{([^{]+)/)[0];
+                cssText = cssText.substring(1, cssText.length - 1);
+                component.styles[cssName] = cssText;
+            });
 
-    const ace = require("ace-builds/src/ace.js");
-    require("ace-builds/src/mode-css.js");
-    require("ace-builds/src/ext-language_tools.js");
-    require("ace-builds/src/theme-tomorrow_night.js");
-    require("ace-builds/src/theme-tomorrow.js");
-    var editor = ace.edit(codeEdior);
-
-    editor.setOptions({
-        model: "ace/mode/css",
-        // 默认:false
-        wrap: true, // 换行
-        autoScrollEditorIntoView: false, // 自动滚动编辑器视图
-        enableLiveAutocompletion: true, // 智能补全
-        enableBasicAutocompletion: true, // 启用基本完成 不推荐使用
-        showGutter: false,
-        readOnly: component.master != undefined && component.master.length > 0,
-    })
-
-    editor.session.setMode("ace/mode/css");
-    if (document.getElementById("app").className == "dark")
-        editor.setTheme("ace/theme/tomorrow_night");
-    else
-        editor.setTheme("ace/theme/tomorrow");
-
-    function getComponent(): IComponent {
-        return editorComponent;
+        } else if (component.style != undefined) {
+            component.style = lines.substring(5, lines.length - 1);
+        }
+        updateComponentsStyle([component]);
 
 
-    }
+    },250);
+
+}
+var editor: any;
+var editorComponent: any;
+function renderComponentStyleEditor(component: IComponent) {
+
     if (component.styles != undefined) {
         var value = "";
         for (var key in component.styles) {
@@ -1904,34 +1861,6 @@ function renderComponentStyleEditor(component: IComponent) {
     else
         editor.setValue("root{\n \n \n}");
 
-    editor.gotoLine(0);
     editor.resize();
-    editor.on("blur", (e: any) => {
-        if (editorChange) {
-            var lines = editor.getSession().doc.$lines;
-            var code = "";
-            lines.forEach((line: any) => {
-                if (line.length > 0)
-                    code += line;
-            })
-            var component = getComponent();
-            if (component.styles != undefined) {
-                code.match(/[A-z]+{[^{]+}/g).forEach((key) => {
-                    var cssName = key.match(/[A-z]+/)[0];
-                    var cssText = key.match(/{([^{]+)/)[0];
-                    cssText = cssText.substring(1, cssText.length - 1);
-                    component.styles[cssName] = cssText;
-                });
-
-            } else if (component.style != undefined) {
-                component.style = code.substring(5, code.length - 1);
-            }
-            updateComponentsStyle([component]);
-
-        }
-
-
-
-    });
 
 }

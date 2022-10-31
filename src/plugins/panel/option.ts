@@ -3,16 +3,15 @@ Copyright (c) taoyongwen. All rights reserved.
 
 底部  选项标签
 ***************************************************************************** */
-import { showMessageBox } from "../../render/workspace";
-import { IComponent, IPanel } from "../../common/interfaceDefine";
-import * as form from "../../render/form";
-import { ipcRendererSend } from "../../preload";
 import { ipcRenderer } from "electron";
-import { loadChart } from "../../render/chart";
-import { findCurPageComponent, getCurPage, getSelectComponents } from "../../render/workbench";
+import { IComponent, IPanel } from "../../common/interfaceDefine";
+import { ipcRendererSend } from "../../preload";
+import * as form from "../../render/form";
 import { pushHistory } from "../../render/history";
+import { findCurPageComponent, getCurPage, getSelectComponents } from "../../render/workbench";
+import { showMessageBox } from "../../render/workspace";
 
-
+import { Editor } from "../../editor/editor";
 const panel: IPanel = {
     key: "option", name: "选项", hidden: true, sort: 2,
     render: (content: HTMLElement) => {
@@ -30,7 +29,7 @@ const panel: IPanel = {
 
             var cmpt = findCurPageComponent(sl[0]);
   
-            clearComponentsCode();
+          
             loadComponentsCode(cmpt);
         }
 
@@ -245,109 +244,38 @@ function renderChartOption(content: HTMLElement) {
     content.appendChild(codeEdior);
     //console.log(ace);
 
+    editor=new Editor(codeEdior,(lines)=>{
+        //
+        var component =editorComponent;
+        component.option = lines;
+        try {
+            var ele = document.getElementById(component.key);
+            component.onRender(component, ele);
+            pushHistory(getCurPage());
+        } catch (error) {
+            console.log(error);
+        }
+
+
+
+    });
+    
+
 
 
 }
 
 
 
-function clearComponentsCode() {
-    editorChange = false;
-    // var codeEdior = document.getElementById("optionEdior");
-    if (editor == undefined || editor == null) return;
-    editor.setValue("");
-}
 
 var editor: any;
 var editorComponent: any;
-var editorChange: boolean = false;
 function loadComponentsCode(component: IComponent) {
 
     editorComponent = component;
-    var codeEdior = document.getElementById("optionEdior");
-    if (codeEdior == undefined || codeEdior == null) return;
-    if (editor == undefined) {
-        const ace = require("ace-builds/src/ace.js");
-        require("ace-builds/src/mode-javascript.js");
-        require("ace-builds/src/ext-language_tools.js");
-        require("ace-builds/src/theme-tomorrow_night.js");
-        require("ace-builds/src/theme-tomorrow.js");
-        editor = ace.edit(codeEdior);
-        editor.setOption({
-            // 默认:false
-            model: "ace/mode/javascript",
-            wrap: true, // 换行
-            autoScrollEditorIntoView: false, // 自动滚动编辑器视图
-            enableLiveAutocompletion: true, // 智能补全
-            enableBasicAutocompletion: true, // 启用基本完成 不推荐使用
-            showPrintMargin: false,
-            tabSize: 4,
-
-
-        });
-        if (document.getElementById("app").className == "dark")
-            editor.setTheme("ace/theme/tomorrow_night");
-        else
-            editor.setTheme("ace/theme/tomorrow");
-        editor.getSession().on('change', (e: any) => {
-
-            if (editorChange) {
-                var lines = editor.getSession().doc.$lines;
-       
-                var code = "";
-                lines.forEach((line: any, r: number) => {
-                    if (r < lines.length - 1) {
-                        code += line + "\n";
-                    } else {
-                        code += line;
-                    }
-
-                })
-                console.log(code);
-                var component = getComponent();
-                component.option = code;
-                try {
-                    var ele = document.getElementById(component.key);
-                    component.onRender(component, ele);
-                    pushHistory(getCurPage());
-                } catch (error) {
-                    console.log(error);
-                }
-                // var chart = document.getElementById(component.key);
-
-                // chart.style.cssText = component.style;
-
-                // loadChart(chart, component);
-
-                // try {
-                //     //    chart.innerHTML = "";
-
-                //     // console.log("renderChart");
-                //     var echarts = require("echarts");
-                //     var myChart = echarts.init(chart, null, { renderer: "svg" });
-
-                //     var option;
-                //     if (component.option != undefined) {
-                //         eval(component.option);
-                //         myChart.clear();
-                //         myChart.setOption(option);
-                //         myChart.resize();
-                //     }
-                // } catch (error) {
-                //     console.log(error);
-                // }
-            }
-
-        });
-    }
-    function getComponent(): IComponent {
-        return editorComponent;
-
-    }
 
     editor.setValue(component.option);
-    editor.gotoLine(0);
     editor.resize();
-    editorChange = true;
+
 
 }

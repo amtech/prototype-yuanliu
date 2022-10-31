@@ -563,9 +563,10 @@ export class FormSolider {
         if (this.unit != undefined) {
             this.point.innerText += this.unit;
         }
-
-        this.point.style.left = (value - this.min) / (this.max - this.min) * this.bg.clientWidth + "px";
         this.onChange = onChange;
+        requestIdleCallback(()=>{
+            this.point.style.left = (value - this.min) / (this.max - this.min) * this.bg.clientWidth + "px";
+        });
     }
     render(content: HTMLElement) {
         var div = document.createElement("div");

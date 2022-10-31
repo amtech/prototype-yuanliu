@@ -20,11 +20,6 @@ export interface IComponentContextMenuItem {
     children?: IMenuItem[];
 
 }
-export function checkContextMenu() {
-    var contextMenu = document.getElementById("contextMenu");
-    if (contextMenu != undefined)
-        contextMenu.remove();
-}
 
 
 export function showComponentContextMenu(menuItems: Array<IComponentContextMenuItem>, x: number, y: number, args?: any, element?: HTMLElement) {

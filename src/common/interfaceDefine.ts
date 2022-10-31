@@ -32,6 +32,19 @@ export interface IProject {
 export interface IComponent {
     key: string;
     label: string;
+     /**
+     *  层级
+     */
+    level?:number;
+     /**
+     * 是否 有子组件
+     */
+    isDir?:boolean;
+    /**
+     * 是否为根组件
+     */
+    isRoot?:boolean;
+    isOpen?:boolean;
     /**
      * 是否隐藏
      */
@@ -305,6 +318,16 @@ export interface ICatalog {
     // page?:IPage;
     sort?: number;
     template?:string;
+    /**
+     *  层级
+     */
+     level?:number;
+     /**
+     * 是否 有子组件
+     */
+    isDir?:boolean;
+
+    isOpen?:boolean;
 }
 /**
  * 对话框

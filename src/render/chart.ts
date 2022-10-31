@@ -20,7 +20,7 @@ export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boo
                 theme = "dark";
             }
             //    regeditTheme()
-            console.log("renderChart ", theme,isMap);
+          //  console.log("renderChart ", theme,isMap);
             var echarts = require("echarts");
             if (isMap) {
 

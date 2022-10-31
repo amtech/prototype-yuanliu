@@ -16,10 +16,7 @@ import { saveSimplePage } from "../../render/toolbar";
 import { getProject, openExpand, renderExpand, showMessageBox } from "../../render/workspace";
 import { showStatusLoadding } from "../../render/statusBar";
 import { mode } from "d3";
-
-
 var image: HTMLImageElement;
-
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
 var formScale: forms.FormSolider;
@@ -40,6 +37,7 @@ var formInfo: forms.FormPragraph;
 var component_list: HTMLElement;
 var hiddenMap = new Map();
 var formMode:forms.FormIcons;
+var lastPageKey:string;
 const panel: IPanel = {
   key: "page", name: "页面", hidden: true, sort: 0,
   render: (content: HTMLElement) => {
@@ -248,17 +246,17 @@ const panel: IPanel = {
   },
   update: () => {
 
-
+   
     if (getCurPage() == undefined) {
       return;
     }
-
+    if(lastPageKey!=undefined&&getCurPage().key==lastPageKey){
+      return;
+    }
+   
+    lastPageKey=getCurPage().key;
+    console.log("page update:",lastPageKey);
     image.src = getProject().work + "/images/" + getCurPage().key + ".jpeg";
-    var app_bg_img:any=document.getElementById("app_bg_img");
-    app_bg_img.src=image.src;
-    
-
-
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
       getCurPage().height = parseFloat(value);

@@ -12,7 +12,7 @@ import { renderDatabaseExplorer } from "./sidebar";
 import { findCurPageComponent, getCurPage, updatePageViewScrollH, updatePageViewScrollV } from "./workbench";
 export function updateFloatPanel(comment?: IComponent) {
     if (comment == undefined) {
-        switchFloatTab("页面");
+        switchFloatTab("导航");
     } else if (comment.option != undefined) {
         switchFloatTab("选项");
     }
@@ -53,22 +53,17 @@ function renderSilderBar(content: HTMLElement) {
     silderBar.appendChild(silderBarBlock);
 
     silderBarBlock.onmousedown = (ed: MouseEvent) => {
-        var workbenchHeight = document.getElementById("workbench").clientHeight;
+        var floatPanel = document.getElementById("floatPanel");
+        var floatPanelHeight=floatPanel.clientHeight;
         var startY = ed.clientY;
         var move: boolean = true;
         document.onmousemove = (em: MouseEvent) => {
             if (move) {
-                var y = em.clientY - startY;
-                var height = workbenchHeight + y;
-                if (height > innerHeight - 32 - 30)
-                    height = innerHeight - 32 - 30;
-                document.getElementById("workbench").style.height = (height) + "px";
-                document.getElementById("workbench_pages").style.height = (height - 32) + "px";
-                document.getElementById("floatPanel").style.height = (window.innerHeight - 32 - height) + "px";
-
+                var y = -em.clientY+startY;
+                var height = floatPanelHeight + y;
+                silderBar.style.bottom = (height ) + "px";
+                floatPanel.style.height = height + "px";
             }
-
-
         }
         document.onmouseup = () => {
             move = false;

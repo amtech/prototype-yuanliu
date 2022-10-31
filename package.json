@@ -1,6 +1,6 @@
 {
     "name": "yuanliu",
-    "version": "1.0.7",
+    "version": "2.0",
     "description": "源流-让设计跟接近产品",
     "main": "dist/main.js",
     "scripts": {
@@ -36,7 +36,6 @@
     },
     "dependencies": {
         "@types/uuid": "^8.3.4",
-        "ace-builds": "^1.4.14",
         "adm-zip": "^0.5.9",
         "bootstrap-icons": "^1.9.1",
         "d3": "^7.4.4",
@@ -44,8 +43,6 @@
         "echarts": "^5.3.2",
         "file-saver": "^2.0.5",
         "font-list": "^1.4.5",
-        "markdown": "^0.5.0",
-        "node-stream-zip": "^1.15.0",
         "node-xlsx": "^0.21.0",
         "request": "^2.88.2",
         "sharp": "^0.30.7",

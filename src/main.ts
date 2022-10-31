@@ -21,6 +21,7 @@ function createWindow(project: any) {
     height: screen_height,
     width: screen_width,
     webPreferences: {
+      devTools:false,
       preload: path.join(__dirname, "preload.js"),
     },
     titleBarStyle: "hidden",
@@ -32,6 +33,7 @@ function createWindow(project: any) {
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "../index.html"));
+  
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
   var id = wId + 0;
@@ -105,6 +107,7 @@ function createHub() {
     minHeight:500,
     minWidth:700,
     webPreferences: {
+      devTools:false,
       preload: path.join(__dirname, "./hub/hubPreload.js"),
     },
     width: 900,

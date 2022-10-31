@@ -5,10 +5,10 @@ Copyright (c) taoyongwen. All rights reserved.
 ***************************************************************************** */
 import { IpcMain, ipcRenderer } from "electron";
 import { getPathKey, renderComponent } from "../common/components";
-import { checkContextMenu, onContextMenu } from "../common/contextmenu";
+import { onContextMenu } from "../common/contextmenu";
 import { getUUID, ICatalog, IComponent, IPage, IProject } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
-import { renderFloatPanel } from "../render/floatPanel";
+import { renderFloatPanel, updateFloatPanel } from "../render/floatPanel";
 
 import { renderPropertyPanel, activePropertyPanel } from "./propertypanel";
 import { renderSidebar, updateSidebar } from "./sidebar";
@@ -51,6 +51,7 @@ export function renderWorkSpace(app: HTMLElement) {
         app.className = config.theme;
         renderRecent();
         renderStatusBar();
+    
     });
     ipcRendererSend("readConfig");
 
@@ -66,6 +67,7 @@ export function renderWorkSpace(app: HTMLElement) {
             updateToolbar();
             updateSidebar();
             activePropertyPanel("project");
+            updateFloatPanel(undefined);
         });
 
     })
@@ -161,9 +163,21 @@ export function renderWorkSpace(app: HTMLElement) {
             }
     })
 }
+
+export function getViewPosition():{
+    top:number,right:number,bottom:number,left:number
+}{
+    var rs={
+        top:32+32,
+        left:240,
+        right:document.getElementById("edgePanel").clientWidth,
+        bottom:document.getElementById("floatPanel").clientHeight+22
+    }
+    return rs;
+}
 function layout(app: HTMLElement) {
 
-
+    var edgePanelWidth=300;
     //标题工具栏
     var toolBarHeight: number = 32;//60;
     var toolBar = document.createElement("div");
@@ -172,42 +186,44 @@ function layout(app: HTMLElement) {
     toolBar.style.position = "fixed";
     toolBar.style.width = "100%";
     toolBar.style.overflow = "hidden";
-
+    toolBar.style.zIndex="100";
+    toolBar.className="surface";
     app.appendChild(toolBar);
-    var flex = document.createElement("div");
-    flex.style.display = "flex";
-    flex.style.position = "fixed";
-    flex.style.inset = toolBarHeight + "px 0px 0px";
 
-
-    app.appendChild(flex);
 
     //状态栏
     var statusBarHeight = 22;
     var statusBar = document.createElement("div");
     statusBar.className = "statusBar";
     statusBar.id = "statusBar";
+    statusBar.style.zIndex="100";
     app.appendChild(statusBar);
 
 
     //侧边栏
+    var sideBarWidth=240;
     var sideBar = document.createElement("div");
-    flex.appendChild(sideBar);
+    sideBar.style.top = toolBarHeight + "px";
+    sideBar.style.position = "fixed";
+    sideBar.style.width = sideBarWidth+"px";
+    sideBar.style.bottom = statusBarHeight + "px";
+    sideBar.style.overflow = "hidden";
+    sideBar.style.zIndex="100";
+    sideBar.className="surface";
+    app.appendChild(sideBar);
 
 
-    var main = document.createElement("div");
-    main.id = "main";
-    main.style.flex = "1";
-    flex.appendChild(main);
+
 
     var floatPanelHeight = 210;
     //工作台
     var workbench = document.createElement("div");
     workbench.id = "workbench";
-    workbench.style.position = "relative";
-    main.appendChild(workbench);
+    workbench.style.position = "absolute";
+    workbench.style.inset="0";
+    workbench.style.zIndex="0";
+    app.appendChild(workbench);
 
-    workbench.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - statusBarHeight) + "px";
 
     var tabsHeight = 32;
 
@@ -215,7 +231,15 @@ function layout(app: HTMLElement) {
     row.id = "workbench_row";
     row.style.display = "flex";
     row.style.height = tabsHeight + "px";
+    row.style.position = "fixed";
+    row.style.top = toolBarHeight+"px";
+    row.style.left = sideBarWidth + "px";
+    row.style.right =  edgePanelWidth+ "px";
+    row.style.overflow = "hidden";
+    row.style.zIndex="100";
+    row.className="surface";
 
+    app.appendChild(row);
     //多标签页面
     var tabs = document.createElement("div");
     tabs.className = "workbench_tabs";
@@ -240,9 +264,9 @@ function layout(app: HTMLElement) {
     var pages = document.createElement("div");
     pages.className = "workbench_pages";
     pages.id = "workbench_pages";
-    pages.style.position = "relative";
-    pages.style.height = (window.innerHeight - toolBarHeight - floatPanelHeight - tabsHeight - statusBarHeight) + "px";
-    workbench.appendChild(row);
+    pages.style.position = "fixed";
+    pages.style.inset = "0px";
+  
     workbench.appendChild(pages);
 
     //
@@ -252,15 +276,23 @@ function layout(app: HTMLElement) {
     var recent = document.createElement("div");
     recent.className = "project_recent";
     recent.id = "project_recent";
-
-    workbench.appendChild(recent);
+    recent.style.top = toolBarHeight + "px";
+    recent.style.position = "fixed";
+    recent.style.right = edgePanelWidth+"px";
+    recent.style.left = sideBarWidth+"px";
+    recent.style.bottom = statusBarHeight + "px";
+    app.appendChild(recent);
 
     //扩展页面
     var expand = document.createElement("div");
     expand.className = "project_expand";
     expand.id = "project_expand";
-    expand.style.position = "absolute";
-    workbench.appendChild(expand);
+
+    expand.style.top = toolBarHeight + "px";
+    expand.style.position = "fixed";
+    expand.style.right = edgePanelWidth+"px";
+    expand.style.bottom = statusBarHeight + "px";
+    app.appendChild(expand);
 
     var expandContent = document.createElement("div");
     expandContent.className = "expandContent";
@@ -282,28 +314,45 @@ function layout(app: HTMLElement) {
     expand.oncontextmenu = () => {
         expand.style.display = "none";
     }
-    //工作区 左侧 阴影线
-    var leftShadow = document.createElement("div");
-    leftShadow.id = "left_shadow";
-    leftShadow.style.position = "absolute";
-    leftShadow.style.left = "-10px";
-    leftShadow.style.top = "32px";
-    leftShadow.style.bottom = "0px";
-    leftShadow.style.width = "10px";
+    // //工作区 左侧 阴影线
+    // var leftShadow = document.createElement("div");
+    // leftShadow.id = "left_shadow";
+    // leftShadow.style.position = "fixed";
+    // leftShadow.style.left = "-10px";
+    // leftShadow.style.top = "32px";
+    // leftShadow.style.bottom = "0px";
+    // leftShadow.style.width = "10px";
 
-    workbench.appendChild(leftShadow);
+    // app.appendChild(leftShadow);
 
-
+  
     //底部栏
     var floatPanel = document.createElement("div");
     floatPanel.id = "floatPanel";
-    main.appendChild(floatPanel);
+    floatPanel.style.position="fixed";
+    floatPanel.style.right = edgePanelWidth+"px";
+    floatPanel.style.left =  sideBarWidth+"px";
+    floatPanel.style.bottom = statusBarHeight+"px";
     floatPanel.style.height = floatPanelHeight + "px";
-    renderRightSilderBar(flex, window.innerHeight - toolBarHeight);
+    floatPanel.style.zIndex="100";
+    floatPanel.className="surface";
+    app.appendChild(floatPanel);
+   
+
+
     //右侧栏
+ 
     var edgePanel = document.createElement("div");
     edgePanel.id = "edgePanel";
-    flex.appendChild(edgePanel);
+    edgePanel.style.position="fixed";
+    edgePanel.style.right = "0px";
+    edgePanel.style.top =  toolBarHeight+"px";
+    edgePanel.style.bottom = statusBarHeight+"px";
+    edgePanel.style.overflow="hidden";
+    edgePanel.style.width = edgePanelWidth+"px";
+    edgePanel.style.zIndex="100";
+    edgePanel.className="surface";
+    app.appendChild(edgePanel);
 
     renderToolbar(toolBar);
     renderSidebar(sideBar);
@@ -312,25 +361,32 @@ function layout(app: HTMLElement) {
 
     requestIdleCallback(() => {
         loadProjectTitleNav();
+        renderRightSilderBar(app, 64,edgePanel.clientWidth,floatPanelHeight+statusBarHeight);
     });
 }
 
 /**
- * 渲染左侧边栏 滚动条
+ * 渲染右侧侧边栏 滚动条
  * @param content 
  * @param h 
  */
-function renderRightSilderBar(content: HTMLElement, h: number) {
+function renderRightSilderBar(content: HTMLElement, t: number,r:number,b:number) {
 
     var silderBar = document.createElement("div");
     silderBar.className = "silderBarV";
-    silderBar.style.height = h + "px";
+    silderBar.id="silderBarV";
+    silderBar.style.top=t+"px";
+    silderBar.style.right=r+"px";
+    silderBar.style.bottom=b+"px";
+
+
     content.appendChild(silderBar);
     var silderBarBlock = document.createElement("div");
     silderBarBlock.className = "silderBarBlockV";
     silderBar.appendChild(silderBarBlock);
     silderBarBlock.onmousedown = (ed: MouseEvent) => {
-        var propertyWidth = document.getElementById("edgePanel").clientWidth;
+        var edgePanel= document.getElementById("edgePanel");
+        var propertyWidth =edgePanel.clientWidth;
         var startX = ed.clientX;
         var move: boolean = true;
         document.onmousemove = (em: MouseEvent) => {
@@ -340,7 +396,8 @@ function renderRightSilderBar(content: HTMLElement, h: number) {
                 if (width < 20)
                     width = 20;
                 //  document.getElementById("workbench").style.width = (width) + "px";
-                document.getElementById("edgePanel").style.width = (width) + "px";
+                edgePanel.style.width = (width) + "px";
+                silderBar.style.right=width+"px";
             }
         }
         document.onmouseup = () => {
@@ -430,8 +487,7 @@ export function renderRecent() {
                         //open page
                         //   renderPage(catalog.page);
                         var cp: any = e.target;
-                        console.log(cp);
-
+                  
                         ipcRendererSend("openPage", {
                             path: cp.getAttribute("data-path"), name: cp.getAttribute("data-name")
                         });
@@ -475,7 +531,7 @@ export function renderExpand(component: IComponent) {
     var project_expand = document.getElementById("project_expand");
     expandContent.innerHTML = "";
     requestIdleCallback(() => {
-        var root = renderComponent(expandContent, component);
+        var root = renderComponent(expandContent, component).root;
         expandContent.style.width = (root.clientWidth + 20) + "px";
         project_expand.style.width = (root.clientWidth + 20) + "px";
     })
@@ -539,7 +595,7 @@ function onSelect(pages: HTMLElement) {
         if (e.button != 0) {
             return;
         }
-        checkContextMenu();
+
         if (e.target.className == "workbench"||e.target.className == "page_view" || e.target.className == "component" || e.target.className == "page" || e.target.className == "grid"){
             e.stopPropagation();
             var selectCover = document.createElement("div");

@@ -218,10 +218,12 @@ function copyModules(dist:string){
     var echarts=path.join(modules,"echarts/dist/echarts.js");
     var fileSaver=path.join(modules,"file-saver/dist/FileSaver.js");
     var xlsx=path.join(modules,"xlsx/dist/xlsx.full.min.js");
+    var dom=path.join(modules,"dom-to-image/dist/dom-to-image.min.js");
 
     fs.copyFileSync(echarts,path.join(js,"echarts.js"));
     fs.copyFileSync(fileSaver,path.join(js,"FileSaver.js"));
     fs.copyFileSync(xlsx,path.join(js,"xlsx.full.min.js"));
+    fs.copyFileSync(dom,path.join(js,"dom-to-image.min.js"));
 
 
 }
