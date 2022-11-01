@@ -112,7 +112,7 @@ function renderComponent(component:IComponent,code:string,componentTypes:string[
 
 function exportComponents(folder:string){
     var code="";
-    storage.loadPluginsComponent().forEach(item=>{
+    storage.loadPlugins("component").forEach(item=>{
         var component: IComponent = require(item).default();
         exportComponent(component,folder);
         code+="import { "+component.type+" } from './"+component.type+"';\n"

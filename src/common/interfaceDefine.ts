@@ -4,6 +4,8 @@ Copyright (c) taoyongwen. All rights reserved.
 接口定义
 ***************************************************************************** */
 
+import { IMenuItem } from "./contextmenu";
+
 /**
  * 项目
  */
@@ -498,4 +500,30 @@ export interface IStatusBarActivity{
     onRender:(acticity:HTMLElement,config?:any,project?:IProject)=>void;
     onClick?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,componentSelects?:string[])=>void;
     onUpdate?:(acticity:HTMLElement,config?:any,project?:IProject,page?:IPage,component?:IComponent,selects?:string[],msg?:string)=>void;
+}
+/**
+ * 浏览面板
+ */
+export interface IExplorer{
+    index?:number;
+    key:string;
+    title:string;
+    sort:number;
+    extend:boolean;
+    height?:number;
+    onRender:(content:HTMLElement)=>void;
+    onSearch?:(text:string)=>void;
+    taps?:Array<IMenuItem>;
+    /**
+     * <0 继续，>0 高度限制
+     */
+    onResize:(height:number)=>number;
+     /**
+     * <0 继续，>0 高度限制
+     */
+    onExtend:(extend:boolean,height?:number)=>number;
+    update:()=>void;
+    setHeight?:(height:number)=>void;
+
+
 }

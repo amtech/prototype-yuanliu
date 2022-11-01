@@ -437,8 +437,8 @@ export function renderRecent() {
     title.style.lineHeight = "30px";
     title.style.fontSize = "10px";
     title.className = "project_recent_title"
-    title.style.color="var(--theme-color)";
-    title.style.borderBottom="1px solid var(--theme-color)";
+  //  title.style.color="var(--theme-color)";
+    title.style.borderBottom="1px solid";
     content.appendChild(title);
 
     var list = document.createElement("div");

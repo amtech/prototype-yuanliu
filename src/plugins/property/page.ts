@@ -207,7 +207,7 @@ const panel: IPanel = {
       args.forEach((item: string) => {
         try {
           // console.log(item);
-          var bg: IBackground = require("../"+item).default;
+          var bg: IBackground = require("../background/"+item).default;
           if (bg != undefined) {
             list.push({
               label:bg.title,value:bg.key

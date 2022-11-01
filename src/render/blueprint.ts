@@ -3,13 +3,12 @@ Copyright (c) taoyongwen. All rights reserved.
 
 蓝图
 ***************************************************************************** */
+import { getDataBase } from "../plugins/explorer/data";
 import { initComponent, onSelectComponent } from "../common/components";
 import { getContextMenuArg, IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getUUID, IBlue, IBlueEvent, IBlueLink, IBlueMethod, IBluePoint, IBlueProperty, IComponent } from "../common/interfaceDefine";
-import { getBlueMethods } from "./blueprintMethods";
 import * as dargData from "./DragData";
 import * as paints from "./paints";
-import { getDataBase } from "./sidebar";
 import { findCurPageComponent, getCurPage } from "./workbench";
 /**
  * 更新蓝图界面
@@ -244,7 +243,7 @@ export function renderBlueView(content: HTMLElement) {
                 // showContextMenu(viewContentMenu, getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数和对象");
 
             } else if (e.key == "f") {
-                openContextMenu(getBlueMethods());
+              //  openContextMenu(getBlueMethods());
                 //  showContextMenu(getBlueMethods(), getMousePosition().x, getMousePosition().y, getCurPage().blues, undefined, "增加函数");
 
 

@@ -1,28 +1,93 @@
-import { clipboard } from "electron";
-import { getUUID } from "../common/interfaceDefine";
-import { IComponent } from "../common/interfaceDefine";
-import { icons } from "../common/icons";
-import * as dargData from "./DragData";
-import { findCurPageComponent, getSelectComponents } from "./workbench";
+import { ipcRendererSend } from "../../preload";
+import { getUUID, ICatalog, IComponent, IExplorer, IStatusBarActivity } from "../../common/interfaceDefine";
+import { activePropertyPanel } from "../../render/propertypanel";
+import { createExplorerLayout } from "../../common/explorerTool";
+import { getProject } from "../../render/workspace";
+import { renderDialog } from "../../dialog/export";
+import * as dargData from "../../render/DragData";
+import { openContextMenu } from "../../common/contextmenu";
+import { IMenuItem } from "../../common/contextmenu";
+import { getContextMenuArg } from "../../common/contextmenu";
+import { getContextMenuElement } from "../../common/contextmenu";
+import { getChartCount } from "../../render/sidebar";
+import { clipboard, ipcRenderer } from "electron";
+import { icons } from "../../common/icons";
+import { getSelectComponents } from "../../render/workbench";
+import { findCurPageComponent } from "../../render/workbench";
+var body:HTMLElement;
+const explorer:IExplorer={
+    key:"icons",
+    extend:false,
+    title:"图标",
+    height:400,
+    onRender(content) {
+        body= createExplorerLayout(content,this);
+        renderIcons(body,"");
 
+    },
+    sort:3,
+    onResize(height) {
+        return -1;
+    },
+    onSearch(filter) {
+        rowStart=0;
+        if(filter.length==0){
+            iconList=icons;
+        }else{
+            iconList=icons.filter(i=>i.indexOf(filter)>0);
+        }
+    
+        renderIconsView(treeView);
+    },
+    onExtend(extend) {
+        return -1;
+    },
+    update() {
+        
+    },
+    setHeight(height) {
+        body.style.height = height + "px";
+        viewHeight=height;
+        updateLayout();
+        renderIconsView(treeView);
+    },
+}
+export default explorer;
+
+var tree:HTMLElement;
 var rowHeight = 28;
 var viewHeight = 400;
 var rowStart = 0;
 var rowCount = 0;
 var iconList:Array<string>=[];
+var scroll_thumb:HTMLElement;
+var treeView:HTMLElement;
+function updateLayout(){
+    tree.style.height = viewHeight + "px";
+    treeView.style.height = tree.style.height;
+    rowCount = Math.floor(viewHeight / rowHeight);
+
+}
 export function renderIcons(context: HTMLElement,filter: string) {
     context.innerHTML="";
-    var tree = document.createElement("div");
+    tree = document.createElement("div");
     tree.className = "explorer_tree";
     tree.style.height = 400 + "px";
     context.appendChild(tree);
 
-    var treeView = document.createElement("div");
+    treeView = document.createElement("div");
     treeView.className = "explorer_tree_view";
     treeView.id="explorer_icon_view";
     treeView.style.height = tree.style.height;
     var treeScroll = document.createElement("div");
     treeScroll.className = "explorer_tree_scroll";
+
+    scroll_thumb=document.createElement("div");
+    scroll_thumb.className="explorer_tree_scroll_thumb";
+
+
+    treeScroll.appendChild(scroll_thumb);
+
 
     tree.appendChild(treeView);
     tree.appendChild(treeScroll);
@@ -57,6 +122,14 @@ export function renderIcons(context: HTMLElement,filter: string) {
 var l=6;
 function renderIconsView(treeView: HTMLElement) {
 
+    var scroll_val=rowCount/(iconList.length/l);
+    if(scroll_val>0.99){
+        scroll_thumb.style.height="0px";
+      
+    }else{
+        scroll_thumb.style.height=rowCount/(iconList.length/l)*viewHeight+"px";
+        scroll_thumb.style.top=rowStart/iconList.length*l*viewHeight+"px";
+    }
    
     var adds: Array<any> = [];
     var exits: Array<string> = [];
@@ -113,7 +186,9 @@ function renderIconsRow(content: HTMLElement, _icons: string[], index: number) {
     row.style.top=(index*rowHeight)+"px";
     content.appendChild(row);
     row.style.display="flex";
-
+    var space = document.createElement("div");
+    space.style.width = "10px";
+    row.appendChild(space);
     _icons.forEach(icon=>{
    
 
@@ -201,7 +276,9 @@ function renderIconsRow(content: HTMLElement, _icons: string[], index: number) {
 
 
     })
-
+    var space1 = document.createElement("div");
+    space1.style.width = "10px";
+    row.appendChild(space1);
 
 
 

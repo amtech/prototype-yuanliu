@@ -42,7 +42,7 @@ export function renderStatusBar(){
     ipcRenderer.on("_loadPluginsStatus",(event,arg)=>{
         var plugins: IStatusBarActivity[] = [];
         arg.forEach((item: string) => {
-            var panel: IStatusBarActivity = require(item).default   ;
+            var panel: IStatusBarActivity = require("../plugins/status/"+item).default   ;
             panel.key=getUUID();
             plugins.push(panel);
         });

@@ -8,7 +8,6 @@ import { IComponent, IPanel } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
 import { loadChart } from "./chart";
 import { pushHistory } from "./history";
-import { renderDatabaseExplorer } from "./sidebar";
 import { findCurPageComponent, getCurPage, updatePageViewScrollH, updatePageViewScrollV } from "./workbench";
 export function updateFloatPanel(comment?: IComponent) {
     if (comment == undefined) {
@@ -33,7 +32,7 @@ export function renderFloatPanel(content: HTMLElement) {
         //    console.log("_loadPluginsPanel",arg);
         var plugins: IPanel[] = [];
         arg.forEach((item: string) => {
-            var panel: IPanel = require(item).default();
+            var panel: IPanel = require("../plugins/panel/"+item).default();
             plugins.push(panel);
         });
         plugins.sort((a, b) => a.sort - b.sort);
@@ -180,14 +179,7 @@ export function switchFloatTab(name: string) {
     }
 
     //blue
-    if (name == "蓝图") {
-        document.getElementById("sidebar_blue").style.display = "block";
-        document.getElementById("sidebar_database").style.display = "block";
-        renderDatabaseExplorer();
-    } else {
-        document.getElementById("sidebar_blue").style.display = "none";
-        document.getElementById("sidebar_database").style.display = "none";
-    }
+ 
 
     // panelContext.innerHTML = "";
     // renderTabsBar(panelContext);

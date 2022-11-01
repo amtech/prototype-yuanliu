@@ -21,7 +21,7 @@ function createWindow(project: any) {
     height: screen_height,
     width: screen_width,
     webPreferences: {
-      devTools:false,
+     devTools:false,
       preload: path.join(__dirname, "preload.js"),
     },
     titleBarStyle: "hidden",

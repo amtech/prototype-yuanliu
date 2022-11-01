@@ -262,7 +262,7 @@ function buildComponents(wProject: IProject,terminal?:(log:any)=>void) {
     var rs = "import { loadChart,cal_catolog,cal_data,updateComponent } from './component.js';"+
     "import { renderPageByCatalogKey } from './main.js';"+
     "export default [";
-    storage.loadPluginsComponent().forEach(cpt => {
+    storage.loadPlugins("component").forEach(cpt => {
 
         var cPath = path.join(storage.getAppFolderPath("plugins"), "component", cpt.replace("../plugins/component/", ""));
 
@@ -395,7 +395,7 @@ function buildMaps(wProject:IProject){
 }
 function buildPluginsBackground(wProject:IProject){
     var rs="export default [";
-    storage.loadPluginsBackground().forEach(item=>{
+    storage.loadPlugins("background").forEach(item=>{
 
 
         var cPath = path.join(storage.getAppFolderPath("plugins"), "background", item.replace("../plugins/background/", ""));
@@ -416,7 +416,7 @@ function buildPluginsBackground(wProject:IProject){
 }
 function buildPluginsShape(wProject:IProject){
     var rs="export default [";
-    storage.loadPluginsShape().forEach(item=>{
+    storage.loadPlugins("shape").forEach(item=>{
 
 
         var cPath = path.join(storage.getAppFolderPath("plugins"), "shape", item.replace("../plugins/shape/", ""));

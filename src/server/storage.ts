@@ -535,7 +535,7 @@ export function getAppFolderPath(folder?: "plugins" | "src" | "map" | "client" |
 
 export function loadMapCatalog(): string[] {
     var folder = getAppFolderPath("map");
-    //  console.log("loadPluginsComponent",componentsFolder);
+   
     var result: string[] = [];
     if (fs.existsSync(folder)) {
         fs.readdirSync(folder).forEach(file => {
@@ -552,123 +552,14 @@ export function loadMap(map: string): any {
     var file = path.join(getAppFolderPath("map"), map);
     return JSON.parse(fs.readFileSync(file).toString());
 }
-export function loadPluginsStatus():string[]{
-
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "status");
-    //  console.log("loadPluginsComponent",componentsFolder);
+export function loadPlugins(plugin:"explorer"|"background"|"component"|"panel"|"shape"|"status"|"styles"|"property"): string[] {
+    var componentsFolder = path.join(getAppFolderPath("plugins"), plugin);
+   
     var result: string[] = [];
     if (fs.existsSync(componentsFolder)) {
         fs.readdirSync(componentsFolder).forEach(file => {
             if (file.endsWith(".js")) {
-                var path = "../plugins/status/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-export function loadPluginsBg():string[]{
-
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "background");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../plugins/background/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-export function loadPluginsShape():string[]{
-
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "shape");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../plugins/shape/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-
-export function loadPluginsProperty(): string[] {
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "property");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../plugins/property/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-export function loadPluginsPanel(): string[] {
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "panel");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../plugins/panel/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-export function loadPluginsComponent(): string[] {
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "component");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../plugins/component/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-export function loadPluginsBackground(): string[] {
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "background");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../plugins/background/" + file;
-                result.push(path);
-            }
-
-        })
-    }
-    return result;
-}
-export function loadPluginsStyle(): string[] {
-    var componentsFolder = path.join(getAppFolderPath("plugins"), "styles");
-    //  console.log("loadPluginsComponent",componentsFolder);
-    var result: string[] = [];
-    if (fs.existsSync(componentsFolder)) {
-        fs.readdirSync(componentsFolder).forEach(file => {
-            if (file.endsWith(".js")) {
-                var path = "../styles/" + file;
+                var path = file;
                 result.push(path);
             }
 

@@ -245,47 +245,52 @@ export function loadIpc(bw: BrowserWindow, wId: number, wProject: IProject) {
     });
 
     ipcMain.on("loadPluginsComponent_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsComponent();
+        var result = storage.loadPlugins("component");
         bw.webContents.send("_loadPluginsComponent", result);
 
     });
 
     ipcMain.on("loadPluginsStyle_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsStyle();
+        var result = storage.loadPlugins("styles");
         bw.webContents.send("_loadPluginsStyle", result);
+
+    });
+    ipcMain.on("loadPluginsExplorer_" + wId, (event: any, arg: any) => {
+        var result = storage.loadPlugins("explorer");
+        bw.webContents.send("_loadPluginsExplorer", result);
 
     });
 
     ipcMain.on("loadPluginsPanel_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsPanel();
+        var result = storage.loadPlugins("panel");
 
         bw.webContents.send("_loadPluginsPanel", result);
 
     });
 
     ipcMain.on("loadPluginsProperty_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsProperty();
+        var result = storage.loadPlugins("property");
 
         bw.webContents.send("_loadPluginsProperty", result);
 
     });
 
     ipcMain.on("loadPluginsStatus_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsStatus();
+        var result = storage.loadPlugins("status");
 
         bw.webContents.send("_loadPluginsStatus", result);
 
     });
 
     ipcMain.on("loadPluginsBg_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsBg();
+        var result = storage.loadPlugins("background");
 
         bw.webContents.send("_loadPluginsBg", result);
 
     });
 
     ipcMain.on("loadPluginsShape_" + wId, (event: any, arg: any) => {
-        var result = storage.loadPluginsShape();
+        var result = storage.loadPlugins("shape");
 
         bw.webContents.send("_loadPluginsShape", result);
 

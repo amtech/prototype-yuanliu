@@ -99,7 +99,7 @@ export function renderPropertyPanel(content: HTMLElement) {
     ipcRenderer.on("_loadPluginsProperty", (event, arg) => {
         var plugins: IPanel[] = [];
         arg.forEach((item: string) => {
-            var panel: IPanel = require(item).default();
+            var panel: IPanel = require("../plugins/property/"+item).default();
             plugins.push(panel);
         });
         plugins.sort((a, b) => a.sort - b.sort);

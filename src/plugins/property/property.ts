@@ -65,26 +65,24 @@ function renderPropertypanel(content: HTMLElement) {
     content.appendChild(propertyPanel);
 
 
-    var explorerViewMaxHeight = (window.innerHeight - 78 - 24 * 7);
-
-    layers = renderExplorer("property_layer", propertyPanel, "层级", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    layers = renderExplorer("property_layer", propertyPanel, "层级", true, undefined, onExplorerHide);
     renderLayers(layers);
-    base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide);
     renderBaseProperty(base);
-    layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide);
     renderLayoutProperty(layout);
 
-    theme = renderExplorer("property_theme", propertyPanel, "填充", false, undefined, onExplorerHide, explorerViewMaxHeight);
+    theme = renderExplorer("property_theme", propertyPanel, "填充", false, undefined, onExplorerHide);
     renderThemeProperty(theme);
 
 
-    font = renderExplorer("property_font", propertyPanel, "字体&段落", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    font = renderExplorer("property_font", propertyPanel, "字体&段落", true, undefined, onExplorerHide);
     renderFontProperty(font);
 
-    style = renderExplorer("property_style", propertyPanel, "样式", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    style = renderExplorer("property_style", propertyPanel, "样式", true, undefined, onExplorerHide);
     renderComponentStyle(style);
 
-    var shortcuts = renderExplorer("property_panel", propertyPanel, "快捷键", true, undefined, onExplorerHide, explorerViewMaxHeight);
+    var shortcuts = renderExplorer("property_panel", propertyPanel, "快捷键", true, undefined, onExplorerHide);
     renderShortcutsProperty(shortcuts);
 
     layout.style.display = "none";
