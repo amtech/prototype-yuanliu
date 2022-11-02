@@ -330,6 +330,14 @@ select {
     position: relative;
     transition: transform 0.3s;
     cursor: pointer;
+    height: 24px;
+    overflow: hidden;
+}
+
+.explorer_row .name {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .explorer_solider {

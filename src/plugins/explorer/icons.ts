@@ -1,19 +1,9 @@
-import { ipcRendererSend } from "../../preload";
-import { getUUID, ICatalog, IComponent, IExplorer, IStatusBarActivity } from "../../common/interfaceDefine";
-import { activePropertyPanel } from "../../render/propertypanel";
+import { clipboard } from "electron";
 import { createExplorerLayout } from "../../common/explorerTool";
-import { getProject } from "../../render/workspace";
-import { renderDialog } from "../../dialog/export";
-import * as dargData from "../../render/DragData";
-import { openContextMenu } from "../../common/contextmenu";
-import { IMenuItem } from "../../common/contextmenu";
-import { getContextMenuArg } from "../../common/contextmenu";
-import { getContextMenuElement } from "../../common/contextmenu";
-import { getChartCount } from "../../render/sidebar";
-import { clipboard, ipcRenderer } from "electron";
 import { icons } from "../../common/icons";
-import { getSelectComponents } from "../../render/workbench";
-import { findCurPageComponent } from "../../render/workbench";
+import { getUUID, IComponent, IExplorer } from "../../common/interfaceDefine";
+import * as dargData from "../../render/DragData";
+import { findCurPageComponent, getSelectComponents } from "../../render/workbench";
 var body:HTMLElement;
 const explorer:IExplorer={
     key:"icons",
@@ -42,7 +32,7 @@ const explorer:IExplorer={
     onExtend(extend) {
         return -1;
     },
-    update() {
+    update(updater) {
         
     },
     setHeight(height) {

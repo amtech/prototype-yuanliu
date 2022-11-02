@@ -53,7 +53,7 @@ const explorer: IExplorer = {
         });
 
     },
-    sort: 1,
+    sort: 0,
     onResize(height) {
         return 0;
     },
@@ -72,10 +72,11 @@ const explorer: IExplorer = {
     onExtend(extend) {
         return 0;
     },
-    update() {
-        changeCatalogs(getProject().catalogs);
-
-        updateCatalogs();
+    update(updater) {
+        if(updater.type=="project"){
+            changeCatalogs(updater.data.catalogs);
+            updateCatalogs();
+        }
     },
     setHeight(height) {
         body.style.height = height + "px";
@@ -117,10 +118,6 @@ function updateLayout(){
     tree.style.height = viewHeight + "px";
     treeView.style.height = tree.style.height;
     rowCount = Math.floor(viewHeight / rowHeight);
-
-   
-
-
 }
 function renderCatalogs(context: HTMLElement) {
 

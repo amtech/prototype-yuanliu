@@ -8,32 +8,21 @@ Copyright (c) taoyongwen. All rights reserved.
 import { clipboard, ipcRenderer } from "electron";
 import { regeditTheme } from "../echarts/theme";
 
+import { onAddComponents } from "../common/componentEvent";
 import { copyComponent, deleteComponent, getComponentsTemplate, getComponentTempateByType, initComponent, renderComponent, renderComponentPreview, renderComponents, renderRootComponents, renderStorePreview } from "../common/components";
 import { IMenuItem, openContextMenu } from "../common/contextmenu";
 import { getUUID, IBackground, IComponent, IPage, ITitle } from "../common/interfaceDefine";
+import { onOpenPage, onSwitchPage } from "../common/pageEvent";
 import { isDark } from "../dialog/picker";
 import { ipcRendererSend } from "../preload";
-import { getKeyCode, getMousePosition } from "../render/shorcuts";
-import { updateBlueView } from "./blueprint";
+import { getMousePosition } from "../render/shorcuts";
 import * as dargData from "./DragData";
-import { pushHistory } from "./history";
 import { INavItem, renderNavTrees } from "./pageNav";
 import { renderTitleBar } from "./pageTitle";
-import { changeLayers } from "./propertyLayers";
 import { activePropertyPanel, setComponentStyle } from "./propertypanel";
-import { updateStatus } from "./statusBar";
 import { saveSimplePage } from "./toolbar";
 import { getProject, getViewPosition, openExpand, renderExpand, renderRecent } from "./workspace";
 
-
-
-// var hoverComponentRoot: HTMLElement;
-// export function setHoverComponentRoot(componentRoot: HTMLElement) {
-//     hoverComponentRoot = componentRoot;
-// }
-// export function getHoverComponentRoot() {
-//     return hoverComponentRoot;
-// }
 /**
  * 获取当前页面展示上下文div
  * @returns 
@@ -422,27 +411,8 @@ export function renderPage(page: IPage) {
         renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
         //更新右侧、底部面板
 
-        requestIdleCallback(() => {
-            //右侧面板
-            activePropertyPanel("page");
-            //更新层级后台
-            changeLayers(getLayers());
-            //状态栏
-            updateStatus(page, undefined, undefined);
-        });
-        setTimeout(() => {
-            //TODO  load
-            //   renderPageViewF();
-            //  switchFloatTab("页面");
-            updateBlueView();//蓝图
+        onOpenPage(page);
 
-            //renderGuidePanel();//引导面板
-
-            //渲染 背景
-            //  document.getElementById("edgePanel").style.backgroundImage="url("+getProject().work + "/images/" +page.key+".jpeg)";
-        }, 1000);
-        //历史记录
-        //    pushHistory(page);
 
     } else {
         //切换页面
@@ -470,24 +440,8 @@ export function renderPage(page: IPage) {
                 view.style.display = "block";
             }
         }
-        requestIdleCallback(() => {
-            //右侧面板
-            activePropertyPanel("page");
-            //更新层级后台
-            changeLayers(getLayers());
-            //renderGuidePanel();//引导面板
-            //状态栏
-            updateStatus(page, undefined, undefined);
-
-        });
-        //更新右侧、底部面板
-        setTimeout(() => {
-            //TODO  load
-            //   renderPageViewF();
-            //   switchFloatTab("页面");
-            updateBlueView();//蓝图
-
-        }, 1000);
+        onSwitchPage(page);
+      
     }
     requestIdleCallback(() => {
         var theme = "default";
@@ -1220,11 +1174,8 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
 
                 }
             }
-
-            //更新层级后台
-            changeLayers(getLayers());
-            //历史
-            pushHistory(getCurPage());
+            onAddComponents([component]);
+            
         }
         var dragStore = dargData.getData("store");
         if (dragStore != undefined) {
@@ -1239,7 +1190,7 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
                     //  activePropertyPanel();
                     renderComponent(page, cmpt);
 
-                    pushHistory(getCurPage());
+                    onAddComponents([cmpt]);
 
 
                 } else {
@@ -1350,10 +1301,7 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                         }
 
                     }
-                    //右侧面板
-                    activePropertyPanel();
-                    //更新层级后台
-                    changeLayers(getLayers());
+                  onAddComponents([ct]);
 
                 }
             }
@@ -1424,14 +1372,8 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
                     component.children.push(ncmpt);
                 }
             }
-            //右侧面板
-            activePropertyPanel(ncmpt);
-            renderComponent(body, ncmpt);
-            //更新层级后台
-            changeLayers(getLayers());
-
-
         });
+        onAddComponents(_selectComponents);
         return;
     }
 
@@ -1510,11 +1452,7 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
                             component.children.push(tableC);
                         }
                     }
-                    //右侧面板
-                    activePropertyPanel(tableC);
-                    renderComponent(body, tableC);
-                    //更新层级后台
-                    changeLayers(getLayers());
+                 onAddComponents([tableC]);
 
                 }
 
@@ -1556,23 +1494,21 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
                 iPage = false;
                 if (parent.children == undefined) parent.children = [];
                 parent.children.push(component);
-                //右侧面板
-                activePropertyPanel(component);
+             
                 renderComponent(document.getElementById(parent.key), component);
-                //更新层级后台
-                changeLayers(getLayers());
+            
 
             }
         }
         if (iPage) {
             getCurPage().children.push(component);
             //右侧面板
-            activePropertyPanel();
+          
             renderComponent(getCurPageContent(), component);
-            //更新层级后台
-            changeLayers(getLayers());
+          
 
         }
+        onAddComponents([component]);
     } else {
         console.log("readText");
         var text = clipboard.readText();

@@ -65,7 +65,7 @@ export function renderWorkSpace(app: HTMLElement) {
 
         requestIdleCallback(() => {
             updateToolbar();
-            updateSidebar();
+            updateSidebar({type:"project",data:project});
             activePropertyPanel("project");
             updateFloatPanel(undefined);
         });

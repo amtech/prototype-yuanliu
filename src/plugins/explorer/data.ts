@@ -18,13 +18,11 @@ const explorer:IExplorer={
     onResize(height) {
         return -1;
     },
-    onSearch(text) {
-        
-    },
+   
     onExtend(extend) {
         return -1;
     },
-    update() {
+    update(updater) {
         
     },
     setHeight(height) {

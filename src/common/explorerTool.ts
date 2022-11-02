@@ -45,6 +45,7 @@ export function createExplorerLayout(content: HTMLElement, ex: IExplorer): HTMLE
                 view.style.display = "block";
                 icon.style.transform = "rotate(90deg)";
                 ex.extend = true;
+                ex.setHeight(rs);
             }
         } else {
             view.style.display = "none";

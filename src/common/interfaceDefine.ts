@@ -522,8 +522,12 @@ export interface IExplorer{
      * <0 继续，>0 高度限制
      */
     onExtend:(extend:boolean,height?:number)=>number;
-    update:()=>void;
+    update:(updater:IExplorerUpdater)=>void;
     setHeight?:(height:number)=>void;
 
 
+}
+export interface IExplorerUpdater{
+    type:"project"|"page"|"add"|"del"|"select"|"move";
+    data:any;
 }

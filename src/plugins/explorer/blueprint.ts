@@ -20,15 +20,13 @@ const explorer:IExplorer={
         
         return -1;
     },
-    onSearch(text) {
-        
-    },
+    
     onExtend(extend) {
         return -1;
     },
-    update() {
-        
-    },  
+   update(updater) {
+       
+   },
     setHeight(height) {
         body.style.height=height+"px";
     },

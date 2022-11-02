@@ -4,22 +4,16 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染侧边栏
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { setComponentsTemplate } from "../common/components";
-import { getContextMenuArg, getContextMenuElement, IMenuItem, openContextMenu } from "../common/contextmenu";
-import { getUUID, ICatalog, IComponent, IDatabase, IExplorer } from "../common/interfaceDefine";
-import { logj } from "../common/log";
-import { renderDialog } from "../dialog/export";
+import { IMenuItem } from "../common/contextmenu";
+import { getUUID, IExplorer, IExplorerUpdater } from "../common/interfaceDefine";
 import { ipcRendererSend } from "../preload";
 
-import { showCustomComponent } from "./customComponent";
-import * as dargData from "./DragData";
-import { getCurPageContent } from "./workbench";
-import { getConfig, getProject } from "./workspace";
-export function updateSidebar() {
 
-    if(explorerList!=undefined){
-        explorerList.forEach(ex=>{
-            ex.update();
+export function updateSidebar(updater: IExplorerUpdater) {
+
+    if (explorerList != undefined) {
+        explorerList.forEach(ex => {
+            ex.update(updater);
         })
     }
 
@@ -65,7 +59,7 @@ export function renderSidebar(content: HTMLElement) {
 
                 loadExplorerEvent(ex);
                 ex.onRender(sidebar);
-                if(ex.extend){
+                if (ex.extend) {
                     ex.setHeight(ex.height);
                 }
 
@@ -119,10 +113,12 @@ var explorerBarHeight = 25;
  */
 function loadExplorerEvent(explorer: IExplorer) {
 
-    if (explorer.height == undefined) {
-        explorer.height = explorerBarHeight;
+    if (explorer.extend) {
+        totalHeight += explorer.height+25;
+    } else {
+        if (explorer.height == undefined)
+            explorer.height = explorerBarHeight;
         totalHeight += explorerBarHeight;
-
     }
 
     explorer.onResize = (height) => {
@@ -141,52 +137,41 @@ function loadExplorerEvent(explorer: IExplorer) {
             }
             //压缩
             if (adjustExplorer != undefined) {
-
                 adjustExplorer.height -= adj;
                 adjustExplorer.setHeight(adjustExplorer.height);
                 explorer.height = height;
                 return height;
             }
-
             return -1;
-
         } else {
             totalHeight += height - explorer.height;
-            console.log("height", height);
             explorer.height = height;
             return height;
         }
-
-
-
-
     }
 
     explorer.onExtend = (extend, height) => {
-      
+        var sidebarHeight = window.innerHeight - 32 - 22;
+
         if (extend) {
-            var sidebarHeight = window.innerHeight - 32 - 22;
             if (totalHeight + height - explorerBarHeight > sidebarHeight) {
                 var h = sidebarHeight - totalHeight;
                 totalHeight = sidebarHeight;
                 if (h < explorerMinHeight) {//调整其他组件大小，给这个组件留个地方
                     //寻找一个合适的组件，压缩高度
-          
                     var adjustExplorerIndex: number;
                     var adjustExplorerVal: number = explorerList.length;
                     explorerList.forEach((ex, exi) => {
-                        if (exi != explorer.index) {
+                        if (exi != explorer.index&&ex.extend) {
                             var tmp = Math.abs(explorer.index - exi);
-                 
                             if (tmp < adjustExplorerVal && ex.height > explorerMinHeight * 2 - h) {
-                             
                                 adjustExplorerVal = tmp;
                                 adjustExplorerIndex = exi;
                             }
                         }
-
                     });
                     if (adjustExplorerIndex != undefined) {
+
                         var adjustExplorer = explorerList[adjustExplorerIndex];
                         adjustExplorer.height = adjustExplorer.height - explorerMinHeight + h;
                         //主动调整高度
@@ -194,6 +179,7 @@ function loadExplorerEvent(explorer: IExplorer) {
                             adjustExplorer.setHeight(adjustExplorer.height);
                         }
                         explorer.height = explorerMinHeight;
+                      
                         return explorerMinHeight;
                     } else {
                         console.log("adjustExplorerIndex is null");
@@ -203,10 +189,8 @@ function loadExplorerEvent(explorer: IExplorer) {
                     explorer.height = h;
                     return h;
                 }
-
             } else {
                 totalHeight += height;
-        
                 explorer.height = height;
                 return height;
             }
@@ -234,52 +218,6 @@ export function getChartCount(text: string, char: string): number {
     return count;
 }
 
-/**
- * 
- * @param name 
- * @param catalog 
- */
-
-function createPage(name: string, catalog?: ICatalog, template?: string) {
-    if (catalog == undefined) {
-        //level =0
-        var page: ICatalog = { name: name, path: "/" + name + ".json", dir: "/", sort: 0, key: getUUID(), template: template };
-        if (getProject().catalogs == undefined) {
-            getProject().catalogs = [];
-        }
-        getProject().catalogs.push(page);
-
-        // changeCatalogs(getProject().catalogs);
-        // updateCatalogs();
-
-    } else {
-        if (catalog.children == undefined) {
-            catalog.children = [];
-        }
-        //children
-        var page: ICatalog = { key: getUUID(), name: name, path: catalog.path + "/" + name + ".json", dir: catalog.path, sort: catalog.children.length, template: template };
-        // if(catalog.path=="/"){
-        //     page.path = "/" + catalog.name;
-        // }
-        catalog.children.push(page);
-
-        // changeCatalogs(getProject().catalogs);
-        // updateCatalogs();
-
-
-
-    }
-
-
-    // ipcRendererSend("newFile", {
-    //     path: path,
-    //     name: name,
-    //     isDirectory: false
-    // })
-}
-
-
-
 export function toggleExplorer(key: string, hide: boolean) {
     var explorer = document.getElementById(key);
     var title = explorer.getElementsByClassName("explorer_title")[0];
@@ -294,8 +232,6 @@ export function toggleExplorer(key: string, hide: boolean) {
         view.style.display = "block";
         icon.className = "bi bi-chevron-down";
     }
-
-
 }
 
 export function renderExplorer(key: string, content: HTMLElement, name: string, hide?: boolean, taps?: IMenuItem[], onHide?: (key: string, hide: boolean) => void): HTMLDivElement {
@@ -341,16 +277,16 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
             view.style.display = "block";
             icon.style.transform = "rotate(90deg)";
 
-            // if(onHide){
-            //     onHide(key,false);
-            // }
+            if(onHide){
+                onHide(key,false);
+            }
         } else {
             view.style.display = "none";
             icon.style.transform = "rotate(0deg)";
 
-            // if(onHide){
-            //     onHide(key,true);
-            // }
+            if(onHide){
+                onHide(key,true);
+            }
         }
     }
 

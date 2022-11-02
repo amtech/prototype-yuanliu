@@ -20,7 +20,6 @@ import { renderExplorer, toggleExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
 
 import { Editor } from "../../editor/editor";
-import { renderLayers, updateLayers } from "../../render/propertyLayers";
 var lastComponentKey:string;
 const panel: IPanel = {
     key: "property", name: "属性", hidden: true, sort: 0,
@@ -41,9 +40,7 @@ const panel: IPanel = {
           
             clearComponentsProperty();
         }
-        requestIdleCallback(() => {
-            updateLayersProperty();
-        });
+  
 
 
     }
@@ -63,10 +60,7 @@ function renderPropertypanel(content: HTMLElement) {
     propertyPanel.className = "propertyPanel";
     propertyPanel.id = "propertyPanel";
     content.appendChild(propertyPanel);
-
-
-    layers = renderExplorer("property_layer", propertyPanel, "层级", true, undefined, onExplorerHide);
-    renderLayers(layers);
+    
     base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide);
     renderBaseProperty(base);
     layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide);
@@ -110,10 +104,7 @@ function onExplorerHide(key: string, hide: boolean) {
             }
 
             showExplorers.push(key);
-            if (key == "property_layer") {
-                //如果是展开层级的话，更新一次层级
-                updateLayersProperty();
-            }
+           
         }
 
     }
@@ -125,12 +116,7 @@ var theme: HTMLElement;
 var base: HTMLElement;
 var style: HTMLElement;
 var font: HTMLElement;
-function updateLayersProperty() {
-    //如果 层级块时 隐藏状态 的话，不更新,
-    // if (showExplorers.indexOf("property_layer") >= 0)
-    //     if (layers != undefined) layers.innerHTML = "";
-    updateLayers();
-}
+
 
 
 export function clearComponentsProperty() {

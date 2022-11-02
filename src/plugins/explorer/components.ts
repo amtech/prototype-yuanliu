@@ -1,19 +1,12 @@
-import { ipcRendererSend } from "../../preload";
-import { getUUID, ICatalog, IComponent, IExplorer, IStatusBarActivity } from "../../common/interfaceDefine";
-import { activePropertyPanel } from "../../render/propertypanel";
-import { createExplorerLayout } from "../../common/explorerTool";
-import { getConfig, getProject } from "../../render/workspace";
-import { renderDialog } from "../../dialog/export";
-import * as dargData from "../../render/DragData";
-import { openContextMenu } from "../../common/contextmenu";
-import { IMenuItem } from "../../common/contextmenu";
-import { getContextMenuArg } from "../../common/contextmenu";
-import { getContextMenuElement } from "../../common/contextmenu";
-import { getChartCount } from "../../render/sidebar";
 import { ipcRenderer } from "electron";
 import { setComponentsTemplate } from "../../common/components";
-import { getCurPageContent } from "../../render/workbench";
+import { createExplorerLayout } from "../../common/explorerTool";
+import { IComponent, IExplorer } from "../../common/interfaceDefine";
+import { ipcRendererSend } from "../../preload";
 import { showCustomComponent } from "../../render/customComponent";
+import * as dargData from "../../render/DragData";
+import { getCurPageContent } from "../../render/workbench";
+import { getConfig } from "../../render/workspace";
 var body:HTMLElement;
 const explorer:IExplorer={
     key:"component",
@@ -32,7 +25,7 @@ const explorer:IExplorer={
     onExtend(extend) {
         return -1;
     },
-    update() {
+    update(updater) {
         
     },
     setHeight(height) {
@@ -43,7 +36,7 @@ export default explorer;
 
 
 function renderComponentsExplorer(content: HTMLElement) {
-    content.style.paddingBottom = "20px";
+  
     ipcRenderer.on("_loadPluginsComponent", (event, args) => {
         //    console.log("_loadPluginsComponent", args);
         var components: IComponent[] = [];

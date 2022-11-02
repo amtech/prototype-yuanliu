@@ -1,19 +1,70 @@
-import { clearComponentsProperty } from "../plugins/property/property";
-import { loadComponentsProperty } from "../plugins/property/property";
-import { deleteComponent, onSelectComponent } from "../common/components";
-import { openContextMenu } from "../common/contextmenu";
-import { IMenuItem } from "../common/contextmenu";
-import { IComponent } from "../common/interfaceDefine";
-import { getLayers } from "./workbench";
+import { onSelectComponents } from "../../common/componentEvent";
+import { deleteComponent } from "../../common/components";
+import { IMenuItem, openContextMenu } from "../../common/contextmenu";
+import { createExplorerLayout } from "../../common/explorerTool";
+import { IComponent, IExplorer } from "../../common/interfaceDefine";
+import { getCurPage, getLayers } from "../../render/workbench";
+var body: HTMLElement;
+const explorer: IExplorer = {
+    key: "outline",
+    extend: false,
+    title: "层级",
+    height: 260,
+    onRender(content) {
+        body = createExplorerLayout(content, this);
+        renderLayers(body);
+    },
+    sort: 1,
+    onResize(height) {
+        return -1;
+    },
+
+    onExtend(extend) {
+        return -1;
+    },
+    update(updater) {
+        
+        if (updater.type == "page") {
+            changeLayers(updater.data.children);
+            updateLayers();
+        } else if (updater.type == "add" || updater.type == "del" || updater.type == "move") {
+            
+            changeLayers(getCurPage().children);
+            updateLayers();
+        } else if (updater.type == "select"&&explorer.extend) {
+            
+            //寻找并展示
+            findComponent(updater.data);
+            changeLayers(getCurPage().children);
+            selectComponent(updater.data);
+            updateLayers();
+
+        }
+    },
+    setHeight(height) {
+        body.style.height = height + "px";
+        viewHeight = height;
+        updateLayout();
+        updateLayers();
+    },
+}
+export default explorer;
+var tree: HTMLElement;
 var rowHeight = 24;
-var viewHeight = 400;
+var viewHeight = 0;
 var rowStart = 0;
 var rowCount = 0;
 var treeView: HTMLElement;
-export function renderLayers(context: HTMLElement) {
-    var tree = document.createElement("div");
+var scroll_thumb: HTMLElement;
+function updateLayout() {
+    tree.style.height = viewHeight + "px";
+    treeView.style.height = tree.style.height;
+    rowCount = Math.floor(viewHeight / rowHeight);
+}
+function renderLayers(context: HTMLElement) {
+    tree = document.createElement("div");
     tree.className = "explorer_tree";
-    tree.style.height = 400 + "px";
+    tree.style.height = viewHeight + "px";
     context.appendChild(tree);
 
     treeView = document.createElement("div");
@@ -22,15 +73,16 @@ export function renderLayers(context: HTMLElement) {
     treeView.style.height = tree.style.height;
     var treeScroll = document.createElement("div");
     treeScroll.className = "explorer_tree_scroll";
+    scroll_thumb = document.createElement("div");
+    scroll_thumb.className = "explorer_tree_scroll_thumb";
+
+
+    treeScroll.appendChild(scroll_thumb);
 
     tree.appendChild(treeView);
     tree.appendChild(treeScroll);
     //
-
     rowCount = viewHeight / rowHeight;
-
-
-
     tree.onwheel = (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -49,20 +101,25 @@ export function renderLayers(context: HTMLElement) {
     }
 
 }
-export function changeLayers(layers: IComponent[]) {
+function changeLayers(layers: IComponent[]) {
     layerList = [];
+    console.log("changeLayers", layers.length);
     tranformLayers(layers, 0);
 }
-export function updateLayers() {
-
+function updateLayers() {
     renderLayersView(treeView);
-
-
 }
 
 function renderLayersView(treeView: HTMLElement) {
+    var scroll_val = rowCount / (layerList.length);
+    if (scroll_val > 0.99) {
+        scroll_thumb.style.height = "0px";
 
-    console.log("renderLayersView");
+    } else {
+        scroll_thumb.style.height = rowCount / (layerList.length) * viewHeight + "px";
+        scroll_thumb.style.top = rowStart / layerList.length * viewHeight + "px";
+    }
+
     var adds: Array<any> = [];
     var exits: Array<string> = [];
     treeView.style.top = (-rowStart * rowHeight) + "px";
@@ -72,6 +129,16 @@ function renderLayersView(treeView: HTMLElement) {
         if (row != undefined) {
             exits.push(row.id);
             row.style.top = (i) * rowHeight + "px";
+
+            if (select != undefined && select.key == layer.key) {
+                if (lastSelected != undefined) {
+                    lastSelected.setAttribute("selected", "false");
+
+                }
+                lastSelected = row;
+                row.setAttribute("selected", "true");
+                select = undefined;
+            }
         } else {
             adds.push({
                 index: i,
@@ -96,21 +163,14 @@ function renderLayersView(treeView: HTMLElement) {
         var layer = value.layer;
         renderLayersRow(treeView, layer, index);
     });
-
-
-
-
-
 }
 var layerList: Array<IComponent> = [];
 function tranformLayers(layers: IComponent[], level: number) {
-    // console.log("tranformLayers");
-    layers.forEach((layer) => {
-        tranformLayer(layer, level);
 
-    })
-
-
+    if (layers != undefined)
+        layers.forEach((layer) => {
+            tranformLayer(layer, level);
+        })
 }
 function tranformLayer(layer: IComponent, level: number) {
     layer.level = level;
@@ -119,12 +179,37 @@ function tranformLayer(layer: IComponent, level: number) {
         layer.isDir = true; {
         if (layer.isOpen) {
             level++;
-
             tranformLayers(layer.children, level);
         }
     }
 }
-
+function findComponent(component: IComponent) {
+    var paths = component.path.split("/");
+    var children = getCurPage().children;
+    for (var i = 0; i < paths.length - 1; i++) {
+        var path = paths[i];
+        var cmpt = children.find(p => p.key == path);
+        if (cmpt != undefined && cmpt.children != undefined && cmpt.children.length > 0) {
+            cmpt.isOpen = true;
+            children = cmpt.children;
+        }
+    }
+}
+function selectComponent(component: IComponent) {
+    for (var i = 0; i < layerList.length; i++) {
+        var layer = layerList[i];
+        if (layer.key == component.key) {
+            rowStart = i - Math.floor(rowCount / 2);
+            select = component;
+            if (rowStart < 0) {
+                rowStart = 0;
+            }
+            break;
+        }
+    }
+    console.log("select", select);
+}
+var select: IComponent;
 var lastSelected: HTMLElement;
 function renderLayersRow(content: HTMLElement, component: IComponent, index: number) {
 
@@ -138,7 +223,7 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
     page.title = component.path;
     var indent = document.createElement("div");
     indent.className = "indent";
-    indent.style.width = 10 + level * 12 + "px";
+    indent.style.width = 10 + level * 5 + "px";
     page.appendChild(indent);
     var icon = document.createElement("i");
     if (component.isDir) {
@@ -152,7 +237,7 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
             page.setAttribute("data-extend", "false");
         }
     } else {
-        icon.className = component.icon;
+        icon.className = "bi bi-dash";//component.icon;
     }
     page.appendChild(icon);
 
@@ -164,20 +249,21 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
     page.appendChild(name);
 
 
-    var type = document.createElement("div");
-    type.style.paddingRight = "10px";
-    type.style.opacity = "0.6";
-    type.innerText = "[" + component.type + "]";
-    page.appendChild(type);
+    // var type = document.createElement("div");
+    // type.style.paddingRight = "10px";
+    // type.style.opacity = "0.6";
+    // type.innerText = "[" + component.type + "]";
+    // page.appendChild(type);
 
 
     var visiable = document.createElement("i");
     visiable.style.cursor = "pointer";
+    visiable.style.fontSize="10px";
     if (component.hidden) {
         visiable.className = "bi bi-eye-slash";
 
     } else {
-        visiable.className = "bi bi-eye";
+        visiable.className = component.icon;//"bi bi-eye";
     }
 
     page.appendChild(visiable);
@@ -186,7 +272,7 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
     page.appendChild(space);
     visiable.onclick = (e: MouseEvent) => {
         if (component.hidden) {
-            visiable.className = "bi bi-eye";
+            visiable.className =component.icon;// "bi bi-eye";
             component.hidden = false;
         } else {
             visiable.className = "bi bi-eye-slash";
@@ -204,6 +290,15 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
         e.stopPropagation();
     }
 
+    if (select != undefined && select.key == component.key) {
+        if (lastSelected != undefined) {
+            lastSelected.setAttribute("selected", "false");
+
+        }
+        lastSelected = page;
+        page.setAttribute("selected", "true");
+        select = undefined;
+    }
     page.onclick = (e: MouseEvent) => {
         if (lastSelected == undefined || lastSelected != page) {
             if (lastSelected != undefined) lastSelected.setAttribute("selected", "false");
@@ -237,11 +332,11 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
         }
 
 
-        clearComponentsProperty();
-        //  clearComponentsCode();
-        loadComponentsProperty(component);
-        //   loadComponentsCode([component]);
-        onSelectComponent(component.path);
+        // clearComponentsProperty();
+        // //  clearComponentsCode();
+        // loadComponentsProperty(component);
+        // //   loadComponentsCode([component]);
+        onSelectComponents([component]);
     }
     page.oncontextmenu = (e: MouseEvent) => {
         // page.setAttribute("selected", "true");
@@ -252,7 +347,7 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
             id: "delete",
             label: "删除", icon: "bi bi-trash", onclick: () => {
                 var del = document.getElementById("layer_" + component.key);
-                console.log("del", del);
+
                 if (del != undefined) {
                     del.remove();
                 }

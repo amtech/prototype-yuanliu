@@ -4,21 +4,17 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染组件
 ***************************************************************************** */
 import { clipboard } from "electron";
-import { updateFloatPanel } from "../render/floatPanel";
 
 import { ipcRendererSend } from "../preload";
-import { updateBlueView } from "../render/blueprint";
 import * as dargData from "../render/DragData";
-import { pushHistory } from "../render/history";
 import { copyComponents } from "../render/pageTitle";
-import { activePropertyPanel, getComponentStyle, setComponentStyle } from "../render/propertypanel";
-import { getMousePosition, getShiftKeyDown } from "../render/shorcuts";
-import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getLayers, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
-import { getConfig, getProject, getViewPosition, openExpand } from "../render/workspace";
+import { getComponentStyle, setComponentStyle } from "../render/propertypanel";
+import { getMousePosition } from "../render/shorcuts";
+import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
+import { getConfig, getProject, getViewPosition } from "../render/workspace";
+import { onAddComponents, onDelComponents, onMoveComponent, onSelectComponents } from "./componentEvent";
 import { IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
 import { getUUID, IComponent, IComponentProperty, IExtension, IShape } from "./interfaceDefine";
-import { updateStatus } from "../render/statusBar";
-import { changeLayers } from "../render/propertyLayers";
 export function getComponentTempateByType(type: string): IComponent {
     if (componentsTemplate == undefined || componentsTemplate.length == 0) {
         console.log("componentsTemplate is undefined");
@@ -287,8 +283,8 @@ function commentTypeCountMap(type: string): number {
  */
 export function renderRootComponents(content: HTMLElement, components: IComponent[]) {
     var page_parent = document.getElementById("page_parent_" + getCurPage().key);
-    var viewPosition=getViewPosition();
-    var viewHeigh=window.innerHeight-viewPosition.top-viewPosition.bottom;
+    var viewPosition = getViewPosition();
+    var viewHeigh = window.innerHeight - viewPosition.top - viewPosition.bottom;
     components.forEach((component, index) => {
 
         component.isRoot = true;
@@ -312,25 +308,25 @@ export function renderRootComponents(content: HTMLElement, components: IComponen
                         //初始化时，不渲染 扩展内容
                     } else {
                         var cpmt = renderComponent(content, component, undefined, index, undefined, undefined, true);
-                        var root=cpmt.root;;
-                        var body=cpmt.body;
+                        var root = cpmt.root;;
+                        var body = cpmt.body;
                         requestIdleCallback(() => {
-                        
 
-                            if (root.offsetTop >viewHeigh -parseFloat(page_parent.style.top.replace("px",""))+viewPosition.top+100) {
-                            
-                                body.innerHTML="";
-                            }else if (root.offsetTop + root.clientHeight<-( parseFloat(page_parent.style.top.replace("px",""))+viewPosition.top+100)) {
-                                body.innerHTML="";
-                            }  else {
-                                var db= root.getAttribute("data-background");
-                                if(db!=undefined){
-                                    root.style.background=db;
+
+                            if (root.offsetTop > viewHeigh - parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100) {
+
+                                body.innerHTML = "";
+                            } else if (root.offsetTop + root.clientHeight < -(parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100)) {
+                                body.innerHTML = "";
+                            } else {
+                                var db = root.getAttribute("data-background");
+                                if (db != undefined) {
+                                    root.style.background = db;
                                 }
-                             
+
 
                                 //渲染形状背景
-                                if (component.shape != undefined && component.shape.length > 0 ) {
+                                if (component.shape != undefined && component.shape.length > 0) {
                                     requestIdleCallback(() => {
                                         setTimeout(() => {
                                             renderComponentShape(component, root)
@@ -338,7 +334,7 @@ export function renderRootComponents(content: HTMLElement, components: IComponen
                                     })
                                 }
 
-                                if (component.children != undefined && component.children.length > 0 ) {
+                                if (component.children != undefined && component.children.length > 0) {
                                     setTimeout(() => {
                                         //渲染子组件
                                         renderComponents(body, component.children, component);
@@ -498,8 +494,8 @@ var previewParent: string;
  * @returns 
  */
 export function renderComponent(content: HTMLElement, component: IComponent, dropIndex?: number, index?: number, parent?: IComponent, self?: HTMLElement, hideReal?: boolean): {
-    root:HTMLElement,
-    body:HTMLElement
+    root: HTMLElement,
+    body: HTMLElement
 } {
 
 
@@ -555,9 +551,9 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
     root.setAttribute("component_group", component.group);
     root.setAttribute("component_type", component.type);
     root.id = component.key;
-    if(body!=root){
-        body.id="_"+component.key;
-        root.setAttribute("data-body","true");
+    if (body != root) {
+        body.id = "_" + component.key;
+        root.setAttribute("data-body", "true");
     }
     //设置组件样式
     if (root.style != undefined && root.style.cssText.length <= 0) {
@@ -566,9 +562,9 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         } else if (component.style != undefined) {
             root.style.cssText += component.style;
         }
-        if(hideReal){
-            root.setAttribute("data-background",root.style.background+"");
-            root.style.background="";
+        if (hideReal) {
+            root.setAttribute("data-background", root.style.background + "");
+            root.style.background = "";
         }
 
     }
@@ -681,13 +677,8 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         setSelectComponents([component.path]);
         eventEle.setAttribute("selected", "true");
         e.stopPropagation();
+        onSelectComponents([component]);
 
-        //右侧面板
-        activePropertyPanel(component);
-        //底部面板
-        updateFloatPanel(component);
-        //状态栏
-        updateStatus(getCurPage(), component, getSelectComponents());
 
     }
     ////////////
@@ -710,7 +701,7 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
 
     componentOnMouse(eventEle, component, body);
 
-    return {root:root,body:body};
+    return { root: root, body: body };
 }
 /**
  * 组件鼠标事件
@@ -1284,6 +1275,7 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
                     renderComponents(content, parent.children, undefined);
                 }
             }
+            onMoveComponent(dragComponent);
         }
         var dragComponentTemplate = dargData.getData("componentTemplate");
         if (dragComponentTemplate != undefined) {
@@ -1319,11 +1311,8 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
 
                     }
                     subComponent.path = component.path + "/" + subComponent.key;
-                    //右侧面板
-                    // activePropertyPanel();
                     renderComponent(body, subComponent, dropIndex);
-
-
+                    onAddComponents([subComponent]);
                 }
             }
         }
@@ -1332,10 +1321,7 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
             //拖拽 商店 内容 至 界面
 
         }
-        //操作历史记录
-        pushHistory(getCurPage());
-        //更新层级后台
-        changeLayers(getLayers());
+
 
     }
 }
@@ -1397,11 +1383,7 @@ export function deleteComponent(component: IComponent) {
     if (componentDiv != undefined) {
         componentDiv.remove();
     }
-    //  activePropertyPanel();
-    // updateBlueView();
-    pushHistory(getCurPage());
-    //更新层级后台
-    changeLayers(getLayers());
+    onDelComponents([component]);
 
 }
 /**
