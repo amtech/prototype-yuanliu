@@ -7,7 +7,7 @@ import { updateStatus } from "../render/statusBar";
 import { IComponent } from "./interfaceDefine";
 import { updateSidebar } from "../render/sidebar";
 
-export function onAddComponents(components: IComponent[]) {
+export function onAddComponents(components: IComponent[],handle?:"outline"|"page") {
 
     setTimeout(() => {
         //右侧面板
@@ -27,7 +27,7 @@ export function onAddComponents(components: IComponent[]) {
     });
 }
 
-export function onMoveComponent(component: IComponent) {
+export function onMoveComponent(component: IComponent,handle?:"outline"|"page") {
 
     setTimeout(() => {
         //导航栏
@@ -40,7 +40,7 @@ export function onMoveComponent(component: IComponent) {
     });
 }
 
-export function onDelComponents(components: IComponent[]) {
+export function onDelComponents(components: IComponent[],handle?:"outline"|"page") {
 
     setTimeout(() => {
         //右侧面板
@@ -59,7 +59,7 @@ export function onDelComponents(components: IComponent[]) {
     });
 }
 
-export function onSelectComponents(components: IComponent[]) {
+export function onSelectComponents(components: IComponent[],handle?:"outline"|"page") {
 
 
     setTimeout(() => {
@@ -67,7 +67,8 @@ export function onSelectComponents(components: IComponent[]) {
         //右侧面板
         activePropertyPanel(components[0]);
         //导航栏
-        updateSidebar({ type: "select", data: components[0] });
+        if(handle!="outline")
+            updateSidebar({ type: "select", data: components[0] });
         //底部面板
         updateFloatPanel(components[0]);
     }, 0);
@@ -75,8 +76,6 @@ export function onSelectComponents(components: IComponent[]) {
         //状态栏
         updateStatus(getCurPage(), components[0], getSelectComponents());
 
-        //历史
-        pushHistory(getCurPage());
     });
 
 }

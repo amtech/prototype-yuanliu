@@ -264,6 +264,16 @@ select {
     user-select: none;
 }
 
+.explorer_row_line {
+    height: 24px;
+    position: absolute;
+    left: 10px;
+    width: 1px;
+    background-color: var(--theme-color);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .explorer_title {
     font-size: 12px;
     line-height: 2;
@@ -272,11 +282,6 @@ select {
     display: flex;
     align-items: center;
     user-select: none;
-}
-
-.explorer_title i {
-    padding-left: 2px;
-    padding-right: 5px;
 }
 
 .explorer_view {

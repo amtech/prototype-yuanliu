@@ -516,8 +516,29 @@ export function renderComponents(content, components, parent) {
                             if (component.isExpand) {
                                 component.hidden = true;
                             }
+
                         }
                     }
+                }
+                //复原被压缩的样式
+                if (component.style != undefined && component.style.length > 0) {
+                    var old = component.style;
+                    styleTransform.forEach(trans => {
+                        var rg = RegExp("\\[" + trans[1] + "\\]", "g");
+                        old = old.replace(rg, trans[0] + ":")
+
+                    })
+                    component.style = old;
+
+                }
+                if (component.styles != undefined && component.styles.length > 0) {
+                    var olds = component.styles;
+                    styleTransform.forEach(trans => {
+                        var rg = RegExp("\\[" + trans[1] + "\\]", "g");
+                        olds = olds.replace(rg, trans[0] + ":")
+                    })
+                    component.styles = olds;
+
                 }
                 if (component.onRender != undefined && component.onPreview != undefined) {
                     renderComponent(content, component, parent, index);
@@ -525,6 +546,25 @@ export function renderComponents(content, components, parent) {
             }
         })
 }
+const styleTransform = [
+    ["flex", "f"],
+    ["background", "b"],
+    ["border-radius", "br"],
+    ["padding", "d"],
+    ["height", "h"],
+    ["width", "w"],
+    ["margin", "m"],
+    ["shadow", "s"],
+    ["border", "r"],
+    ["text-align", "ta"],
+    ["color", "c"],
+    ["position", "p"],
+    ["font-weight", "fw"],
+    ["white-space", "ws"],
+    ["font-size", "fs"],
+    ["display", "di"],
+    ["cursor", "cu"]
+];
 
 function copyBlue(blue) {
     if (blue == undefined)

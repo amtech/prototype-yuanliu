@@ -124,10 +124,30 @@ export function renderToolbar(content: HTMLElement) {
 
     });
 }
+const noSaveAttrs:Array<string>=["icon","drop","blue","group","edge","isRoot","level","isDir","isOpen","path"]; 
+export const styleTransform:Array<Array<string>>=[
+    ["flex","f"],
+    ["background","b"],
+    ["border-radius","br"],
+    ["padding","d"],
+    ["height","h"],
+    ["width","w"],
+    ["margin","m"],
+    ["shadow","s"],
+    ["border","r"],
+    ["text-align","ta"],
+    ["color","c"],
+    ["position","p"],
+    ["font-weight","fw"],
+    ["white-space","ws"],
+    ["font-size","fs"],
+    ["display","di"],
+    ["cursor","cu"]
+];
 export function saveSimplePage(page: IPage) {
 
     console.log("SavePage")
-    console.log("page.type is " + page.type);
+    console.log("page.type is " + page.type);   
     //判断是否是title
     if (page.type == "title") {
         if (page.children != undefined) {
@@ -148,7 +168,23 @@ export function saveSimplePage(page: IPage) {
                 tab.setAttribute("changed", "false");
             }
             ipcRendererSend("savePage", {
-                page: JSON.stringify(page), path: page.path
+                page: JSON.stringify(page,(key,value)=>{
+                    if(key=="style"||key=="styles"){
+                    
+                        var old=value;
+                        if(old!=undefined&&old.length>0){
+                            styleTransform.forEach(trans=>{
+                                var rg = RegExp(trans[0]+":", "g");
+                                old=old.replace(rg,"["+trans[1]+"]")
+                            })
+                        }
+                        return old;
+                    }else
+                    if(noSaveAttrs.indexOf(key)<0){
+                        return value;
+                    }
+                    
+                }), path: page.path
             });
 
             //页面截图 保存

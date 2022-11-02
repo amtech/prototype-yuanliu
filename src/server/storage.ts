@@ -132,6 +132,8 @@ export function savePage(page: string, folder: string, wProject: IProject): any 
 
 
     //删除组件中不需要保存的数据，减少整体的大小。
+
+    
     
     //edge
 

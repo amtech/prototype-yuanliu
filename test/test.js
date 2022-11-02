@@ -1,16 +1,18 @@
-var style =
-    "display:flex;" +
-    "	background:transparent;" +
-    "	min-height:34px;" +
-    "	padding:5px;" +
-    "	border-radius:5px;" +
-    "	align-items: center;" +
-    "	";
-var property = "display";
-var rep = RegExp("[^\-]" + property + ":[^;]+;");
+var node = {
+    "asdas": 234234,
+    "ls": [
+        { "a": "[f]asd,flex:333", "b": 33 }
+    ]
+};
+var text = JSON.stringify(node, (key, val) => {
 
-var m = style.match(rep);
-for (var i = 0; i < m.length; i++) {
+    if (key == "a") {
+        var rg = RegExp("\\[f\\]", "g");
 
-    console.log(m[i].substring(1));
-}
+
+        return val.replace(rg, "flex:");
+    } else {
+        return val
+    }
+})
+console.log(text);

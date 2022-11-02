@@ -32,7 +32,7 @@ const explorer: IExplorer = {
             changeLayers(getCurPage().children);
             updateLayers();
         } else if (updater.type == "select"&&explorer.extend) {
-            
+           
             //寻找并展示
             findComponent(updater.data);
             changeLayers(getCurPage().children);
@@ -47,6 +47,26 @@ const explorer: IExplorer = {
         updateLayout();
         updateLayers();
     },
+    taps:[
+        {
+            id:"allHide",
+            label:"折叠",
+            icon:"bi bi-dash-circle-dotted",onclick() {
+                var layers=getCurPage().children;
+                if(layers!=undefined){
+                    layers.forEach(layer=>{
+                        if(layer.isOpen){
+                            layer.isOpen=false;
+                        }
+                    })
+                }
+                rowStart=0;
+                changeLayers(getCurPage().children);
+                updateLayers();
+            },
+
+        }
+    ]
 }
 export default explorer;
 var tree: HTMLElement;
@@ -209,6 +229,46 @@ function selectComponent(component: IComponent) {
     }
     console.log("select", select);
 }
+var colors=[
+    "#2ec7c9",
+    "#b6a2de",
+    "#5ab1ef",
+    "#ffb980",
+    "#d87a80",
+    "#8d98b3",
+    "#e5cf0d",
+    "#97b552",
+    "#95706d",
+    "#dc69aa",
+    "#07a2a4",
+    "#9a7fd1",
+    "#588dd5",
+    "#f5994e",
+    "#c05050",
+    "#59678c",
+    "#c9ab00",
+    "#7eb00a",
+    "#6f5553",
+    "#c14089"
+];
+function renderRowLine(row:HTMLElement,level:number){
+
+    for(var i=0;i<level ;i++){
+        var line=document.createElement("div");
+        line.className="explorer_row_line";
+        var color;
+        if(i<colors.length)
+            color =colors[i];
+            else
+            color =colors[i%colors.length];
+        line.style.background=color;
+        line.style.left=12 + i * 5 + "px";
+        row.appendChild(line);
+    }
+
+
+}
+
 var select: IComponent;
 var lastSelected: HTMLElement;
 function renderLayersRow(content: HTMLElement, component: IComponent, index: number) {
@@ -220,12 +280,15 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
     page.id = "layer_" + component.key;
     content.appendChild(page);
 
+    renderRowLine(page,level);
+
     page.title = component.path;
     var indent = document.createElement("div");
     indent.className = "indent";
     indent.style.width = 10 + level * 5 + "px";
     page.appendChild(indent);
     var icon = document.createElement("i");
+    icon.style.pointerEvents="none";
     if (component.isDir) {
 
         if (component.isOpen) {
@@ -326,17 +389,10 @@ function renderLayersRow(content: HTMLElement, component: IComponent, index: num
             layerList = [];
             tranformLayers(getLayers(), 0);
 
-
-            renderLayersView(document.getElementById("explorer_tree_view"));
-
+            updateLayers();
+     
         }
-
-
-        // clearComponentsProperty();
-        // //  clearComponentsCode();
-        // loadComponentsProperty(component);
-        // //   loadComponentsCode([component]);
-        onSelectComponents([component]);
+        onSelectComponents([component],"outline");
     }
     page.oncontextmenu = (e: MouseEvent) => {
         // page.setAttribute("selected", "true");

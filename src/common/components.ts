@@ -4,6 +4,7 @@ Copyright (c) taoyongwen. All rights reserved.
 渲染组件
 ***************************************************************************** */
 import { clipboard } from "electron";
+import { styleTransform } from "../render/toolbar";
 
 import { ipcRendererSend } from "../preload";
 import * as dargData from "../render/DragData";
@@ -459,18 +460,45 @@ export function installComponent(component: IComponent) {
     } else {
         var template = getComponentTempateByType(component.type);
         if (template != undefined) {
+            //辅助模板属性至组件
             component.onPreview = template.onPreview;
             component.onRender = template.onRender;
             component.onChild = template.onChild;
-
+            component.icon=template.icon;
+            component.drop=template.drop;
+            component.group=template.group;
+            component.edge=template.edge;
             component.blue = copyBlue(template.blue);
             component.edge = template.edge;
             if (template.toogle) {
                 component.toogle = template.toogle;
             }
+           
+       
+
         } else {
             console.log("没有找到组件类型:" + component.type);
         }
+    }
+     //复原被压缩的样式
+     if(component.style!=undefined&&component.style.length>0){
+        var old=component.style;
+        styleTransform.forEach(trans=>{
+            var rg = RegExp("\\["+trans[1]+"\\]", "g");
+            old=old.replace(rg,trans[0]+":")
+           
+        })
+         component.style=old;
+        
+    }
+    if(component.styles!=undefined&&component.styles.length>0){
+        var olds=component.styles;
+        styleTransform.forEach(trans=>{
+            var rg = RegExp("\\["+trans[1]+"\\]", "g");
+            olds=olds.replace(rg,trans[0]+":")
+        })
+        component.styles=olds;
+        
     }
 }
 

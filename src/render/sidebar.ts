@@ -246,6 +246,7 @@ export function renderExplorer(key: string, content: HTMLElement, name: string, 
     var icon = document.createElement("i");
     icon.className = "explorer_icon bi bi-chevron-right";
     icon.style.marginLeft = "5px";
+    icon.style.paddingRight="3px";
     title.appendChild(icon);
 
 
