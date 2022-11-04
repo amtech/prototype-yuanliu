@@ -1144,14 +1144,6 @@ iframe {
     pointer-events: none;
 }
 
-#optionEdior::before {
-    content: "选择界面图表等组件，展示选项。";
-    color: rgba(175, 175, 175, 0.5);
-    font-size: 12px;
-    position: absolute;
-    pointer-events: none;
-}
-
 
 /* .component_canvas[component_group=chart]::before {
     content: "...";
@@ -1886,4 +1878,27 @@ iframe {
 
 .explorer_tree:hover .explorer_tree_scroll_thumb {
     width: 6px;
+}
+
+.tips_row {
+    display: flex;
+    height: 24px;
+    align-items: center;
+    font-size: 13px;
+    border-radius: 5px;
+    transition: transform 0.5s;
+    padding: 5px 10px 5px 10px;
+    cursor: pointer;
+}
+
+.tips_row:hover {
+    background-color: rgba(175, 175, 175, 0.2);
+}
+
+.link {
+    cursor: pointer;
+}
+
+.link:hover {
+    text-decoration: underline;
 }

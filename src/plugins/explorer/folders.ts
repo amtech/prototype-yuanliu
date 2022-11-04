@@ -11,6 +11,7 @@ import { getContextMenuArg } from "../../common/contextmenu";
 import { getContextMenuElement } from "../../common/contextmenu";
 import { getChartCount } from "../../render/sidebar";
 import { ipcRenderer } from "electron";
+import { openPage } from "../../render/workbench";
 var body: HTMLElement;
 const explorer: IExplorer = {
     key: "folders",
@@ -373,7 +374,7 @@ function renderCatalogsRow(content: HTMLElement, catalog: ICatalog, index: numbe
         //   renderPage(catalog.page);
         if (!catalog.isDir) {
             console.log("---Open--", Date.now());
-            ipcRendererSend("openPage", catalog);
+           openPage(catalog);
         }
 
 

@@ -10,7 +10,7 @@ const push:IStatusBarActivity={
        
   
 
-        if(project.type=="git"){
+        if(project!=undefined&& project.type=="git"){
             var i=document.createElement("i");
             i.className="bi bi-git";
             acticity.appendChild(i);

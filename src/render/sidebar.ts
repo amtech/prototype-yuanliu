@@ -29,13 +29,14 @@ export function renderSidebar(content: HTMLElement) {
 
 
 
-    ipcRendererSend("loadPluginsExplorer");
-    ipcRenderer.on("_loadPluginsExplorer", (event, args) => {
+    ipcRenderer.send("loadPlugins","explorer");
+    ipcRenderer.on("_loadPlugins_explorer", (event, args) => {
         explorerList = [];
-
+        console.log(args);
         args.forEach((item: string) => {
+            console.log(item);
             try {
-                // console.log(item);
+            
 
                 var ex: IExplorer = require("../plugins/explorer/" + item).default;
                 if (ex != undefined) {

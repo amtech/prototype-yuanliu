@@ -10,7 +10,16 @@ export function onOpenPage(page:IPage){
 
     requestIdleCallback(() => {
         //右侧面板
-        activePropertyPanel("page");
+        if(page.type=="projects"){
+            activePropertyPanel("config");
+        }else if(page.type=="pages"){
+            activePropertyPanel("project");
+        }else if(page.type=="title"){
+            activePropertyPanel("project");
+        }else{
+            activePropertyPanel("page");
+        }
+       
         //状态栏
         updateStatus(page, undefined, undefined);
         updateSidebar({type:"page",data:page});
@@ -19,9 +28,13 @@ export function onOpenPage(page:IPage){
         //TODO  load
         //   renderPageViewF();
         //  switchFloatTab("页面");
-        updateBlueView();//蓝图
+        if(page.type=="pages"){
+            updateBlueView();//蓝图
+            pushHistory(page);
+           }
+           
         //历史记录
-        pushHistory(page);
+       
    }, 1000);
     
   
@@ -29,9 +42,16 @@ export function onOpenPage(page:IPage){
 
 export function onSwitchPage(page:IPage){
     requestIdleCallback(() => {
-          
-        //右侧面板
-        activePropertyPanel("page");
+        if(page.type=="projects"){
+            activePropertyPanel("config");
+        }else if(page.type=="pages"){
+            activePropertyPanel("project");
+        }else if(page.type=="title"){
+            activePropertyPanel("project");
+        }else{
+             //右侧面板
+            activePropertyPanel("page");
+        }
         //导航
         updateSidebar({type:"page",data:page});
         //状态栏
@@ -40,8 +60,10 @@ export function onSwitchPage(page:IPage){
     });
     //更新右侧、底部面板
     setTimeout(() => {
-       
+       if(page.type=="pages"){
         updateBlueView();//蓝图
+       }
+       
 
     }, 1000);
     

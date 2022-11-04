@@ -149,7 +149,7 @@ export function openContextMenu(menuItems: Array<IMenuItem>,arg?:any,element?:HT
         });
     });
    
-    ipcRendererSend("show-context-menu", list);
+    ipcRenderer.send("show-context-menu", list);
 
 
 

@@ -50,10 +50,6 @@ export function renderToolbar(content: HTMLElement) {
 
             renderExport();
         });
-
-
-
-
     }
     var toolBar = document.createElement("div");
     toolBar.className = "toolBar";
@@ -351,6 +347,7 @@ export function renderWin32TitleBar(min: () => void, max: () => void, close: () 
     titleBar.style.top = "0";
     titleBar.style.display = "flex";
     titleBar.style.right = "0";
+    titleBar.style.zIndex="9999";
     var minTap = document.createElement("div");
     minTap.className = "titleBarTap";
     var minTapIcon = document.createElement("i");

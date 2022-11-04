@@ -11,9 +11,11 @@ import { regeditTheme } from "../echarts/theme";
 import { onAddComponents } from "../common/componentEvent";
 import { copyComponent, deleteComponent, getComponentsTemplate, getComponentTempateByType, initComponent, renderComponent, renderComponentPreview, renderComponents, renderRootComponents, renderStorePreview } from "../common/components";
 import { IMenuItem, openContextMenu } from "../common/contextmenu";
-import { getUUID, IBackground, IComponent, IPage, ITitle } from "../common/interfaceDefine";
+import { getUUID, IBackground, ICatalog, IComponent, IPage, ITitle } from "../common/interfaceDefine";
 import { onOpenPage, onSwitchPage } from "../common/pageEvent";
 import { isDark } from "../dialog/picker";
+import { renderPagesPage } from "../plugins/pages/pages";
+import { renderProjectsPage } from "../plugins/pages/projects";
 import { ipcRendererSend } from "../preload";
 import { getMousePosition } from "../render/shorcuts";
 import * as dargData from "./DragData";
@@ -21,7 +23,19 @@ import { INavItem, renderNavTrees } from "./pageNav";
 import { renderTitleBar } from "./pageTitle";
 import { activePropertyPanel, setComponentStyle } from "./propertypanel";
 import { saveSimplePage } from "./toolbar";
-import { getProject, getViewPosition, openExpand, renderExpand, renderRecent } from "./workspace";
+import { getProject, getViewPosition, openExpand, renderExpand } from "./workspace";
+import { renderMarkDownPage } from "../plugins/pages/markdown";
+
+export function openPage(catalog:ICatalog){
+
+    var page=pages.find(p=>p.path==catalog.path);
+    if(page!=undefined){
+        renderPage(page);
+    }else{
+        ipcRendererSend("openPage", catalog);
+    }
+}
+
 
 /**
  * 获取当前页面展示上下文div
@@ -214,7 +228,7 @@ export function reRenderPage() {
     }
 }
 
-function closePage(spage: IPage) {
+export function closePage(spage: IPage) {
 
     var index = pages.findIndex(p => p.path == spage.path);
     if (index != -1) {
@@ -229,12 +243,15 @@ function closePage(spage: IPage) {
     if (view != undefined) {
         view.remove();
     }
-    if (pages.length > 0) {
+    if (pages.length > 0&&getProject()!=undefined) {
         renderPage(pages[0]);
     }
-    if (pages.length == 0) {
+    if (pages.length == 0&&getProject()!=undefined) {
+
         activePropertyPanel("project");
-        renderRecent();
+        var page:IPage={key:"pages",name:getProject().name,theme:"light",type:"pages",path:"pages"};
+        renderPage(page);
+       
     }
 
 
@@ -366,7 +383,7 @@ export function renderPage(page: IPage) {
             e.stopPropagation();
 
 
-            if (page.change) {
+            if ((page.type=="page"||page.type=="title")&& page.change) {
 
                 ipcRendererSend("isSave", { message: "是否保存 " + page.name, page: page.key });
                 ipcRenderer.on("_isSave", (eve, arg) => {
@@ -408,9 +425,19 @@ export function renderPage(page: IPage) {
         workbenchpages.appendChild(pageView);
 
         //渲染页面工作区
-        renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
-        //更新右侧、底部面板
+        if(page.type=="projects"){
+            renderProjectsPage(pageView);
 
+        }else if(page.type=="pages"){
+            renderPagesPage(pageView);
+
+        }else if(page.type=="markdown"){
+            renderMarkDownPage(pageView,page.path);
+
+        }else{
+            renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
+        }
+        //更新右侧、底部面板
         onOpenPage(page);
 
 

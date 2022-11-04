@@ -6,44 +6,6 @@ mac touchbar
 import { BrowserWindow, TouchBar } from "electron";
 import * as path from "path";
 const {TouchBarColorPicker, TouchBarButton } = TouchBar
-export function touchBarHub(mainWindow:BrowserWindow){
-    const nativeImage = require('electron').nativeImage;
-   
-    mainWindow.setTouchBar(new TouchBar({
-        items:[
-          new TouchBarButton({
-            icon:nativeImage.createFromPath( path.join(__dirname, '../../touchbar/back.png')),
-        
-            click: () => {
-                mainWindow.webContents.send("touchBar_back");
-            }
-           }),
-           new TouchBarButton({
-            icon:nativeImage.createFromPath( path.join(__dirname, '../../touchbar/open.png')),
-           
-            click: () => {
-                mainWindow.webContents.send("touchBar_open");
-            }
-           }),
-           new TouchBarButton({
-            icon:nativeImage.createFromPath( path.join(__dirname, '../../touchbar/new.png')),
-           
-            click: () => {
-                mainWindow.webContents.send("touchBar_new");
-            }
-           }),
-           new TouchBarButton({
-            icon:nativeImage.createFromPath( path.join(__dirname, '../../touchbar/git.png')),
-           
-            click: () => {
-                mainWindow.webContents.send("touchBar_git");
-            }
-           }),
-        ]
-        }))
-
-}
-
 export function touchBarEditor(mainWindow:BrowserWindow){
     const nativeImage = require('electron').nativeImage;
     mainWindow.setTouchBar(new TouchBar({

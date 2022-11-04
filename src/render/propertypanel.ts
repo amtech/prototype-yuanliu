@@ -95,8 +95,8 @@ export function renderPropertyPanel(content: HTMLElement) {
     propertyPanel.appendChild(tabsBody);
 
 
-    ipcRendererSend("loadPluginsProperty");
-    ipcRenderer.on("_loadPluginsProperty", (event, arg) => {
+    ipcRenderer.send("loadPlugins","property");
+    ipcRenderer.on("_loadPlugins_property", (event, arg) => {
         var plugins: IPanel[] = [];
         arg.forEach((item: string) => {
             var panel: IPanel = require("../plugins/property/"+item).default();

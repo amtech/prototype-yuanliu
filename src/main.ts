@@ -2,126 +2,90 @@
 Copyright (c) taoyongwen. All rights reserved.
 main
 ***************************************************************************** */
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, Menu, screen, shell } from "electron";
 import * as path from "path";
-import { touchBarEditor, touchBarHub } from "./server/touchBar";
+import { IProject } from "./common/interfaceDefine";
+import { loadCommonIpc } from "./server/commonIpc";
+import { loadProjectIpc, pushProjectMap } from "./server/projectIpc";
+import * as storage from "./server/storage";
+import { touchBarEditor } from "./server/touchBar";
 //单一实例
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
-  app.quit();
+  app.quit()
 }
-var wId = 1;
-var screen_width: number = 600;
-var screen_height: number = 1000;
+//监听第二实例
+app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+  // Print out data received from the second instance.
+  // Someone tried to run a second instance, we should focus our window.
+  createWindow();
+})
 //创建窗口
-function createWindow(project: any) {
+function createWindow(project?:IProject) {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
+  var config = storage.readConfig();
   var mainWindow: BrowserWindow = new BrowserWindow({
-    height: screen_height,
-    width: screen_width,
+    height: height,
+    width: width,
     webPreferences: {
-      devTools:false,
+     // devTools: false,
       preload: path.join(__dirname, "preload.js"),
     },
     titleBarStyle: "hidden",
-   // transparent: process.platform === "darwin"?true:false,
-    show: false,
-    minWidth:1000,
-    minHeight:600,
+    darkTheme: config.theme == "dark"
   });
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "../index.html"));
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
-  var id = wId + 0;
-  setTimeout(() => {
-    const ipc = require("./server/ipc");
-    ipc.loadIpc(mainWindow, id, project);
-    mainWindow.webContents.on("did-finish-load", () => {
-      mainWindow.webContents.send("_init", { id: id });
-    });
-    //清除监听
-    mainWindow.on("close", (event: any) => {
-      ["readConfig", "saveConfig", "readProjects", "saveProjects", "openFolder", "readProject",
-        "readTitleNav", "saveTitle", "saveNav", "newFile", "deleteFile", "copyFile", "renameFile",
-        "savePage", "startPreview", "build", "readPageCatalog", "readDataCatolog",
-        "saveAs", "save", "insertImage", "saveProject", "openPage", "deletePage", "loadPluginsPanel", "loadMapCatalog",
-        "loadMap", "readDatabase", "saveDatabase", "min", "max", "close", "touchbar_colors", "touchbar_default", 
-        "desktopCapturer","isSave","show-context-menu","show-notification","importDataExcel","loadPluginsStatus_"].forEach((item: any) => {
-          ipcMain.removeAllListeners(item + "_" + id);
-        });
-    });
-    wId++;
-  }, 10);
+  mainWindow.webContents.on("will-navigate",(event: Electron.Event, url: string)=>{
+    event.preventDefault();
+    shell.openExternal(url);
+  });
+
   if (process.platform === "darwin") {
     touchBarEditor(mainWindow);
   }
-  setTimeout(() => {
-    mainWindow.show();
-    mainWindow.maximize();
-  }, 2000);
+  if(project!=undefined){
+    pushProjectMap(mainWindow.webContents.getProcessId(),project);
+  }
 }
-var vib: ('appearance-based' | 'light' | 'dark' | 'titlebar' | 'selection' | 'menu' | 'popover' | 'sidebar' | 'medium-light' | 'ultra-dark' | 'header' | 'sheet' | 'window' | 'hud' | 'fullscreen-ui' | 'tooltip' | 'content' | 'under-window' | 'under-page') = "sidebar";
-var hub: BrowserWindow;
-//创建hub窗口
-function createHub() {
-  var mainWindow: BrowserWindow = new BrowserWindow({
-    height: 600,
-    minHeight:500,
-    minWidth:700,
-    webPreferences: {
-      devTools:false,
-      preload: path.join(__dirname, "./hub/hubPreload.js"),
-    },
-    width: 900,
-    titleBarStyle: "hidden",
-  });
-  hub = mainWindow;
-  // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "../hub.html"));
-  // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
-  ipcMain.on("openProject_hub", (event: any, arg: any) => {
-    const work = require("./server/work");
-    work.initWork(arg);
-    createWindow(arg);
-  });
-  ipcMain.on("openHub", (event: any, arg: any) => {
-    console.log("openHub");
-    mainWindow.maximize();
-  });
-  //touchBar
-  setTimeout(() => {
-    const ipchub = require("./hub/ipchub");
-    ipchub.loadHubIpc(mainWindow);
-    touchBarHub(mainWindow);
-  }, 10);
-  setTimeout(() => {
-    const storage = require("./server/storage");
-    ipcMain.on("saveConfig_hub", (event: any, arg: any) => {
-      storage.saveConfig(arg);
-      mainWindow.webContents.send("_saveConfig", null);
-    })
+app.on("open-file",(event,file)=>{
+  var work = path.join(app.getPath("home"), ".prototyping", "work");
+  if(file.indexOf(work)==0){
+   var project:IProject={name:path.basename(file),path:file};
+    //project
+    createWindow(project);
+  }else{
+    //other
+    shell.openPath(file);
+  }
+})
+loadCommonIpc();
+loadProjectIpc();
 
-  }, 10);
-  setTimeout(() => {
-    const { screen } = require('electron');
-    // Create a window that fills the screen's available work area.
-    const primaryDisplay = screen.getPrimaryDisplay();
-    const { width, height } = primaryDisplay.workAreaSize;
-    screen_height = height;
-    screen_width = width;
-  }, 3000);
-}
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+const dockMenu = Menu.buildFromTemplate([
+  {
+    label: 'New Window',
+    click () { 
+      createWindow();
+    }
+  }
+])
+
 app.on("ready", () => {
-  createHub();
+  if (process.platform === 'darwin') {
+    app.dock.setMenu(dockMenu)
+  }
+  createWindow();
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {
-      ipcMain.removeAllListeners(); createHub();
+      // ipcMain.removeAllListeners();
+      createWindow();
     }
   });
 });

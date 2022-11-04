@@ -14,14 +14,14 @@ const store:IStatusBarActivity={
 
         if (config == undefined) {
             i.className= "bi bi-eye";
-        }
+        }else
         if (config.eye == undefined) {
             config.eye = false;
 
         }
 
 
-        if (config.eye) {
+        if (config!=undefined&& config.eye) {
             i.className= "bi bi-eye-slash";
         } else {
             i.className= "bi bi-eye";
@@ -34,13 +34,13 @@ const store:IStatusBarActivity={
         acticity.appendChild(i);
         if (config == undefined) {
             i.className= "bi bi-eye";
-        }
+        }else
         if (config.eye == undefined) {
             config.eye = false;
 
         }
         config.eye = !config.eye;
-        if (config.eye) {
+        if (config!=undefined&&config.eye) {
             i.className= "bi bi-eye-slash";
         } else {
             i.className= "bi bi-eye";

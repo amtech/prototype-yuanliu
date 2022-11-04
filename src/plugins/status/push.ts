@@ -7,7 +7,7 @@ const push:IStatusBarActivity={
     position:"left",
     sort:6,
     onRender(acticity, config?, project?) {
-        if(project.type=="git"){
+        if(project!=undefined&& project.type=="git"){
             var i=document.createElement("i");
             i.className="bi bi-cloud-upload";
             acticity.appendChild(i);

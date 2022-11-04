@@ -9,7 +9,7 @@ const pagea:IStatusBarActivity={
     },
     onUpdate(acticity, config?, project?, page?, component?, selects?) {
         acticity.innerHTML="";
-        if(page!=undefined){
+        if(page!=undefined&&page.width!=undefined){
             var i=document.createElement("i");
             i.className="bi bi-file-earmark";
             acticity.appendChild(i);

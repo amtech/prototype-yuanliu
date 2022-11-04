@@ -1,6 +1,6 @@
 {
     "name": "yuanliu",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "description": "源流-让设计跟接近产品",
     "main": "dist/main.js",
     "scripts": {
@@ -24,6 +24,7 @@
     "devDependencies": {
         "@types/d3": "^7.1.0",
         "@types/dom-to-image": "^2.6.4",
+        "@types/markdown-it": "^12.2.3",
         "@types/sharp": "^0.30.4",
         "@types/three": "^0.140.0",
         "@typescript-eslint/eslint-plugin": "^4.33.0",
@@ -43,6 +44,7 @@
         "echarts": "^5.3.2",
         "file-saver": "^2.0.5",
         "font-list": "^1.4.5",
+        "markdown-it": "^13.0.1",
         "node-xlsx": "^0.21.0",
         "request": "^2.88.2",
         "sharp": "^0.30.7",

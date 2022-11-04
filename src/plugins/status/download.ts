@@ -9,7 +9,7 @@ const download:IStatusBarActivity={
     onRender(acticity, config?, project?) {
        
      
-        if(project.type=="git"){
+        if(project!=undefined&& project.type=="git"){
             var i=document.createElement("i");
             i.className="bi bi-cloud-download";
             acticity.appendChild(i);

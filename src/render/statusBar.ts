@@ -39,7 +39,7 @@ export function renderStatusBar(){
 
 
   
-    ipcRenderer.on("_loadPluginsStatus",(event,arg)=>{
+    ipcRenderer.on("_loadPlugins_status",(event,arg)=>{
         var plugins: IStatusBarActivity[] = [];
         arg.forEach((item: string) => {
             var panel: IStatusBarActivity = require("../plugins/status/"+item).default   ;
@@ -53,7 +53,7 @@ export function renderStatusBar(){
 
 
     });
-    ipcRendererSend("loadPluginsStatus");
+    ipcRenderer.send("loadPlugins",'status');
 
 }
 var acticities:IStatusBarActivity[]=[];

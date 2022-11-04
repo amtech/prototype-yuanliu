@@ -122,6 +122,9 @@ function renderLayers(context: HTMLElement) {
 
 }
 function changeLayers(layers: IComponent[]) {
+    if(layers==undefined){
+        return;
+    }
     layerList = [];
     console.log("changeLayers", layers.length);
     tranformLayers(layers, 0);

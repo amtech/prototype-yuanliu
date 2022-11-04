@@ -561,8 +561,8 @@ export function loadPlugins(plugin:"explorer"|"background"|"component"|"panel"|"
     if (fs.existsSync(componentsFolder)) {
         fs.readdirSync(componentsFolder).forEach(file => {
             if (file.endsWith(".js")) {
-                var path = file;
-                result.push(path);
+                
+                result.push(file.replace(".js",""));
             }
 
         })

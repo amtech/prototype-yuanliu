@@ -37,7 +37,7 @@ export default explorer;
 
 function renderComponentsExplorer(content: HTMLElement) {
   
-    ipcRenderer.on("_loadPluginsComponent", (event, args) => {
+    ipcRenderer.on("_loadPlugins_component", (event, args) => {
         //    console.log("_loadPluginsComponent", args);
         var components: IComponent[] = [];
         args.forEach((item: string) => {
@@ -71,7 +71,7 @@ function renderComponentsExplorer(content: HTMLElement) {
             showCustomComponent();
         }
     });
-    ipcRendererSend("loadPluginsComponent");
+    ipcRenderer.send("loadPlugins","component");
 }
 
 function renderComponentGroup(content: HTMLElement, key: string, label: string) {

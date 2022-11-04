@@ -35,45 +35,55 @@ export function saveConfig() {
  */
 export function renderWorkSpace(app: HTMLElement) {
     layout(app);
+    onContextMenu();
     requestIdleCallback(() => {
         //import * as shorcuts from "./shorcuts";
-        const shorcuts = require("./shorcuts");
-        shorcuts.init();
+        // const shorcuts = require("./shorcuts");
+        // shorcuts.init();
+        // var page:IPage={key:"projects",name:"Get Started",theme:"light",type:"projects",path:"projects"};
+        // renderPage(page);
     });
 
-    onContextMenu();
+    ipcRenderer.send("windowsLoaded");
+    ipcRenderer.on("_openProjects",()=>{
+        var page:IPage={key:"projects",name:"Get Started",theme:"light",type:"projects",path:"projects"};
+        renderPage(page);
+    })
 
-    ipcRendererSend("readProject");
+   // ipcRendererSend("readProject");
     ipcRenderer.on("_readConfig", (event: any, arg: any) => {
         console.log("_readConfig", arg);
         config = arg;
         app.setAttribute("data-platform", process.platform);
         app.className = config.theme;
-        renderRecent();
-        renderStatusBar();
+        // renderRecent();
+       // renderStatusBar();
     
     });
-    ipcRendererSend("readConfig");
+    ipcRenderer.send("readConfig");
 
     ipcRenderer.on("_readProject", (event, arg) => {
         console.log("_readProject", arg);
         document.title = arg.name + " - " + arg.path;
         project = arg;
-        //  render(app);
+      
         //切换主题色
         document.body.style.cssText = "--theme-color:" + getProject().themeColor + ";" + "--light-color:" + getProject().lightColor;
+        var page:IPage={key:"pages",name:arg.name,theme:"light",type:"pages",path:"pages"};
+        renderPage(page);
 
         requestIdleCallback(() => {
+            loadProjectTitleNav();
             updateToolbar();
             updateSidebar({type:"project",data:project});
-            activePropertyPanel("project");
+            // activePropertyPanel("project");
             updateFloatPanel(undefined);
         });
 
     })
 
     ipcRenderer.on("_openPage", (event, arg: IPage) => {
-        hideRecent();
+      
         if (arg == undefined) {
             showMessageBox("页面不存在", "info");
         } else {
@@ -251,7 +261,7 @@ function layout(app: HTMLElement) {
     row.appendChild(tabs);
 
     tabs.ondblclick = () => {
-        renderRecent();
+      
     }
 
     //工具栏
@@ -273,15 +283,15 @@ function layout(app: HTMLElement) {
     onSelect(pages);
 
     //最近使用页面
-    var recent = document.createElement("div");
-    recent.className = "project_recent";
-    recent.id = "project_recent";
-    recent.style.top = toolBarHeight + "px";
-    recent.style.position = "fixed";
-    recent.style.right = edgePanelWidth+"px";
-    recent.style.left = sideBarWidth+"px";
-    recent.style.bottom = statusBarHeight + "px";
-    app.appendChild(recent);
+    // var recent = document.createElement("div");
+    // recent.className = "project_recent";
+    // recent.id = "project_recent";
+    // recent.style.top = toolBarHeight + "px";
+    // recent.style.position = "fixed";
+    // recent.style.right = edgePanelWidth+"px";
+    // recent.style.left = sideBarWidth+"px";
+    // recent.style.bottom = statusBarHeight + "px";
+    // app.appendChild(recent);
 
     //扩展页面
     var expand = document.createElement("div");
@@ -358,9 +368,10 @@ function layout(app: HTMLElement) {
     renderSidebar(sideBar);
     renderFloatPanel(floatPanel);
     renderPropertyPanel(edgePanel);
+    renderStatusBar();
 
     requestIdleCallback(() => {
-        loadProjectTitleNav();
+       // loadProjectTitleNav();
         renderRightSilderBar(app, 64,edgePanel.clientWidth,floatPanelHeight+statusBarHeight);
     });
 }
@@ -417,94 +428,7 @@ function renderRightSilderBar(content: HTMLElement, t: number,r:number,b:number)
 export function showMessageBox(message: string, type: "info" | "error" | "warning" | "question" | "none") {
     ipcRendererSend("show-notification", message);
 }
-export function hideRecent() {
-    //最近使用页面
-    var recent = document.getElementById("project_recent");
-    recent.style.display = "none";
-}
-export function renderRecent() {
 
-    //最近使用页面
-    var recent = document.getElementById("project_recent");
-    recent.style.display = "block";
-    recent.innerHTML = "";
-    var content = document.createElement("div");
-    content.style.width = "300px";
-    recent.appendChild(content);
-
-    var title = document.createElement("div");
-    title.innerHTML = "最近使用";
-    title.style.lineHeight = "30px";
-    title.style.fontSize = "10px";
-    title.className = "project_recent_title"
-  //  title.style.color="var(--theme-color)";
-    title.style.borderBottom="1px solid";
-    content.appendChild(title);
-
-    var list = document.createElement("div");
-    list.style.minWidth = "800px";
-    content.appendChild(list);
-
-    ipcRenderer.on("_readProjectRecentPage", (event, recentData) => {
-
-        if (recentData.length > 0) {
-            for (var i = recentData.length - 1; i >= 0; i--) {
-
-                if (recentData.length - i > 9) {
-                    continue;
-                }
-                var pagePath = recentData[i];
-
-                var pg: any = getPageByPath(pagePath, getProject().catalogs);
-
-                if (pg != undefined) {
-                    var page = document.createElement("div");
-                    page.className = "recent_card ground";
-                    page.id = pg.key;
-                    page.setAttribute("data-path", pg.path);
-                    page.setAttribute("data-name", pg.name);
-                    list.appendChild(page);
-
-                    var imageDiv = document.createElement("div");
-                    imageDiv.style.height = "100px";
-                    imageDiv.style.width = "200px";
-                    page.appendChild(imageDiv);
-                    imageDiv.style.backgroundImage = "url(" + getProject().work + "/images/" + pg.key + ".jpeg" + ")";
-                    imageDiv.style.backgroundSize = "cover";
-                    imageDiv.style.pointerEvents = "none";
-                    imageDiv.style.borderRadius="2px";
-
-                    var pageTitle = document.createElement("div");
-                    pageTitle.innerHTML = pg.name;
-                    pageTitle.style.lineHeight = "30px";
-                    pageTitle.style.fontSize = "12px";
-                    pageTitle.style.textAlign="center";
-                    pageTitle.style.pointerEvents = "none";
-                    page.appendChild(pageTitle);
-
-
-                    page.onclick = (e: MouseEvent) => {
-                        //open page
-                        //   renderPage(catalog.page);
-                        var cp: any = e.target;
-                  
-                        ipcRendererSend("openPage", {
-                            path: cp.getAttribute("data-path"), name: cp.getAttribute("data-name")
-                        });
-
-
-                    }
-                }
-
-
-            }
-
-        }
-
-    })
-    ipcRendererSend("readProjectRecentPage", null);
-
-}
 export function getPageByPath(pagePath: string, catalogs: ICatalog[]) {
     for (var index in catalogs) {
         var cl = catalogs[index];
@@ -551,9 +475,7 @@ export function openExpand() {
 
     // console.log("layers", layers);
     layers.forEach((layer: IComponent) => {
-
         renderLayersTree(layer, expandCatalog);
-
     });
 
 
@@ -570,23 +492,13 @@ function renderLayersTree(layer: IComponent, expandCatalog: HTMLElement) {
         component_item_icon.className = layer.icon;
         component_item.appendChild(component_item_icon);
         expandCatalog.appendChild(component_item);
-
         component_item.onclick = () => {
-
             if (layer.isExpand) {
                 renderExpand(layer);
                 activePropertyPanel(layer);
-
             }
-
-
-
         }
-
-
     }
-
-
 }
 
 function onSelect(pages: HTMLElement) {

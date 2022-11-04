@@ -27,8 +27,8 @@ export function renderFloatPanel(content: HTMLElement) {
 
     renderSilderBar(floatPanel);
 
-    ipcRendererSend("loadPluginsPanel");
-    ipcRenderer.on("_loadPluginsPanel", (event, arg) => {
+    ipcRenderer.send("loadPlugins","panel");
+    ipcRenderer.on("_loadPlugins_panel", (event, arg) => {
         //    console.log("_loadPluginsPanel",arg);
         var plugins: IPanel[] = [];
         arg.forEach((item: string) => {

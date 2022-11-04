@@ -109,7 +109,7 @@ function renderCatalog(content: HTMLElement) {
         
 
     });
-    ipcRendererSend("readDatabase")
+    //ipcRendererSend("readDatabase")
 
 
 }

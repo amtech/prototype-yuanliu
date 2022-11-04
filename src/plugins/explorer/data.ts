@@ -76,7 +76,7 @@ var database: IDatabase;
 
         }
     });
-    ipcRendererSend("readDatabase");
+   // ipcRendererSend("readDatabase");
 
 }
 

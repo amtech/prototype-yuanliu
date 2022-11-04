@@ -213,6 +213,73 @@ export class FormPragraph {
 
 }
 
+export class FormButtons{
+
+
+    buttons: IMenuItem[];
+    ele: HTMLDivElement;
+    constructor( buttons: IMenuItem[]) {
+        this.buttons = buttons;
+    }
+    render(content: HTMLElement) {
+
+        var div = document.createElement("div");
+        div.style.marginTop = "5px";
+        div.style.display = "flex";
+        div.style.fontSize = "12px";
+        div.style.padding = "5px 10px 5px 10px";
+        div.style.alignItems = "center";
+        div.style.borderRadius = "5px";
+        div.style.height = "24px";
+        div.className = "form_bg"
+        div.style.display="flex";
+
+        var start=document.createElement("div");
+        start.style.flex="1";
+        div.appendChild(start);
+
+
+        if (this.buttons != undefined && this.buttons.length > 0) {
+            this.buttons.forEach(btn=>{
+                var tapDiv = document.createElement("div");
+                tapDiv.style.flex="1";
+                tapDiv.style.display="flex";
+                tapDiv.style.alignItems="center";
+                tapDiv.style.fontSize="12px";
+                tapDiv.style.marginTop="5px";
+                tapDiv.style.color="var(--theme-color)";
+              
+                var tapIcon = document.createElement("i");
+                tapIcon.className = btn.icon + "";
+                tapDiv.appendChild(tapIcon);
+                tapIcon.style.paddingRight="5px";
+            
+                var text=document.createElement("div");
+                text.innerText=btn.label;
+                text.className="link";
+                tapDiv.appendChild(text);
+                content.appendChild(tapDiv);
+                text.onclick=()=>{
+                  btn.onclick();
+                }
+
+                div.appendChild(tapDiv);
+                var end=document.createElement("div");
+                end.style.flex="1";
+                div.appendChild(end);
+
+            })
+    
+          
+        }
+
+
+        content.appendChild(div);
+      
+
+    }
+}
+
 export class FormIcons {
 
     label: string;
