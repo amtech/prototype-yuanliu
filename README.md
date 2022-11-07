@@ -20,20 +20,24 @@
 ### 导出页面
 ![源流导出界面](./Export.png)
 
-## 打包源码
-Package your Electron app into OS-specific bundles (.app, .exe, etc.) via JavaScript or the command line.\
-window
-```bash
-npm run build_mac
-```
-mac
-```bash
-npm run build_win
-```
 
-## 了解更多
+## 版本更新
 
-- [violetime.com](https://www.violetime.com) - all Prototyping of 's documentation、download yuanliu for Mac or Windows 
+- [release 2.1.0](./releases//2.1.0/release%202.1.0.md) 
+
+## 文档介绍
+
+- [开始](./docs/started/Getting%20Started.md)
+- [安装](./docs/setup/Setting%20up.md)
+- [用户界面](./docs/guide/User%20guide.md)
+- [组件](./docs/components/components.md)
+- [蓝图](./docs/blueprint/blueprint.md)
+- [演示&导出](./docs/build/build.md)
+
+## 了解个更多
+
+访问[violetime.com](http://violetime.com/)
+
 
 ## License
 

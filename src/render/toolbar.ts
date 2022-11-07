@@ -32,7 +32,7 @@ export function renderToolbar(content: HTMLElement) {
         //touchbar
         ipcRenderer.on("touchBar_save", (event: any, arg: any) => {
 
-            saveSimplePage(getCurPage());
+            saveSimplePage(getCurPage(true));
         });
         ipcRenderer.on("touchBar_fresh", (event: any, arg: any) => {
 
@@ -237,7 +237,7 @@ const tools = [
         },
         {
             key: "tool_save", label: "保存页面", icon: "bi bi-file-post", onTaped: (component: IComponent) => {
-                saveSimplePage(getCurPage());
+                saveSimplePage(getCurPage(true));
             }
         }
        

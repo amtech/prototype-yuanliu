@@ -59,6 +59,7 @@
         "directories": {
             "output": "builder"
         },
+
         "mac": {
             "target": [
                 "dmg",

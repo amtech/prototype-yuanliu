@@ -126,7 +126,7 @@ export function getCurPageKey() {
  * 获取当前页面
  * @returns 
  */
-export function getCurPage() {
+export function getCurPage(iSort?:boolean) {
 
     var page = pages.find(p => p.key == selectPageKey);
     if (page != undefined) {
@@ -138,7 +138,8 @@ export function getCurPage() {
         }
         if (page != undefined && page.children != undefined) {
             //sort
-            component_sort(page.children);
+            if(iSort)
+                component_sort(page.children);
         }
         return page;
     }
