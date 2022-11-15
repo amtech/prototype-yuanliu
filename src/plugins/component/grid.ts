@@ -24,6 +24,7 @@ import { IComponent } from "../../common/interfaceDefine"
         gridBg.style.right="0";
         gridBg.style.zIndex="0";
         var gridContent=document.createElement("div");
+        gridContent.className = "component_body";
         gird.appendChild(gridBg);
         gird.appendChild(gridContent);
         if(type=="product"){

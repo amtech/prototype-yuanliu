@@ -25,7 +25,7 @@ const component: IComponent = {
         var select=document.createElement("select");
         div.appendChild(select);
      
-        var options=JSON.parse(component.option);
+        var options=eval(component.option);
         options.forEach((ele:any) => {
 
             var option = document.createElement("option");

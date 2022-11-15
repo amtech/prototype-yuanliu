@@ -367,7 +367,7 @@ export function renderComponents(content: HTMLElement, components: IComponent[],
         if (component.isRemoved == undefined && !component.isRemoved) {
             if (component.onRender == undefined) {
                 try {
-                    installComponent(component);
+                    installComponent(component,parent.path);
                 } catch (error) {
                     console.log(error);
                 }
@@ -417,7 +417,14 @@ export function copyComponent(cmpt: any, parentPath?: string) {
  * 给组件绑定 
  * @param component 
  */
-export function installComponent(component: IComponent) {
+export function installComponent(component: IComponent,parentPath?:string) {
+
+        if(parentPath!=undefined){
+            component.path=parentPath+"/"+component.key;
+        }else{
+            component.path=component.key;
+        }
+
     if (component.type == "icon") {
         var icon_e = component.icon;
         component.onPreview = () => {
@@ -706,8 +713,6 @@ export function renderComponent(content: HTMLElement, component: IComponent, dro
         eventEle.setAttribute("selected", "true");
         e.stopPropagation();
         onSelectComponents([component]);
-
-
     }
     ////////////
     //组件拖拽事件
@@ -1288,9 +1293,11 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
                 //      console.log("parent is undefined");
                 var index = getCurPage().children.findIndex(x => x.key == component.key);
                 if (index >= 0) {
+                   
                     getCurPage().children.splice(index, 0, dragComponent);
                     var content = getCurPageContent();
                     content.innerHTML = "";
+                    component.path=component.key;
                     renderComponents(content, getCurPage().children, undefined);
                 }
 
@@ -1300,6 +1307,7 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
                     parent.children.splice(index, 0, dragComponent);
                     var content = document.getElementById(parent.key);
                     content.innerHTML = "";
+                    component.path= component.path+"/"+component.key;
                     renderComponents(content, parent.children, undefined);
                 }
             }

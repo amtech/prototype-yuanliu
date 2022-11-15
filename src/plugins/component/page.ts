@@ -30,6 +30,7 @@ const component: IComponent = {
         pageContent.style.justifyContent="center";
         pageContent.style.height="inherit";//height: inherit;
         pageContent.style.width="inherit";
+        pageContent.className = "component_body";
 
         page.appendChild(pageBg);
         page.appendChild(pageContent);

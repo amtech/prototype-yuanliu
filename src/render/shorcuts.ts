@@ -56,8 +56,17 @@ export function init() {
                 var cmp = findCurPageComponent(ls[0]);
                 if(cmp!=undefined){
                     var root=document.getElementById(cmp.key);
-                    if(root.getElementsByClassName("component_bg").length>0){
-                        var body:any=root.children.item(1);
+                    var body:HTMLElement;
+                    for(var i=0;i<root.childElementCount;i++){
+                        var child:any=root.children.item(i);
+                        if(child.className=="component_body"){
+                            body=child;
+                            break;
+                        }
+                    }
+              
+                    if(body!=undefined){
+                      
                         clipboardPaste(body, cmp);
                     }else{
                         clipboardPaste(root, cmp);

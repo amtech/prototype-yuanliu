@@ -15,6 +15,16 @@ export function renderMarkDownPage(content: HTMLElement,url:string) {
     page.style.overflow="auto";
     content.appendChild(page);
 
+    var view=document.createElement("div");
+    view.style.maxWidth="800px";
+    view.style.margin="0 auto";
+    view.className="surface";
+    view.style.padding="50px";
+    view.style.borderRadius="5px";
+    view.style.boxShadow="0px 0px 10px rgba(0,0,0,0.2)";
+    page.appendChild(view);
+
+
 
     
     var httpRequest = new XMLHttpRequest();//第一步：建立所需的对象
@@ -28,9 +38,9 @@ export function renderMarkDownPage(content: HTMLElement,url:string) {
             var text = httpRequest.responseText;//获取到json字符串，还需解析
                var mk=new Markdown();
               var html=  mk.render(text);
-              page.innerHTML=html;
+              view.innerHTML=html;
         }else{
-            page.innerHTML="404";
+            view.innerHTML="404";
         }
     };
 

@@ -39,6 +39,7 @@ const component: IComponent = {
 
         button.appendChild(bg);
         var body = document.createElement("div");
+        body.className = "component_body";
         body.style.display = "flex";
         body.style.alignItems = "center";
         button.appendChild(body);

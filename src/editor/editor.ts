@@ -4,6 +4,8 @@ Copyright (c) taoyongwen. All rights reserved.
 文本编辑器
 ***************************************************************************** */
 
+import { tree } from "d3";
+
 export class Editor {
     editor: HTMLElement;
     width: number;
@@ -11,19 +13,19 @@ export class Editor {
     lineHeight: number = 18;
     fontSize: number = 12;
     measure: HTMLElement;
-    content:HTMLElement;
+    content: HTMLElement;
 
-    constructor(content: HTMLElement, onChange: (lines: string) => void,h?:number) {
+    constructor(content: HTMLElement, onChange: (lines: string) => void, h?: number) {
 
         this.editor = document.createElement("div");
-        this.editor.className="editor form_bg";
+        this.editor.className = "editor form_bg";
         content.appendChild(this.editor);
-        this.content=content;
+        this.content = content;
         this.width = content.clientWidth;
-       
-        if(h!=undefined){
+
+        if (h != undefined) {
             this.height = h;
-        }else{
+        } else {
             this.height = content.clientHeight;
         }
         this.onChange = onChange;
@@ -34,10 +36,11 @@ export class Editor {
     navBar: HTMLElement;
     view: HTMLElement;
     textarea: HTMLTextAreaElement;
-    composition: boolean = false;
+    composition: boolean = undefined;
     selectLine: HTMLDivElement;
     selectIndex: number = 0;
     onChange: (lines: string) => void;
+    isChanging: any;
     change() {
 
         if (this.onChange != undefined) {
@@ -46,14 +49,19 @@ export class Editor {
                 var line = this.view.children.item(i).textContent;
                 lines += line + "\n";
             }
-            this.onChange(lines);
+            if (this.isChanging != undefined) {
+                clearTimeout(this.isChanging);
+            }
+            this.isChanging = setTimeout(() => {
+                this.onChange(lines);
+            }, 1000);
         }
 
     }
-    resize(){
-        if(this. content.clientHeight>0){
-            this.width =this. content.clientWidth;
-            this.height =this. content.clientHeight;
+    resize() {
+        if (this.content.clientHeight > 0) {
+            this.width = this.content.clientWidth;
+            this.height = this.content.clientHeight;
         }
         this.editor.style.height = this.height + "px";
     }
@@ -61,12 +69,12 @@ export class Editor {
 
         this.editor.style.overflow = "auto";
         this.editor.style.height = this.height + "px";
-        this.editor.style.borderRadius="5px";
+        this.editor.style.borderRadius = "5px";
 
 
         var context = document.createElement("div");
         context.style.display = "flex";
-        context.style.padding="5px 5px 5px 0px";
+        context.style.padding = "5px 5px 5px 0px";
         this.editor.appendChild(context);
 
         this.navBar = document.createElement("div");
@@ -94,102 +102,102 @@ export class Editor {
         this.textarea.ariaSetSize = "false";
 
 
-        this.view.tabIndex=100;
+        this.view.tabIndex = 100;
         this.view.appendChild(this.textarea);
 
 
         this.view.onkeydown = (e) => {
-            e.preventDefault();
+          
             e.stopPropagation();
-            
-            var wst=window.getSelection();
-            
-            if(wst.type=="Range"){
-                var anchorNode:any=wst.anchorNode.parentElement;
-                var anchorRow=parseInt(anchorNode.getAttribute("data-row"));
-                var focusNode:any=wst.focusNode.parentElement;
-                var focusRow=parseInt(focusNode.getAttribute("data-row"));
-                var anchorOffset=wst.anchorOffset+0;
-                var focusOffset=wst.focusOffset+0;
-              
-                if(e.key=="Backspace"){
-                    if(anchorRow==focusRow){
-                        if(anchorOffset>focusOffset){
-                            var temp=focusOffset+0;
-                            focusOffset=anchorOffset+0;
-                            anchorOffset=temp+0;
+
+            var wst = window.getSelection();
+
+            if (wst.type == "Range") {
+                var anchorNode: any = wst.anchorNode.parentElement;
+                var anchorRow = parseInt(anchorNode.getAttribute("data-row"));
+                var focusNode: any = wst.focusNode.parentElement;
+                var focusRow = parseInt(focusNode.getAttribute("data-row"));
+                var anchorOffset = wst.anchorOffset + 0;
+                var focusOffset = wst.focusOffset + 0;
+
+                if (e.key == "Backspace") {
+                    if (anchorRow == focusRow) {
+                        if (anchorOffset > focusOffset) {
+                            var temp = focusOffset + 0;
+                            focusOffset = anchorOffset + 0;
+                            anchorOffset = temp + 0;
                         }
-                        focusNode.innerText=focusNode.innerText.substring(0,anchorOffset)+focusNode.innerText.substring(focusOffset);
-                        this.selectLine=focusNode;
-                        this.selectIndex=anchorOffset;
-                 
+                        focusNode.innerText = focusNode.innerText.substring(0, anchorOffset) + focusNode.innerText.substring(focusOffset);
+                        this.selectLine = focusNode;
+                        this.selectIndex = anchorOffset;
+
                         this.textareaPosition();
                         this.textarea.focus({
-                            preventScroll:true
+                            preventScroll: true
                         });
                         this.change();
-                    }else if(anchorRow<focusRow){
+                    } else if (anchorRow < focusRow) {
 
-                        anchorNode.innerText=anchorNode.innerText.substring(0,anchorOffset)+focusNode.innerText.substring(focusOffset);
+                        anchorNode.innerText = anchorNode.innerText.substring(0, anchorOffset) + focusNode.innerText.substring(focusOffset);
                         //删除行
-                        var next=anchorNode.nextElementSibling;
-                        while(next!=undefined){
-                            var nextRow=next.getAttribute("data-row");
-                            var _next=next.nextElementSibling;
+                        var next = anchorNode.nextElementSibling;
+                        while (next != undefined) {
+                            var nextRow = next.getAttribute("data-row");
+                            var _next = next.nextElementSibling;
                             next.remove();
 
-                            if(nextRow==focusRow){
+                            if (nextRow == focusRow) {
                                 break;
                             }
-                            next=_next;
+                            next = _next;
                         }
-                        
-                        this.selectLine=anchorNode;
-                        this.selectIndex=anchorOffset;
+
+                        this.selectLine = anchorNode;
+                        this.selectIndex = anchorOffset;
                         this.textareaPosition();
                         this.textarea.focus({
-                            preventScroll:true
+                            preventScroll: true
                         });
                         this.adjustTop();
                         this.change();
-                    }else if(anchorRow>focusRow){
+                    } else if (anchorRow > focusRow) {
 
-                        focusNode.innerText=focusNode.innerText.substring(0,anchorOffset)+anchorNode.innerText.substring(focusOffset);
+                        focusNode.innerText = focusNode.innerText.substring(0, anchorOffset) + anchorNode.innerText.substring(focusOffset);
                         //删除行
-                        var next=focusNode.nextElementSibling;
-                        while(next!=undefined){
-                            var nextRow=next.getAttribute("data-row");
-                            var _next=next.nextElementSibling;
+                        var next = focusNode.nextElementSibling;
+                        while (next != undefined) {
+                            var nextRow = next.getAttribute("data-row");
+                            var _next = next.nextElementSibling;
                             next.remove();
-                            if(nextRow==anchorRow){
+                            if (nextRow == anchorRow) {
                                 break;
                             }
-                            next=_next;
+                            next = _next;
                         }
-                        
-                        this.selectLine=focusNode;
-                        this.selectIndex=focusOffset;
+
+                        this.selectLine = focusNode;
+                        this.selectIndex = focusOffset;
                         this.textareaPosition();
                         this.textarea.focus({
-                            preventScroll:true
+                            preventScroll: true
                         });
                         this.adjustTop();
                         this.change();
-                        
+
 
                     }
 
 
                 }
             }
-            console.log(e.key);
+            
         }
 
 
         this.textarea.onkeydown = (e) => {
-       
+            e.stopPropagation();
             if (e.key == "Enter") {
-                e.preventDefault();
+
                 var text = "";
                 if (this.selectIndex < this.selectLine.innerText.length) {
                     text = this.selectLine.innerText.substring(this.selectIndex);
@@ -201,24 +209,24 @@ export class Editor {
 
                 this.adjustTop();
                 this.switchLine(newLine);
-               
+
                 this.textareaPosition();
                 this.updateNav();
                 this.change();
 
             } else if (e.key == "Backspace") {
-                e.preventDefault();
+
                 if (this.selectIndex == 0) {
-               
+
                     var old = this.selectLine.innerText;
                     var up: any = this.selectLine.previousElementSibling;
                     if (up != undefined) {
-               
+
                         this.selectIndex = up.innerText.length;
                         up.innerText += old;
                         this.selectLine.remove();
                         this.selectLine = up;
-                        this.selectLine.setAttribute("selected","true");
+                        this.selectLine.setAttribute("selected", "true");
                         this.textareaPosition();
                         this.adjustTop();
                         this.updateNav();
@@ -238,40 +246,40 @@ export class Editor {
 
                 }
             } else if (e.key == "ArrowRight") {
-                e.preventDefault();
+
                 if (this.selectIndex < this.selectLine.innerText.length) {
                     this.selectIndex++;
                 }
                 this.textareaPosition();
             } else if (e.key == "ArrowLeft") {
-                e.preventDefault();
+
                 if (this.selectIndex > 0) {
                     this.selectIndex--;
                 }
                 this.textareaPosition();
 
             } else if (e.key == "ArrowDown") {
-                e.preventDefault();
+
                 var next: any = this.selectLine.nextElementSibling;
                 if (next != undefined) {
-     
+
                     this.switchLine(next);
                     this.textareaPosition();
                 }
 
             } else if (e.key == "ArrowUp") {
-                e.preventDefault();
+
                 var up: any = this.selectLine.previousElementSibling;
                 if (up != undefined) {
-                
+
                     this.switchLine(up);
                     this.textareaPosition();
                 }
 
             } else if (e.key == "Tab") {
-                
-                e.preventDefault();
-                e.stopPropagation();
+
+
+
                 setTimeout(() => {
                     this.insertValue("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
                 }, 10);
@@ -280,27 +288,44 @@ export class Editor {
         };
 
         this.textarea.onkeyup = (e) => {
+         
             if (e.key == "Enter" || e.key == "Backspace" || e.key == "ArrowRight" || e.key == "ArrowLeft"
                 || e.key == "ArrowDown" || e.key == "ArrowUp" || e.key == "Tab") {
                 this.textarea.value = "";
-                e.stopPropagation();
+
                 return;
             }
-            if (!this.composition) {
-            
-                var text = this.textarea.value;
+           
+            if (this.composition == undefined) {
+
+                var text = this.textarea.value+ "";
+                this.textarea.value = "";
                 this.insertValue(text);
 
-            }
 
+            } else if (this.composition == false) {
+
+                var text = this.textarea.value + "";
+              //  
+                this.textarea.value = "";
+                this.insertValue(text,false);
+                this.composition = undefined;
+
+            }else if(this.composition==true){
+
+                var text = this.textarea.value + "";
+                
+                this.insertValue(text,true);
+            }
+            e.preventDefault();
 
         }
         this.textarea.addEventListener("compositionstart", () => {
-        
+            
             this.composition = true;
         });
         this.textarea.addEventListener("compositionend", () => {
-          
+            
             this.composition = false;
         });
 
@@ -318,67 +343,92 @@ export class Editor {
 
 
     }
-    switchLine(newLine:HTMLDivElement){
-        if(this.selectLine ==newLine){
+    switchLine(newLine: HTMLDivElement) {
+        if (this.selectLine == newLine) {
             return;
         }
-        if(newLine!=undefined){
-            newLine.setAttribute("selected","true");
+        if (newLine != undefined) {
+            newLine.setAttribute("selected", "true");
         }
-        if(this.selectLine!=undefined){
+        if (this.selectLine != undefined) {
             this.selectLine.removeAttribute("selected");
         }
         this.selectLine = newLine;
 
     }
-    insertValue(text: string) {
+    insertValue(text: string,isComposition?:boolean) {
+        
+        if (text.indexOf("\n") > 0) {
+            var a = this.selectLine.innerText.substring(0, this.selectIndex);
 
-        if(text.indexOf("\n")>0){
-            var a=this.selectLine.innerText.substring(0,this.selectIndex);
-            
-            var b=this.selectLine.innerText.substring(this.selectIndex);
-            this.selectLine.innerHTML=this.selectLine.innerHTML.substring(0,this.selectLine.innerHTML.length-a.length);
+            var b = this.selectLine.innerText.substring(this.selectIndex);
+            this.selectLine.innerHTML = this.selectLine.innerHTML.substring(0, this.selectLine.innerHTML.length - a.length);
 
-            var values=text.split("\n");
+            var values = text.split("\n");
             this.insertLineText(values[0]);
-            for(var i=1;i<values.length;i++){
-                var val=values[i];
+            for (var i = 1; i < values.length; i++) {
+                var val = values[i];
                 this.selectIndex = 0;
                 var newLine = this.newLine(val);
                 this.selectLine.insertAdjacentElement("afterend", newLine);
                 this.adjustTop();
                 this.selectLine = newLine;
-               
-               
+
+
             }
-            this.selectLine.innerText+=b;
+            this.selectLine.innerText += b;
             this.textareaPosition();
             this.updateNav();
             this.change();
-            
-        }else{
-            this.insertLineText(text);
+
+        } else {
+            this.insertLineText(text,isComposition);
         }
-       
+
     }
-    insertLineText(text: string){
+    compositionStart:number;
+    compositionEnd:number;
+    compositionLeft:number;
+    insertLineText(text: string,isComposition?:boolean) {
         var l = this.measureText(text);
         var left = parseFloat(this.textarea.style.left.replace("px", ""));
-     
-        this.textarea.value = "";
+        if(this.compositionLeft!=undefined&&isComposition!=undefined){
+            left=this.compositionLeft;
+        }
+        if(isComposition){
+            this.compositionLeft=left;
+        }else {
+            this.compositionLeft=undefined;
+        }
         left += l;
-        this.textarea.style.left = (left-1) + "px";
-        this.selectLine.innerHTML = this.selectLine.innerText.substring(0, this.selectIndex) +
-            text + this.selectLine.innerText.substring(this.selectIndex);
-        this.selectIndex+=text.length;
+        this.textarea.style.left = (left - 1) + "px";
+    
+
+        var start=this.selectIndex;
+        var end=this.selectIndex;
+        if(this.compositionStart!=undefined&&isComposition!=undefined){
+            start=this.compositionStart;
+            end=this.compositionEnd;
+        }
+        this.selectLine.innerHTML = this.selectLine.innerText.substring(0, start) +
+            text + this.selectLine.innerText.substring(end);
+        this.selectIndex =start+ text.length;
+        if(isComposition){
+            this.compositionStart=start;
+            this.compositionEnd=  this.selectIndex;
+        }else{
+            this.compositionStart=undefined;
+            this.compositionEnd=undefined;
+        }
+       
         this.change();
     }
     setValue(text: string) {
-       
-        this.view.innerHTML="";
-        this.selectLine=undefined;
-        this.selectIndex=0;
-        this.textarea.style.display="none";
+
+        this.view.innerHTML = "";
+        this.selectLine = undefined;
+        this.selectIndex = 0;
+        this.textarea.style.display = "none";
         this.view.appendChild(this.textarea);
         this.view.appendChild(this.measure);
         var lines = text.split("\n");
@@ -390,18 +440,18 @@ export class Editor {
     }
 
     adjustTop() {
-     
+
         var line: any = this.selectLine;
         var top = parseFloat(this.selectLine.style.top.replace("px", ""));
         var row = parseFloat(this.selectLine.getAttribute("data-row"));
         while (line != undefined) {
             row++;
             line.style.top = top + "px";
-            line.setAttribute("data-row",row);
+            line.setAttribute("data-row", row);
 
             line = line.nextElementSibling;
             top += this.lineHeight;
-         
+
 
 
         }
@@ -410,9 +460,9 @@ export class Editor {
     }
 
     measureText(text: string) {
-                this.measure.innerHTML = text;
+        this.measure.innerHTML = text;
         var w = window.getComputedStyle(this.measure).width;
-   
+
         return parseFloat(w.replace("px", ""));
 
     }
@@ -439,7 +489,7 @@ export class Editor {
         if (this.selectIndex > this.selectLine.innerText.length) {
             this.selectIndex = this.selectLine.innerText.length;
         }
-        var left = this.measureText(this.selectLine.innerText.substring(0, this.selectIndex))-1;
+        var left = this.measureText(this.selectLine.innerText.substring(0, this.selectIndex)) - 1;
         this.textarea.style.left = left + "px";
         this.textarea.style.top = this.selectLine.style.top;
     }
@@ -448,26 +498,26 @@ export class Editor {
 
         var top = row * this.lineHeight;
 
-        var newLine = this.newLine(text,row);
+        var newLine = this.newLine(text, row);
         newLine.style.top = top + "px";
         this.view.appendChild(newLine);
     }
-    newLine(text: string,row?:number) {
+    newLine(text: string, row?: number) {
 
-        if(text.indexOf("\t")>=0){
-            text=text.replace(/\t/g,"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        if (text.indexOf("\t") >= 0) {
+            text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         }
-        if(text.indexOf("  ")>=0){
-            text=text.replace(/ /g,"&nbsp;&nbsp;");
+        if (text.indexOf("  ") >= 0) {
+            text = text.replace(/ /g, "&nbsp;&nbsp;");
         }
-        if(row==undefined&&this.selectLine!=undefined){
-            parseInt(this.selectLine.getAttribute("data-row"))+1;
+        if (row == undefined && this.selectLine != undefined) {
+            parseInt(this.selectLine.getAttribute("data-row")) + 1;
 
         }
 
         var line = document.createElement("div");
         line.style.top = top + "px";
-        line.setAttribute("data-row",row+"");
+        line.setAttribute("data-row", row + "");
         line.style.height = this.lineHeight + "px";
         line.style.lineHeight = this.lineHeight + "px";
         line.className = "view-line";
@@ -475,14 +525,14 @@ export class Editor {
         line.style.letterSpacing = "0px";
         line.innerHTML = text;
 
-        line.onmouseup=(e)=>{
+        line.onmouseup = (e) => {
             e.stopPropagation();
-            this.moving=false;
+            this.moving = false;
             this.switchLine(line);
-            var wst=window.getSelection();
-            
-            if(wst.type=="Range"){
-              
+            var wst = window.getSelection();
+
+            if (wst.type == "Range") {
+
                 return;
             }
             var lineLength = this.measureText(line.innerText);
@@ -499,7 +549,7 @@ export class Editor {
                     } else {
                         for (var i = line.innerText.length; i >= 0; i--) {
                             var l = this.measureText(line.innerText.substring(0, i));
-                           
+
                             if (e.offsetX < l) {
                                 left = l;
                             } else {
@@ -516,29 +566,29 @@ export class Editor {
 
                 }
 
-      
+
             this.textarea.style.top = line.style.top;
-            this.textarea.style.left = (left-1) + "px";
-            this.textarea.style.display="block";
+            this.textarea.style.left = (left - 1) + "px";
+            this.textarea.style.display = "block";
             setTimeout(() => {
                 this.textarea.focus({
-                    preventScroll:true
+                    preventScroll: true
                 });
                 //       this.textarea.setSelectionRange(0,0);
             }, 10);
 
 
         }
-        line.onmousemove=(e)=>{
-            if(this.moving&&window.getSelection().toString().length>0){
+        line.onmousemove = (e) => {
+            if (this.moving && window.getSelection().toString().length > 0) {
 
                 this.textarea.style.top = line.style.top;
-               
-                this.textarea.style.pointerEvents="none";
-                var left=0;
+
+                this.textarea.style.pointerEvents = "none";
+                var left = 0;
                 for (var i = line.innerText.length; i >= 0; i--) {
                     var l = this.measureText(line.innerText.substring(0, i));
-               
+
                     if (e.offsetX < l) {
                         left = l;
                     } else {
@@ -549,22 +599,22 @@ export class Editor {
                         left = 0;
                     }
                 }
-                this.textarea.style.left =(left-1) + "px";
-                this.textarea.style.display="block";
+                this.textarea.style.left = (left - 1) + "px";
+                this.textarea.style.display = "block";
             }
 
         }
-        window.onmouseup=(e)=>{
-            this.moving=false;
+        window.onmouseup = (e) => {
+            this.moving = false;
         }
 
         line.onmousedown = (e) => {
-            this.moving=true;
-            this.textarea.style.pointerEvents="all";
+            this.moving = true;
+            this.textarea.style.pointerEvents = "all";
         }
         return line;
     }
-    moving:boolean=false;
+    moving: boolean = false;
     init(content: HTMLElement) {
 
 

@@ -38,8 +38,8 @@ export function renderWorkSpace(app: HTMLElement) {
     onContextMenu();
     requestIdleCallback(() => {
         //import * as shorcuts from "./shorcuts";
-        // const shorcuts = require("./shorcuts");
-        // shorcuts.init();
+        const shorcuts = require("./shorcuts");
+        shorcuts.init();
         // var page:IPage={key:"projects",name:"Get Started",theme:"light",type:"projects",path:"projects"};
         // renderPage(page);
     });

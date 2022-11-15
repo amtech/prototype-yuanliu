@@ -345,6 +345,7 @@ export class FormIcons {
             icon.onclick = (e: any) => {
                 e.stopPropagation();
                 var i = parseInt(e.target.getAttribute("data-index"));
+            console.log(this.onChange);
                 this.onChange(i);
                 for (var j = 0; j < this.icons.length; j++) {
                     var icon = div.getElementsByTagName("i")[j];
@@ -929,7 +930,7 @@ export class FormCatalog {
 
         this.input.style.flex = "1";
         this.input.ondblclick = () => {
-            alert("拖拽组件到此处");
+            alert("拖拽页面到此处");
             if (this.onChange != undefined) {
                 this.onChange(undefined);
                 this.value = "";

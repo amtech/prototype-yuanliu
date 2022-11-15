@@ -24,13 +24,12 @@ app.on('second-instance', (event, commandLine, workingDirectory, additionalData)
 function createWindow(project?:IProject) {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
-
   var config = storage.readConfig();
   var mainWindow: BrowserWindow = new BrowserWindow({
     height: height,
     width: width,
     webPreferences: {
-      devTools: false,
+      //devTools: false,
       preload: path.join(__dirname, "preload.js"),
     },
     titleBarStyle: "hidden",

@@ -28,7 +28,7 @@ const component: IComponent = {
         bg.style.zIndex="-1";
         label.appendChild(bg);
         var body=document.createElement("div");
-
+        body .className = "component_body";
         label.appendChild(body);
 
 

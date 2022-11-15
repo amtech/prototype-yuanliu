@@ -40,7 +40,7 @@ export function renderPagesPage(content: HTMLElement) {
 
     ipcRenderer.on("_readProjectRecentPage", (event, recentData) => {
 
-        if (recentData.length > 0) {
+        if (recentData!=undefined&& recentData.length > 0) {
             for (var i = recentData.length - 1; i >= 0; i--) {
 
                 if (recentData.length - i > 9) {

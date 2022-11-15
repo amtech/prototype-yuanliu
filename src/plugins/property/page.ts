@@ -135,8 +135,8 @@ const panel: IPanel = {
     setting.appendChild(style);
 
     //
-    ipcRendererSend("loadPluginsStyle");
-    ipcRenderer.on("_loadPluginsStyle", (event, args) => {
+    ipcRendererSend("loadPlugins","styles");
+    ipcRenderer.on("_loadPlugins_styles", (event, args) => {
       console.log("_loadPluginsStyle", args);
       var styles: { label: string, value: any }[] = [
 
@@ -313,7 +313,7 @@ const panel: IPanel = {
     formStyle.update(getCurPage().style, (style) => {
       getCurPage().style = style;
       var exStyles = eval("require(style).default()");
-      console.log(exStyles);
+     
       getCurPage().styles = exStyles;
       reRenderPage();
       pushHistory(getCurPage());
@@ -324,64 +324,7 @@ const panel: IPanel = {
 
       pushHistory(getCurPage());
     });
-
-    // var row1 = document.createElement("div");
-    // setting.appendChild(row1);
-    // var bc = form.createDivRow(row1, true);
-
-
-    // var formBackgroundType = new forms.FormIcons("背景", ["bi bi-slash-circle", "bi bi-palette", "bi bi-circle-half", "bi bi-image"]);
-    // formBackgroundType.render(bc);
-
-
-
-    // //bg
-    // var formBackgroundPanel = document.createElement("div");
-    // formBackgroundPanel.style.paddingRight="5px";
-    // setting.appendChild(formBackgroundPanel);
-    // //0 no
-
-    // //1 color
-    // var formBackgroundSolidPanel = document.createElement("div");
-    // formBackgroundSolidPanel.style.display = "none";
-    // formBackgroundPanel.appendChild(formBackgroundSolidPanel);
-    // var formBackgroundSolidPanelColor = new forms.FormColor("填充颜色");
-    // formBackgroundSolidPanelColor.render(formBackgroundSolidPanel);
-
-
-    // //2 gradient
-
-    // var formBackgroundGradientPanel = document.createElement("div");
-    // formBackgroundGradientPanel.style.display = "none";
-    // formBackgroundPanel.appendChild(formBackgroundGradientPanel);
-    // var row = document.createElement("div");
-    // formBackgroundGradientPanel.appendChild(row);
-    // var color1 = form.createDivRow(row, true);
-    // var formBackgroundGradientPanelColor1 = new forms.FormColor("");
-    // formBackgroundGradientPanelColor1.render(color1);
-    // var color2 = form.createDivRow(row,true);
-    // var formBackgroundGradientPanelColor2 = new forms.FormColor("");
-    // formBackgroundGradientPanelColor2.render(color2);
-    // var t3 = form.createDivRow(row);
-    // var formBackgroundGradientPanelType = new forms.FormIcons("类型", ["bi bi-dash-lg", "bi bi-circle"]);
-    // formBackgroundGradientPanelType.render(t3);
-
-    // var ap=document.createElement("div");
-    // formBackgroundGradientPanel.appendChild(ap);
-    // var adiv = form.createDivRow(ap,true);
-
-    // var formBackgroundGradientPanelAngle = new forms.FormSolider("角度", 180, -180);
-    // formBackgroundGradientPanelAngle.render(adiv);
-    // var pdiv = form.createDivRow(ap,true);
-    // var formBackgroundGradientPanelPosition = new forms.FormSolider("位置", 100, 0);
-    // formBackgroundGradientPanelPosition.render(pdiv);
-
-    // // bg.update(getCurPage().backgroundColor, (color) => {
-    // //   getCurPage().backgroundColor = color;
-    // //   var gb: any = getCurViewContent().getElementsByClassName("page_parent")[0];
-    // //   gb.style.backgroundColor = color;
-    // // });
-
+    
     var bgType = 0;
     if (getCurPage().backgroundType != undefined) {
       bgType = getCurPage().backgroundType;

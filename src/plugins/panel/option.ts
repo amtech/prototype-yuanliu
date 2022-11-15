@@ -25,6 +25,7 @@ const panel: IPanel = {
     update: () => {
 
         var sl = getSelectComponents();
+        console.log("SL",sl);
         if (sl != undefined && sl.length == 1) {
 
             var cmpt = findCurPageComponent(sl[0]);
@@ -271,11 +272,14 @@ function renderChartOption(content: HTMLElement) {
 var editor: any;
 var editorComponent: any;
 function loadComponentsCode(component: IComponent) {
-
-    editorComponent = component;
-
-    editor.setValue(component.option);
-    editor.resize();
+    if(component!=undefined&&component.option!=undefined){
+        editorComponent = component;
+        editor.setValue(component.option);
+        editor.resize();
+    }else{
+      
+    }
+ 
 
 
 }

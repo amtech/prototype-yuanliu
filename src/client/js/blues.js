@@ -44,6 +44,10 @@ function renderLines(links, blues) {
     console.log("renderLines");
     var pageView = document.getElementById("pageView");
     var page = pageView.children.item(0);
+    if (page == undefined) {
+        console.log("page is undefined")
+        return;
+    }
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.style.position = "absolute";
     svg.style.top = "0";

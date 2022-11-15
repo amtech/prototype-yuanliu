@@ -53,9 +53,7 @@ export function loadCommonIpc() {
         sendData(event, "_loadPlugins_" + arg, result);
 
     });
-    ipcMain.on("startPreview", (event: any, arg: any) => {
-
-    });
+  
 
     ipcMain.on("readProjects", (event: any, arg: any) => {
         var projects = storage.readProjects();

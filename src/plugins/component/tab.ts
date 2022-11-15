@@ -35,7 +35,7 @@ const component: IComponent = {
         taps.innerHTML = "";
 
       
-        var ops = JSON.parse(component.option);
+        var ops = eval(component.option);
         for (var i = 0; i < ops.length; i++) {
             var op = ops[i];
             var tap = document.createElement("div");

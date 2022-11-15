@@ -371,6 +371,11 @@ export function loadProjectIpc() {
             }
         }
     });
+    ipcMain.on("startPreview", (event: any, arg: any) => {
+        var project=getProjectByEvent(event);
+        var bw=getBrowserWindow(event);
+        startPreview(project);
+    });
 
 }
 

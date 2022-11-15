@@ -26,12 +26,12 @@ import { saveSimplePage } from "./toolbar";
 import { getProject, getViewPosition, openExpand, renderExpand } from "./workspace";
 import { renderMarkDownPage } from "../plugins/pages/markdown";
 
-export function openPage(catalog:ICatalog){
+export function openPage(catalog: ICatalog) {
 
-    var page=pages.find(p=>p.path==catalog.path);
-    if(page!=undefined){
+    var page = pages.find(p => p.path == catalog.path);
+    if (page != undefined) {
         renderPage(page);
-    }else{
+    } else {
         ipcRendererSend("openPage", catalog);
     }
 }
@@ -126,7 +126,7 @@ export function getCurPageKey() {
  * 获取当前页面
  * @returns 
  */
-export function getCurPage(iSort?:boolean) {
+export function getCurPage(iSort?: boolean) {
 
     var page = pages.find(p => p.key == selectPageKey);
     if (page != undefined) {
@@ -138,7 +138,7 @@ export function getCurPage(iSort?:boolean) {
         }
         if (page != undefined && page.children != undefined) {
             //sort
-            if(iSort)
+            if (iSort)
                 component_sort(page.children);
         }
         return page;
@@ -244,15 +244,15 @@ export function closePage(spage: IPage) {
     if (view != undefined) {
         view.remove();
     }
-    if (pages.length > 0&&getProject()!=undefined) {
+    if (pages.length > 0 && getProject() != undefined) {
         renderPage(pages[0]);
     }
-    if (pages.length == 0&&getProject()!=undefined) {
+    if (pages.length == 0 && getProject() != undefined) {
 
         activePropertyPanel("project");
-        var page:IPage={key:"pages",name:getProject().name,theme:"light",type:"pages",path:"pages"};
+        var page: IPage = { key: "pages", name: getProject().name, theme: "light", type: "pages", path: "pages" };
         renderPage(page);
-       
+
     }
 
 
@@ -384,7 +384,7 @@ export function renderPage(page: IPage) {
             e.stopPropagation();
 
 
-            if ((page.type=="page"||page.type=="title")&& page.change) {
+            if ((page.type == "page" || page.type == "title") && page.change) {
 
                 ipcRendererSend("isSave", { message: "是否保存 " + page.name, page: page.key });
                 ipcRenderer.on("_isSave", (eve, arg) => {
@@ -426,16 +426,16 @@ export function renderPage(page: IPage) {
         workbenchpages.appendChild(pageView);
 
         //渲染页面工作区
-        if(page.type=="projects"){
+        if (page.type == "projects") {
             renderProjectsPage(pageView);
 
-        }else if(page.type=="pages"){
+        } else if (page.type == "pages") {
             renderPagesPage(pageView);
 
-        }else if(page.type=="markdown"){
-            renderMarkDownPage(pageView,page.path);
+        } else if (page.type == "markdown") {
+            renderMarkDownPage(pageView, page.path);
 
-        }else{
+        } else {
             renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
         }
         //更新右侧、底部面板
@@ -469,7 +469,7 @@ export function renderPage(page: IPage) {
             }
         }
         onSwitchPage(page);
-      
+
     }
     requestIdleCallback(() => {
         var theme = "default";
@@ -934,6 +934,7 @@ function onScrollReal() {
 
             //TODO  给即将不渲染 父级组件 设置高度，以免影响整体布局
             if (root.offsetTop > viewHeigh - parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100) {
+            
                 if (body.innerHTML != "") {
                     if (root.style.height.indexOf("%") > 0 || root.style.height.indexOf("px") > 0) {
                     } else {
@@ -943,7 +944,8 @@ function onScrollReal() {
                     root.style.background = "";
                     body.innerHTML = "";
                 }
-            } else if (root.offsetTop + root.clientHeight < -(parseFloat(page_parent.style.top.replace("px", "") + viewPosition.top + 100))) {
+            } else if (root.offsetTop + root.clientHeight < -(parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100)) {
+              
                 if (body.innerHTML != "") {
                     if (root.style.height.indexOf("%") > 0 || root.style.height.indexOf("px") > 0) {
                     } else {
@@ -1203,7 +1205,7 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
                 }
             }
             onAddComponents([component]);
-            
+
         }
         var dragStore = dargData.getData("store");
         if (dragStore != undefined) {
@@ -1292,6 +1294,7 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                 label: t.label, icon: t.icon, onclick: () => {
                     var ct = initComponent(t);
                     if (component == undefined) {
+                        ct.path = ct.key;
                         getCurPage().children.push(ct);
                         renderComponent(getCurPageContent(), ct);
                     }
@@ -1300,24 +1303,34 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                             component.children = [];
                         }
                         if (position == undefined) {
+                            ct.path = component.path + "/" + ct.key;
                             component.children.push(ct);
                             renderComponent(document.getElementById(component.key), ct);
                         } else {
                             console.log(component.path, position);
                             if (component.path.indexOf("/") < 0) {
                                 ct.sort = position;
+                                ct.path = ct.key;
                                 getCurPage().children.splice(position, 0, ct);
                                 renderComponent(getCurPageContent(), ct, position);
                             } else {
                                 var parent = findCurPageComponent(component.path.substring(0, component.path.lastIndexOf("/")));
                                 if (parent != undefined) {
                                     ct.sort = position;
+                                    ct.path = parent.path + "/" + ct.key;
                                     parent.children.splice(position, 0, ct);
                                     //TODO  存在问题，需要修改
                                     {
                                         var root = document.getElementById(parent.key);
-                                        if (root.getElementsByClassName("component_bg").length > 0) {
-                                            var body: any = root.children.item(1);
+                                        var body: HTMLElement;
+                                        for (var i = 0; i < root.childElementCount; i++) {
+                                            var child: any = root.children.item(i);
+                                            if (child.className == "component_body") {
+                                                body = child;
+                                                break;
+                                            }
+                                        }
+                                        if (body != undefined) {
                                             renderComponent(body, ct, position);
                                         } else {
                                             renderComponent(root, ct, position);
@@ -1329,7 +1342,7 @@ export function shortcutInsertComponent(x: number, y: number, component?: ICompo
                         }
 
                     }
-                  onAddComponents([ct]);
+                    onAddComponents([ct]);
 
                 }
             }
@@ -1391,14 +1404,21 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
             if (component == undefined) {
                 copyComponent(ncmpt, undefined);
                 getCurPage().children.push(ncmpt);
+                var content = getCurPageContent();
+                content.innerHTML = "";
+                ncmpt.path = ncmpt.key;
+                renderComponents(content, getCurPage().children, undefined);
             } else {
                 copyComponent(ncmpt, component.path);
-
                 if (component.children == undefined) {
                     component.children = [ncmpt];
                 } else {
                     component.children.push(ncmpt);
                 }
+                var content = document.getElementById(component.key);
+                content.innerHTML = "";
+                ncmpt.path = component.path + "/" + ncmpt.key;
+                renderComponents(content, component.children, undefined);
             }
         });
         onAddComponents(_selectComponents);
@@ -1480,7 +1500,7 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
                             component.children.push(tableC);
                         }
                     }
-                 onAddComponents([tableC]);
+                    onAddComponents([tableC]);
 
                 }
 
@@ -1522,18 +1542,18 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
                 iPage = false;
                 if (parent.children == undefined) parent.children = [];
                 parent.children.push(component);
-             
+
                 renderComponent(document.getElementById(parent.key), component);
-            
+
 
             }
         }
         if (iPage) {
             getCurPage().children.push(component);
             //右侧面板
-          
+
             renderComponent(getCurPageContent(), component);
-          
+
 
         }
         onAddComponents([component]);

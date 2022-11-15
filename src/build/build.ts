@@ -264,7 +264,7 @@ function buildComponents(wProject: IProject,terminal?:(log:any)=>void) {
     "export default [";
     storage.loadPlugins("component").forEach(cpt => {
 
-        var cPath = path.join(storage.getAppFolderPath("plugins"), "component", cpt.replace("../plugins/component/", ""));
+        var cPath = path.join(storage.getAppFolderPath("plugins"), "component", cpt.replace("../plugins/component/", "")+".js");
 
         var file = fs.readFileSync(cPath).toString();
         //console.log(text);
@@ -398,7 +398,7 @@ function buildPluginsBackground(wProject:IProject){
     storage.loadPlugins("background").forEach(item=>{
 
 
-        var cPath = path.join(storage.getAppFolderPath("plugins"), "background", item.replace("../plugins/background/", ""));
+        var cPath = path.join(storage.getAppFolderPath("plugins"), "background", item.replace("../plugins/background/", "")+".js");
 
         var file = fs.readFileSync(cPath).toString();
 
@@ -419,7 +419,7 @@ function buildPluginsShape(wProject:IProject){
     storage.loadPlugins("shape").forEach(item=>{
 
 
-        var cPath = path.join(storage.getAppFolderPath("plugins"), "shape", item.replace("../plugins/shape/", ""));
+        var cPath = path.join(storage.getAppFolderPath("plugins"), "shape", item.replace("../plugins/shape/", "")+".js");
 
         var file = fs.readFileSync(cPath).toString();
 

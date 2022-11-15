@@ -614,8 +614,8 @@ table {
 
 ::-webkit-scrollbar {
     /* width: 12px; */
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
     /* background: var(--theme-color); */
 }
 
@@ -630,13 +630,13 @@ table {
 /* 滚动条滑块 */
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(127, 127, 127, 0.2);
+    background-color: rgba(127, 127, 127, 0.4);
     backdrop-filter: blur(10px);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(127, 127, 127, 0.2);
+    background-color: rgba(127, 127, 127, 0.5);
 }
 
 ::-webkit-scrollbar-corner {

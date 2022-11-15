@@ -47,9 +47,6 @@ const component: IComponent = {
         div.appendChild(line);
         div.appendChild(point);
         setTimeout(() => {
-            console.log(component.property);
-           
-
             var v = parseFloat(component.property.default.context);
             var m = parseFloat(component.property.max.context);
             var n = parseFloat(component.property.min.context);

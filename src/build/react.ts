@@ -112,10 +112,12 @@ function renderComponent(component:IComponent,code:string,componentTypes:string[
 
 function exportComponents(folder:string){
     var code="";
+    
     storage.loadPlugins("component").forEach(item=>{
-        var component: IComponent = require(item).default();
+       // var component: IComponent = require("../plugins/component/"+item).default();
+        var component=path.join(storage.getAppFolderPath("src"),"plugins","component",item+".ts");
         exportComponent(component,folder);
-        code+="import { "+component.type+" } from './"+component.type+"';\n"
+       // code+="import { "+component.type+" } from './"+component.type+"';\n"
     });
 
      var file=path.join(folder,"components.tsx");
@@ -124,18 +126,30 @@ function exportComponents(folder:string){
     });
 }
 
-function exportComponent(component:IComponent,folder:string){
+function exportComponent(component:string,folder:string){
 
-    var rs=component.onRender(component,undefined);
-    var code="import React from 'react';\n";
-    code+="export function "+component.type+"(props:any){\n";
-    code+="return <>\n";
-    code+=rs.root.innerHTML;
-    code+=" </>";
+    // var rs=component.onRender(component,undefined);
+    // var code="import React from 'react';\n";
+    // code+="export function "+component.type+"(props:any){\n";
+    // code+="return <>\n";
+    // code+=rs.root.innerHTML;
+    // code+=" </>";
+    var code="";
+    var lines= fs.readFileSync(component).toString().split("\n");
+    for(var row in lines){
+        var line=lines[row];
+        var newLine=line+"";
+      //  console.log(line);
+        var m=line.match(/document.createElement\("(.*)"\)/);
+        if(m!=undefined&&m.length>0){
+            newLine=line.replace("document.createElement","React.createElement");
+        }
+        code+=newLine;
+    }
 
-    var file=path.join(folder,component.type+".tsx");
-    fs.writeFile(file,code,()=>{
-            console.log("component==>"+file);
+    var out=path.join(folder,path.basename(component));
+    fs.writeFile(out,code,()=>{
+            console.log("component==>"+out);
     });
 
 }
