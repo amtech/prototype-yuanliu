@@ -264,7 +264,7 @@ export interface IComponentProperty {
  * 页面
  */
 export interface IPage {
-    type: "page" | "title"|"projects"|"pages"|"markdown";
+    type: "page" | "title"|"projects"|"pages"|"markdown"|"editor";
     key: string;
     name: string,
     path?: string;

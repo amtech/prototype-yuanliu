@@ -79,7 +79,7 @@ var scroll_thumb: HTMLElement;
 function updateLayout() {
     tree.style.height = viewHeight + "px";
     treeView.style.height = tree.style.height;
-    rowCount = Math.floor(viewHeight / rowHeight);
+    rowCount = Math.floor(viewHeight / rowHeight)+1;
 }
 function renderLayers(context: HTMLElement) {
     tree = document.createElement("div");

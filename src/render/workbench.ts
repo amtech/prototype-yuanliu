@@ -25,6 +25,7 @@ import { activePropertyPanel, setComponentStyle } from "./propertypanel";
 import { saveSimplePage } from "./toolbar";
 import { getProject, getViewPosition, openExpand, renderExpand } from "./workspace";
 import { renderMarkDownPage } from "../plugins/pages/markdown";
+import { renderEditorPage } from "../plugins/pages/editor";
 
 export function openPage(catalog: ICatalog) {
 
@@ -435,9 +436,14 @@ export function renderPage(page: IPage) {
         } else if (page.type == "markdown") {
             renderMarkDownPage(pageView, page.path);
 
-        } else {
+        }else if (page.type == "editor") {
+            renderEditorPage(pageView, page.path);
+
+        }  else {
             renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
         }
+
+        
         //更新右侧、底部面板
         onOpenPage(page);
 

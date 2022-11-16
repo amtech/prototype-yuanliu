@@ -55,7 +55,7 @@ var treeView:HTMLElement;
 function updateLayout(){
     tree.style.height = viewHeight + "px";
     treeView.style.height = tree.style.height;
-    rowCount = Math.floor(viewHeight / rowHeight);
+    rowCount = Math.floor(viewHeight / rowHeight)+1;
 
 }
 export function renderIcons(context: HTMLElement,filter: string) {

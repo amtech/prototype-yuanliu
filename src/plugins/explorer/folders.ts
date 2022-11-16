@@ -118,7 +118,7 @@ var scroll_thumb:HTMLElement;
 function updateLayout(){
     tree.style.height = viewHeight + "px";
     treeView.style.height = tree.style.height;
-    rowCount = Math.floor(viewHeight / rowHeight);
+    rowCount = Math.floor(viewHeight / rowHeight)+1;
 }
 function renderCatalogs(context: HTMLElement) {
 
@@ -132,6 +132,7 @@ function renderCatalogs(context: HTMLElement) {
     treeView.id = "explorer_catalog_view";
 
     treeView.style.height = tree.style.height;
+    
     var treeScroll = document.createElement("div");
     treeScroll.className = "explorer_tree_scroll";
 
