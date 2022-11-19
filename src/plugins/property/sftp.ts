@@ -61,6 +61,10 @@ const  panel:IPanel={
         ipcRenderer.on("_sftp",(eve,arg)=>{
             log.innerHTML+=arg+"<br/>";
         })
+        log.ondblclick=()=>{
+            log.innerHTML="";
+        }
+
 
     }, 
     update:(args:any)=>{

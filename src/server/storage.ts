@@ -11,7 +11,14 @@ import { dataCatolog } from "../common/data";
 import { getUUID, ICatalog, IDatabase, IPage, IProject } from "../common/interfaceDefine";
 import { getNowDateTime, initWork } from "./work";
 const admZip = require("adm-zip");
-
+export function readFile(filePath:string):string|undefined{
+    if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath).toString();
+ 
+    } else {
+        return undefined;
+    }
+}
 export function readProjects(): any {
     checkAppData();
     var projectsPath = path.join(appData, "projects.json");

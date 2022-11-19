@@ -170,11 +170,13 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
             emptyFolder(dist);
         }
         fs.mkdirSync(dist);
-        terminal("复制文件");
+        terminal("复制客户端文件");
         copyDir(client, dist,terminal);
         //复制modules：echarts,FileSaver,xlsx.mini.min.js
+        terminal("复制modules文件");
         copyModules(dist);
         //
+        terminal("复制字体文件");
         copyBootstrap(dist);
         //构建js文件
         terminal("创建JS");
@@ -189,6 +191,7 @@ export function building(wProject: any,terminal:(log:any)=>void): boolean {
         return true;
     } catch (e) {
         console.log(e);
+        terminal(e);
     }
     return false;
 }

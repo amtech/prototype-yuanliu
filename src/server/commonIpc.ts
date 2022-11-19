@@ -209,5 +209,12 @@ export function loadCommonIpc() {
 
 
     });
+    ipcMain.on("readFile", (event, filePath) => {
+
+        var text= storage.readFile(filePath);
+
+        sendData(event,"_readFile_"+filePath,text);
+
+    });
 
 }

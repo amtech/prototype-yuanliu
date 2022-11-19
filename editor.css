@@ -1,16 +1,15 @@
 .view-textarea {
-    user-select: text;
+    user-select: none;
     outline: none;
     border: 0;
     resize: none;
-    font-family: sans-serif;
     margin: 0;
     padding: 0;
     position: absolute;
     z-index: 100;
     width: 2px;
     cursor: text;
-    transition: left 0.1s, top 0.1s;
+    transition: left 0.3s, top 0.3s;
     top: -100px;
     border-radius: 5px;
     display: none;
@@ -28,6 +27,14 @@
 
 .dark .view-textarea {
     background-color: #fff;
+}
+
+.light .suggestion {
+    background-color: #f1f1f1;
+}
+
+.dark .suggestion {
+    background-color: #222;
 }
 
 @keyframes hightlight {
@@ -48,6 +55,7 @@
 .editor-view {
     position: absolute;
     outline: none;
+    -webkit-text-size-adjust: 100%;
 }
 
 .editor-view ::selection {
@@ -55,17 +63,15 @@
 }
 
 .view-line {
-    font-family: Arial, sans-serif;
     position: absolute;
     width: 100%;
     letter-spacing: 0px;
     white-space: nowrap;
-    user-select: text;
+    user-select: none;
     cursor: text;
 }
 
 .nav-num {
-    font-family: Arial, sans-serif;
     /* position: absolute; */
     width: 100%;
     text-align: center;
@@ -95,7 +101,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    width: 10px;
+    width: 5px;
 }
 
 .editor_scrollV_thumb {
@@ -108,7 +114,7 @@
 }
 
 .editor:hover .editor_scrollV_thumb {
-    width: 10px;
+    width: 5px;
 }
 
 .editor_scrollH {
@@ -116,7 +122,7 @@
     right: 0;
     left: 32px;
     bottom: 0;
-    height: 10px;
+    height: 5px;
 }
 
 .editor_scrollH_thumb {
@@ -129,10 +135,25 @@
 }
 
 .editor:hover .editor_scrollH_thumb {
-    height: 10px;
+    height: 5px;
 }
 
 .editor-css-heightlight {
     color: #f90;
     pointer-events: none;
+}
+
+.suggestion-item:hover {
+    background: rgba(157, 157, 157, 0.2);
+}
+
+.suggestion-item-text {
+    display: none;
+    flex: 1;
+    text-align: right;
+    opacity: 0.8;
+}
+
+.suggestion-item:hover .suggestion-item-text {
+    display: block;
 }

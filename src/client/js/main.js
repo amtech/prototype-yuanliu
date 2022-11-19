@@ -467,9 +467,7 @@ export function renderComponents(content, components, parent) {
                     if (component.type == "icon") {
                         var icon_e = component.icon;
                         component.onPreview = () => {
-                            var pi = document.createElement("i");
-                            pi.className = icon_e;
-                            return pi;
+                            return undefined;
                         };
                         component.onRender = (component, element) => {
                             var pi;
@@ -479,7 +477,7 @@ export function renderComponents(content, components, parent) {
                                 pi = document.createElement("div");
                             // if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
                             pi.setAttribute("icon_hover", "true");
-                            pi.innerHTML = "<i class='" + icon_e + "'></i>";
+                            pi.innerHTML = "<i class='bi bi-" + icon_e + "'></i>";
                             pi.onclick = () => {
                                     if (component.blue.event.click.on != undefined) {
                                         component.blue.event.click.on();
@@ -902,7 +900,7 @@ function renderSetting(settingContent) {
 
     var toolScreenShotBg = document.createElement("input");
     toolScreenShotBg.type = "text";
-    toolScreenShotBg.color = "#fff";
+    toolScreenShotBg.style.color = "#fff";
     toolScreenShotBg.value = "#fff";
     tools.appendChild(toolScreenShotBg);
 

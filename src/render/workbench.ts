@@ -946,7 +946,9 @@ function onScrollReal() {
                     } else {
                         root.style.height = root.clientHeight + "px";
                         root.setAttribute("data-height", "true");
+                      
                     }
+                    setRootComponentHeight(child.key,root.clientHeight+"px");
                     root.style.background = "";
                     body.innerHTML = "";
                 }
@@ -957,7 +959,9 @@ function onScrollReal() {
                     } else {
                         root.style.height = root.clientHeight + "px";
                         root.setAttribute("data-height", "true");
+                       
                     }
+                    setRootComponentHeight(child.key,root.clientHeight+"px");
                     body.innerHTML = "";
                     root.style.background = "";
                 }
@@ -982,6 +986,14 @@ function onScrollReal() {
         }
     }, 0);
 
+}
+export function getRootComponentHeight(key:string):string{
+    var height=  window.sessionStorage.getItem("RootComponentHeight"+key);
+    return height;
+}
+export function setRootComponentHeight(key:string,height:string|number){
+    window.sessionStorage.setItem("RootComponentHeight"+key,height+"");
+    
 }
 function renderTitleBody(title_bar: HTMLElement, titleJson: any, pageHeight: number) {
     if (title_bar == undefined)
@@ -1413,7 +1425,7 @@ export function clipboardPaste(body: HTMLElement, component?: IComponent) {
                 var content = getCurPageContent();
                 content.innerHTML = "";
                 ncmpt.path = ncmpt.key;
-                renderComponents(content, getCurPage().children, undefined);
+                renderRootComponents(content, getCurPage().children);
             } else {
                 copyComponent(ncmpt, component.path);
                 if (component.children == undefined) {

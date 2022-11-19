@@ -11,7 +11,7 @@ import * as dargData from "../render/DragData";
 import { copyComponents } from "../render/pageTitle";
 import { getComponentStyle, setComponentStyle } from "../render/propertypanel";
 import { getMousePosition } from "../render/shorcuts";
-import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
+import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getRootComponentHeight, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
 import { getConfig, getProject, getViewPosition } from "../render/workspace";
 import { onAddComponents, onDelComponents, onMoveComponent, onSelectComponents } from "./componentEvent";
 import { IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
@@ -309,23 +309,35 @@ export function renderRootComponents(content: HTMLElement, components: IComponen
                         //初始化时，不渲染 扩展内容
                     } else {
                         var cpmt = renderComponent(content, component, undefined, index, undefined, undefined, true);
-                        var root = cpmt.root;;
+                        var root = cpmt.root;
+                      
+                        
                         var body = cpmt.body;
                         requestIdleCallback(() => {
-
+                            var  h=getRootComponentHeight(component.key);
+                            if(h!=undefined&&h.length>0){
+                                root.style.height=h;
+                                root.setAttribute("data-height", "true");
+                            }
 
                             if (root.offsetTop > viewHeigh - parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100) {
-
+                                //设置上次的高度
+                             
                                 body.innerHTML = "";
                             } else if (root.offsetTop + root.clientHeight < -(parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100)) {
+                                  //设置上次的高度
+                                 
+                                 
                                 body.innerHTML = "";
                             } else {
                                 var db = root.getAttribute("data-background");
                                 if (db != undefined) {
                                     root.style.background = db;
                                 }
-
-
+                                var dh = root.getAttribute("data-height");
+                                if (dh != undefined) {
+                                    root.style.height = "";
+                                }
                                 //渲染形状背景
                                 if (component.shape != undefined && component.shape.length > 0) {
                                     requestIdleCallback(() => {
@@ -427,11 +439,12 @@ export function installComponent(component: IComponent,parentPath?:string) {
 
     if (component.type == "icon") {
         var icon_e = component.icon;
-        component.onPreview = () => {
-            var pi = document.createElement("i");
-            pi.className = icon_e;
-            return pi;
-        };
+        if(icon_e==undefined){
+            icon_e="diamond";
+          
+        }
+     
+        component.onPreview=()=>{return undefined};
         component.onRender = (component, element) => {
             var pi: HTMLElement;
             if (element != undefined)
@@ -440,7 +453,13 @@ export function installComponent(component: IComponent,parentPath?:string) {
                 pi = document.createElement("div");
             // if (component.blue!=undefined&&component.blue.event!=undefined&& component.blue.event.click != undefined)
             pi.setAttribute("icon_hover", "true");
-            pi.innerHTML = "<i class='" + icon_e + "'></i>";
+            if(icon_e.indexOf("bi bi-")<0){
+               
+                pi.innerHTML = "<i class='bi bi-" + icon_e + "'></i>";
+            }else{
+                pi.innerHTML = "<i class='" + icon_e + "'></i>";
+            }
+          
             pi.onclick = () => {
                 if (component.blue.event.click.on != undefined) {
                     component.blue.event.click.on();

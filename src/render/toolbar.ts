@@ -120,7 +120,7 @@ export function renderToolbar(content: HTMLElement) {
 
     });
 }
-const noSaveAttrs:Array<string>=["icon","drop","blue","group","edge","isRoot","level","isDir","isOpen","path"]; 
+const noSaveAttrs:Array<string>=["drop","blue","group","edge","isRoot","level","isDir","isOpen","path"]; 
 export const styleTransform:Array<Array<string>>=[
     ["flex","f"],
     ["background","b"],

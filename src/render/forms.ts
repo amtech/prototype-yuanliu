@@ -848,8 +848,8 @@ export class FormComponent {
 
                 var rs = this.onChange(cmpt);
                 if (rs) {
-                    this.input.innerText = cmpt.key;
-                    this.value = cmpt.key;
+                    this.input.innerText = cmpt.path;
+                    this.value = cmpt.path;
                 } else {
                     this.input.innerText = "";
                     this.value = "";

@@ -196,7 +196,7 @@ function renderIconsRow(content: HTMLElement, _icons: string[], index: number) {
 
         iconDiv.draggable = true;
         iconDiv.ondragstart = (e: any) => {
-            var icon_e = e.target.getAttribute("icon");
+            var icon_e = e.target.getAttribute("icon").substring(6);
             var component: IComponent = {
                 type: "icon",
                 isTemplate: true,
@@ -207,7 +207,7 @@ function renderIconsRow(content: HTMLElement, _icons: string[], index: number) {
 
                 onPreview: () => {
                     var pi = document.createElement("i");
-                    pi.className = icon_e;
+                    pi.className ="bi bi-"+icon_e;
                     return pi;
                 }, onRender: (component, element) => {
                     var pi;
@@ -217,7 +217,7 @@ function renderIconsRow(content: HTMLElement, _icons: string[], index: number) {
                         pi = document.createElement("div");
                     //    if (component.blue != undefined && component.blue.event != undefined && component.blue.event.click != undefined)
                     pi.setAttribute("icon_hover", "true");
-                    pi.innerHTML = "<i class='" + icon_e + "'></i>"
+                    pi.innerHTML = "<i class='bi bi-" + icon_e + "'></i>"
                     pi.onclick = () => {
                         if (component.blue.event.click.on != undefined) {
                             component.blue.event.click.on();
@@ -254,7 +254,7 @@ function renderIconsRow(content: HTMLElement, _icons: string[], index: number) {
                     var icon_e = e.target.className;
                     if (icon_e != undefined && icon_e.length > 0) {
 
-                        sc.icon = icon_e;
+                        sc.icon = icon_e.substring(6);
 
                         document.getElementById(sc.key).innerHTML = "<i class='" + icon_e + "'></i>";
                     }

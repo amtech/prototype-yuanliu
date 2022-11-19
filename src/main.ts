@@ -29,7 +29,7 @@ function createWindow(project?:IProject) {
     height: height,
     width: width,
     webPreferences: {
-      //devTools: false,
+      devTools: false,
       preload: path.join(__dirname, "preload.js"),
     },
     titleBarStyle: "hidden",
@@ -45,13 +45,14 @@ function createWindow(project?:IProject) {
   });
 
   if (process.platform === "darwin") {
-    touchBarEditor(mainWindow);
+      touchBarEditor(mainWindow);
   }
   if(project!=undefined){
     pushProjectMap(mainWindow.webContents.getProcessId(),project);
   }
 }
 app.on("open-file",(event,file)=>{
+
   var work = path.join(app.getPath("home"), ".prototyping", "work");
   if(file.indexOf(work)==0){
    var project:IProject={name:path.basename(file),path:file};

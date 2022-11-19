@@ -14,7 +14,7 @@ import { getTitleBar } from "../../render/pageTitle";
 import { Editor } from "../../editor/editor";
 var editor: any;
 const panel: IPanel = {
-    key: "nav", name: "导航", hidden: true,sort:0,
+    key: "nav", name: "导航", hidden: true, sort: 0,
     render: (content: HTMLElement) => {
         var row = document.createElement("div");
         row.style.display = "flex";
@@ -37,12 +37,12 @@ const panel: IPanel = {
 
 
 
-        editor=new Editor(nav,(lines)=>{
-            var pageC=getCurViewContent();
-            var bars=pageC.getElementsByClassName("nav_bar");
+        editor = new Editor(nav, (lines) => {
+            var pageC = getCurViewContent();
+            var bars = pageC.getElementsByClassName("nav_bar");
             // console.log(bars);
-            var nav_bar:any= bars[0];
-            if (nav_bar != undefined ) {
+            var nav_bar: any = bars[0];
+            if (nav_bar != undefined) {
                 try {
                     var navJson = eval(lines);//JSON.parse(code);
                     setNavItems(navJson);
@@ -54,11 +54,51 @@ const panel: IPanel = {
             }
 
 
-        })
-        
-        
-    }, 
-    update: () => {      
+        });
+        editor.highLights = [{
+            match: /([A-z]+) ?=/,
+            color: "#09f"
+        }, {
+            match: /"([^"]+)":/,
+            color: "var(--theme-color)"
+        }, {
+            match: /([A-z]+):/,
+            color: "var(--theme-color)"
+        }, {
+            match: /"([^"]+)"/,
+            color: "#a31515"
+        }, {
+            match: /'([^']+)'/,
+            color: "#a31515"
+        }, {
+            match: /(\d+)/,
+            color: "#098658"
+        }, ];
+        editor.suggestions = [{
+            type: "attribute",
+            label: "name",
+            text: "name"
+        }, {
+            type: "attribute",
+            label: "path",
+            text: "path"
+        }, {
+            type: "attribute",
+            label: "icon",
+            text: "icon"
+        }, {
+            type: "attribute",
+            label: "isExtend",
+            text: "isExtend:false"
+        }, {
+            type: "attribute",
+            label: "children",
+            text: "children:[]"
+        }]
+
+
+    },
+    update: () => {
         var nav = getNavItems();
         // console.log(JSON.stringify(nav, null, 4));
         editor.setValue(JSON.stringify(nav, null, 4));
@@ -67,7 +107,7 @@ const panel: IPanel = {
 
         var navPanel = document.getElementById("navPanel");
         navPanel.innerHTML = "";
-    
+
         if (navPanel == undefined || navPanel == null) return;
         navPanel.style.padding = "0px 20px 0px 20px";
 
@@ -99,9 +139,9 @@ const panel: IPanel = {
         form.createDivCheck(title, "显示标题栏", titleJson.display, (value) => {
 
             titleJson.display = value;
-            var titles =getCurViewContent().getElementsByClassName("title_bar");
-            if(titles.length>0){
-                var titlebar:any=titles[0];
+            var titles = getCurViewContent().getElementsByClassName("title_bar");
+            if (titles.length > 0) {
+                var titlebar: any = titles[0];
                 if (value) {
                     titlebar.style.display = "block";
                 } else {
@@ -109,17 +149,17 @@ const panel: IPanel = {
                 }
             }
             ipcRendererSend("saveTitle", JSON.stringify(getTitleBar()));
-        
-          
+
+
 
         });
 
-        var titlebg= new forms.FormColor("标题背景色");
+        var titlebg = new forms.FormColor("标题背景色");
         titlebg.render(title);
-        titlebg.update(titleJson.background,(color)=>{
-            var titles =getCurViewContent().getElementsByClassName("title_bar");
-            if(titles.length>0){
-                var titlebar:any=titles[0];
+        titlebg.update(titleJson.background, (color) => {
+            var titles = getCurViewContent().getElementsByClassName("title_bar");
+            if (titles.length > 0) {
+                var titlebar: any = titles[0];
                 titlebar.style.backgroundColor = color;
             }
             titleJson.background = color;
@@ -135,14 +175,14 @@ const panel: IPanel = {
             navJson.display = value;
             var navbars = getCurViewContent().getElementsByClassName("nav_bar");
             if (navbars.length > 0) {
-                var navbar:any = navbars[0];
+                var navbar: any = navbars[0];
                 if (value) {
                     navbar.style.display = "block";
                 } else {
                     navbar.style.display = "none";
                 }
             }
-           
+
             ipcRendererSend("saveNav", JSON.stringify(getNavBar()));
 
         });
@@ -155,15 +195,15 @@ const panel: IPanel = {
         //     navJson.background = color;
         // });
 
-        var navbg= new forms.FormColor("导航背景色");
+        var navbg = new forms.FormColor("导航背景色");
         navbg.render(navdiv);
-        navbg.update(navJson.background,(color)=>{
+        navbg.update(navJson.background, (color) => {
             var navbars = getCurViewContent().getElementsByClassName("nav_bar");
             if (navbars.length > 0) {
-                var navbar:any= navbars[0];
+                var navbar: any = navbars[0];
                 navbar.style.backgroundColor = color;
             }
-        
+
             navJson.background = color;
             ipcRendererSend("saveNav", JSON.stringify(getNavBar()));
         });

@@ -12,6 +12,7 @@ import { findCurPageComponent, getCurPage, getSelectComponents } from "../../ren
 import { showMessageBox } from "../../render/workspace";
 
 import { Editor } from "../../editor/editor";
+import { getEchartSuggestions } from "../../echarts/echartsSuggestion";
 const panel: IPanel = {
     key: "option", name: "选项", hidden: true, sort: 2,
     render: (content: HTMLElement) => {
@@ -25,12 +26,12 @@ const panel: IPanel = {
     update: () => {
 
         var sl = getSelectComponents();
-        console.log("SL",sl);
+        console.log("SL", sl);
         if (sl != undefined && sl.length == 1) {
 
             var cmpt = findCurPageComponent(sl[0]);
-  
-          
+
+
             loadComponentsCode(cmpt);
         }
 
@@ -51,8 +52,8 @@ function renderChartData(content: HTMLElement) {
     var chartData = document.createElement("div");
     chartData.className = "chartData";
     chartData.style.flex = "1";
-     chartData.style.paddingLeft = "10px";
-     chartData.style.paddingRight = "10px";
+    chartData.style.paddingLeft = "10px";
+    chartData.style.paddingRight = "10px";
     //   codeEdior.contentEditable = "true";
     content.appendChild(chartData);
     //DATA
@@ -66,7 +67,7 @@ function renderChartData(content: HTMLElement) {
 
     var row0 = document.createElement("div");
     chartData.appendChild(row0);
-    var dataTypeDiv= form.createDivRow(row0);
+    var dataTypeDiv = form.createDivRow(row0);
     var dataCatalogSelect = form.createDivSelect(dataTypeDiv, "数据类别", "", [], (value) => {
         dataType = value;
     }, [{
@@ -75,14 +76,14 @@ function renderChartData(content: HTMLElement) {
             ipcRendererSend("editDataCatolog");
 
         }
-    }, {   id: "ref",label: "刷新", icon: "bi bi-arrow-clockwise", onclick: () => { ipcRendererSend("readDataCatolog"); } }]);
+    }, { id: "ref", label: "刷新", icon: "bi bi-arrow-clockwise", onclick: () => { ipcRendererSend("readDataCatolog"); } }]);
 
     ipcRendererSend("readDataCatolog");
 
     ipcRenderer.on("_readDataCatolog", (event, data) => {
         dataCatalogSelect.innerHTML = "";
         dataCatalog = data;
-   
+
         for (var key in data) {
             if (dataType == "") dataType = key;
             var op = document.createElement("option");
@@ -90,8 +91,8 @@ function renderChartData(content: HTMLElement) {
             op.text = key;
             dataCatalogSelect.appendChild(op);
         }
-      
-      
+
+
     });
 
     var row = document.createElement("div");
@@ -124,7 +125,7 @@ function renderChartData(content: HTMLElement) {
 
     var row1 = document.createElement("div");
     chartData.appendChild(row1);
-    var outTypeDiv = form.createDivRow(row1,true);
+    var outTypeDiv = form.createDivRow(row1, true);
     form.createDivSelect(outTypeDiv, "输出类型", "1", [{ text: "数组", value: "list" }, { text: "对象数组", value: "objlist" }], (value) => {
         outType = value;
     });
@@ -141,17 +142,17 @@ function renderChartData(content: HTMLElement) {
     form.createDivIcon(chartData, "bi bi-calculator", 13, () => {
         if (dataCatalog != undefined && dataType.length > 0 && arrayType.length > 0 && outType.length > 0) {
             var output: string = "cal_catolog('" + dataType + "')\n";
-            
-            var data=dataCatalog[dataType];
-            if(Object.prototype.toString.call(data) ==='[object Object]'){
+
+            var data = dataCatalog[dataType];
+            if (Object.prototype.toString.call(data) === '[object Object]') {
                 var xlist = data.x;
                 var ylist = [];
                 var ySum = 0;
                 for (var i = 0; i < data.y.length; i++) {
-                    ySum+= data.y[i];
+                    ySum += data.y[i];
                 }
                 for (var i = 0; i < data.y.length; i++) {
-                    var v=min+(max-min)*data.y[i] / ySum;
+                    var v = min + (max - min) * data.y[i] / ySum;
                     v = parseFloat(v.toFixed(float));
                     ylist.push(v);
                 }
@@ -160,7 +161,7 @@ function renderChartData(content: HTMLElement) {
                 output += JSON.stringify(ylist) + "\n";
 
 
-            }else if(Object.prototype.toString.call(data) ==='[object Array]'){
+            } else if (Object.prototype.toString.call(data) === '[object Array]') {
                 var xlist = data;
                 var ylist = [];
                 var slist = [];
@@ -180,7 +181,7 @@ function renderChartData(content: HTMLElement) {
                     slist.push(sum);
                     blist.push(sub);
                 }
-    
+
                 if (outType == "list") {
                     output += JSON.stringify(xlist) + "\n";
                     output += "cal_data('" + dataType + "','" + arrayType + "','" + outType + "'" + ",'" + min + "','" + max + "','" + float + "')\n";
@@ -207,16 +208,16 @@ function renderChartData(content: HTMLElement) {
                         list.push({ name: text, value: value });
                     }
                     output += JSON.stringify(list) + "\n";
-    
+
                 }
 
             }
 
-               
-            
 
 
-            
+
+
+
             result.value = output;
 
 
@@ -238,16 +239,16 @@ function renderChartData(content: HTMLElement) {
 function renderChartOption(content: HTMLElement) {
     var codeEdior = document.createElement("div");
     codeEdior.className = "optionEdior";
-    codeEdior.style.width="400px";
+    codeEdior.style.width = "400px";
     codeEdior.style.height = "inherit";
     codeEdior.id = "optionEdior";
     //   codeEdior.contentEditable = "true";
     content.appendChild(codeEdior);
     //console.log(ace);
 
-    editor=new Editor(codeEdior,(lines)=>{
+    editor = new Editor(codeEdior, (lines) => {
         //
-        var component =editorComponent;
+        var component = editorComponent;
         component.option = lines;
         try {
             var ele = document.getElementById(component.key);
@@ -256,11 +257,30 @@ function renderChartOption(content: HTMLElement) {
         } catch (error) {
             console.log(error);
         }
-
-
-
     });
-    
+
+
+
+    editor.highLights = [{
+        match: /([A-z]+) ?=/,
+        color: "#09f"
+    }, {
+        match: /"([^"]+)":/,
+        color: "var(--theme-color)"
+    }, {
+        match: /([A-z]+):/,
+        color: "var(--theme-color)"
+    }, {
+        match: /"([^"]+)"/,
+        color: "#a31515"
+    }, {
+        match: /'([^']+)'/,
+        color: "#a31515"
+    }, {
+        match: /(\d+)/,
+        color: "#098658"
+    }, ];
+
 
 
 
@@ -272,14 +292,19 @@ function renderChartOption(content: HTMLElement) {
 var editor: any;
 var editorComponent: any;
 function loadComponentsCode(component: IComponent) {
-    if(component!=undefined&&component.option!=undefined){
+    if (component != undefined && component.option != undefined) {
         editorComponent = component;
+        if (component.group == "chart") {
+            editor.suggestions = getEchartSuggestions();
+        } else {
+            editor.suggestions = [];
+        }
         editor.setValue(component.option);
         editor.resize();
-    }else{
-      
+    } else {
+
     }
- 
+
 
 
 }

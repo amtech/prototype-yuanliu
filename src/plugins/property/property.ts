@@ -20,7 +20,7 @@ import { renderExplorer, toggleExplorer } from "../../render/sidebar";
 import { getCurPage, getCurPageKey, getLayers } from "../../render/workbench";
 
 import { Editor } from "../../editor/editor";
-var lastComponentKey:string;
+var lastComponentKey: string;
 const panel: IPanel = {
     key: "property", name: "属性", hidden: true, sort: 0,
     render: (content: HTMLElement) => {
@@ -30,17 +30,17 @@ const panel: IPanel = {
         //console.log("update property");
         if (args != undefined) {
             var component: IComponent = args;
-            if(lastComponentKey==undefined||component.key!=lastComponentKey){
-                console.log("property:",component.key);
+            if (lastComponentKey == undefined || component.key != lastComponentKey) {
+                console.log("property:", component.key);
                 loadComponentsProperty(component);
-                lastComponentKey=component.key;
+                lastComponentKey = component.key;
             }
-           
+
         } else {
-          
+
             clearComponentsProperty();
         }
-  
+
 
 
     }
@@ -60,7 +60,7 @@ function renderPropertypanel(content: HTMLElement) {
     propertyPanel.className = "propertyPanel";
     propertyPanel.id = "propertyPanel";
     content.appendChild(propertyPanel);
-    
+
     base = renderExplorer("property_base", propertyPanel, "基础", true, undefined, onExplorerHide);
     renderBaseProperty(base);
     layout = renderExplorer("property_layout", propertyPanel, "布局", true, undefined, onExplorerHide);
@@ -104,7 +104,7 @@ function onExplorerHide(key: string, hide: boolean) {
             }
 
             showExplorers.push(key);
-           
+
         }
 
     }
@@ -126,7 +126,7 @@ export function clearComponentsProperty() {
     style.style.display = "none";
     font.style.display = "none";
     base.style.display = "none";
-   
+
 }
 
 
@@ -139,7 +139,7 @@ export function loadComponentsProperty(component: IComponent) {
 
     base.style.display = "block";
 
- 
+
 
     if (component.group == "chart" || component.group == "layout") {
         font.style.display = "none";
@@ -1514,10 +1514,10 @@ function updateBaseProperty(component: IComponent) {
 }
 
 function renderLayersProperty(context: HTMLElement) {
- 
 
-  
-  
+
+
+
 
 
 
@@ -1815,33 +1815,51 @@ function renderComponentStyle(content: HTMLElement) {
             lines.match(/[A-z]+{[^{]+}/g).forEach((key) => {
                 var cssName = key.match(/[A-z]+/)[0];
                 var cssText = key.match(/{([^{]+)/)[0];
-                cssText = cssText.substring(1, cssText.length - 1);
+                cssText = cssText.substring(cssText.indexOf("{") + 1, cssText.lastIndexOf("}"));
                 component.styles[cssName] = cssText;
             });
 
         } else if (component.style != undefined) {
-            component.style = lines.substring(5, lines.length - 1);
+            component.style = lines.substring(lines.indexOf("{") + 1, lines.lastIndexOf("}"));
         }
         updateComponentsStyle([component]);
 
 
-    },250);
+    }, undefined, undefined, 250);
+    editor.highLights = [{
+        match: /"(\S+)"/,
+        color: "var(--theme-color)"
+    }, {
+        match: /([a-z]+-?[a-z]*):/,
+        color: "var(--theme-color)"
+    }, {
+        match: /\.([a-z]+-?[a-z]*) {/,
+        color: "var(--theme-color)"
+    },
+    ];
+    editor.suggestions = []
 
 }
 var editor: any;
 var editorComponent: any;
 function renderComponentStyleEditor(component: IComponent) {
 
+    editorComponent = component;
     if (component.styles != undefined) {
         var value = "";
         for (var key in component.styles) {
             var style = component.styles[key].replace(/\t/g, "");
-            value += key + "{\n\t" + style.replace(/;/g, ";\n\t") + "\n}\n";
+            if (style.indexOf("\n") < 0)
+                value += key + "{\n\t" + style.replace(/;/g, ";\n\t") + "\n}\n";
+            else
+                value += key + "{" + style + "}";
         }
         editor.setValue(value);
 
     } else if (component.style != undefined && component.style.length > 0)
-        editor.setValue("root{\n\t" + component.style.replace(/\t/g, "").replace(/;/g, ";\n\t") + "\n}");
+        if (component.style.indexOf("\n") < 0)
+            editor.setValue("root{\n\t" + component.style.replace(/\t/g, "").replace(/;/g, ";\n\t") + "\n}");
+        else editor.setValue("root{" + component.style + "}");
     else
         editor.setValue("root{\n \n \n}");
 

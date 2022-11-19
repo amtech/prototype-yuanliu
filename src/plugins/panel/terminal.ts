@@ -34,6 +34,9 @@ const  panel:IPanel={
             terminal.appendChild(line);
             terminal.scrollTo({top:terminal.scrollTop});
         });
+        terminal.ondblclick=()=>{
+            terminal.innerHTML="";
+        }
 
         
     },

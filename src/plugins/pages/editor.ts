@@ -3,7 +3,7 @@ import { Editor } from "../../editor/editor";
 import { ipcRendererSend } from "../../preload";
 import { getPageByPath, getProject, getViewPosition } from "../../render/workspace";
 
-export function renderEditorPage(content: HTMLElement,path:string) {
+export function renderEditorPage(content: HTMLElement, path: string) {
 
 
     var viewPosition = getViewPosition();
@@ -17,14 +17,20 @@ export function renderEditorPage(content: HTMLElement,path:string) {
 
     content.appendChild(page);
 
-    var edit=new Editor(page,(lines)=>{
+    var edit = new Editor(page, (lines) => {
 
 
     });
-    var value=" ";
-   
-    
-    edit.setValue(value); 
-    edit.resize();
+    var value = "加载错误！";
+    ipcRendererSend("readFile", path);
+    ipcRenderer.on("_readFile_" + path, (event, data) => {
+
+        if (data != undefined)
+            value = data;
+        edit.setValue(value);
+        edit.resize();
+    })
+
+
 
 }

@@ -199,7 +199,21 @@ function layout(app: HTMLElement) {
     toolBar.style.zIndex="100";
     toolBar.className="surface";
     app.appendChild(toolBar);
+ 
+    toolBar.ondragover=(e)=>{
+        e.preventDefault();     
+    }
+    toolBar.ondrop=(e)=>{
+        e.preventDefault();
+        var files=e.dataTransfer.files;
+        if(files.length>0){
+            var file=files[0];
+            var page:IPage={key:file.path,name:file.name,theme:"light",type:"editor",path:file.path};
+            renderPage(page);
 
+        }
+    
+    }
 
     //状态栏
     var statusBarHeight = 22;
