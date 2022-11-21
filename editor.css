@@ -9,11 +9,12 @@
     z-index: 100;
     width: 2px;
     cursor: text;
-    transition: left 0.3s, top 0.3s;
+    transition: left 0.2s, top 0.2s;
     top: -100px;
     border-radius: 5px;
     display: none;
     overflow: hidden;
+    pointer-events: none;
 }
 
 .editor:hover .view-textarea {
@@ -56,6 +57,7 @@
     position: absolute;
     outline: none;
     -webkit-text-size-adjust: 100%;
+    cursor: text;
 }
 
 .editor-view ::selection {
@@ -68,7 +70,6 @@
     letter-spacing: 0px;
     white-space: nowrap;
     user-select: none;
-    cursor: text;
 }
 
 .nav-num {
@@ -101,7 +102,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    width: 5px;
+    width: 2px;
 }
 
 .editor_scrollV_thumb {
@@ -114,15 +115,14 @@
 }
 
 .editor:hover .editor_scrollV_thumb {
-    width: 5px;
+    width: 2px;
 }
 
 .editor_scrollH {
     position: absolute;
     right: 0;
-    left: 32px;
     bottom: 0;
-    height: 5px;
+    height: 2px;
 }
 
 .editor_scrollH_thumb {
@@ -135,12 +135,7 @@
 }
 
 .editor:hover .editor_scrollH_thumb {
-    height: 5px;
-}
-
-.editor-css-heightlight {
-    color: #f90;
-    pointer-events: none;
+    height: 2px;
 }
 
 .suggestion-item:hover {
@@ -156,4 +151,17 @@
 
 .suggestion-item:hover .suggestion-item-text {
     display: block;
+}
+
+.suggestion-item[data-selected=true] {
+    background-color: var(--theme-color);
+    color: #fff;
+}
+
+.suggestion-item[data-selected=true] svg {
+    color: #fff;
+}
+
+.suggestion-item svg {
+    color: var(--theme-color);
 }

@@ -239,7 +239,7 @@ function renderChartData(content: HTMLElement) {
 function renderChartOption(content: HTMLElement) {
     var codeEdior = document.createElement("div");
     codeEdior.className = "optionEdior";
-    codeEdior.style.width = "400px";
+    codeEdior.style.flex="1";
     codeEdior.style.height = "inherit";
     codeEdior.id = "optionEdior";
     //   codeEdior.contentEditable = "true";
