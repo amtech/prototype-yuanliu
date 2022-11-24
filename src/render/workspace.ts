@@ -56,6 +56,7 @@ export function renderWorkSpace(app: HTMLElement) {
         config = arg;
         app.setAttribute("data-platform", process.platform);
         app.className = config.theme;
+        app.setAttribute("data-colorfull",arg.colorfull);
         // renderRecent();
        // renderStatusBar();
     

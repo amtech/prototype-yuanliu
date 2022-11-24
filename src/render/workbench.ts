@@ -574,7 +574,26 @@ export function pushLayer(component: IComponent): void {
 
     getCurPage().children.push(component);
 }
+function getPagePostion(curPage:IPage,viewPosition:any):{left:number,top:number}{
 
+    if(curPage.left==undefined){
+        curPage.left=viewPosition.left+100;
+       }
+    
+       if(curPage.top==undefined){
+            curPage.top=viewPosition.top+100;
+       }
+       return {left:curPage.left,top:curPage.top};
+}
+function setPagePostion(curPage:IPage,parent:HTMLDivElement,left:number,top:number){
+
+    curPage.left=left;
+    
+    curPage.top=top;
+
+    parent.style.transform="translate("+curPage.left+"px,"+curPage.top+"px)";
+    
+}
 /**
  *  //渲染页面工作区
  * @param content 
@@ -619,11 +638,13 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     page_parent.id = "page_parent_" + p.key;
     page_parent.className = "page_parent " + curPage.theme;
     page_view.appendChild(page_parent);
-    page_parent.style.transform = "scale(" + scale + ")";
+   // page_parent.style.transform = "scale(" + scale + ")";
 
+  
     var viewPosition = getViewPosition();
-    page_parent.style.left = (viewPosition.left + 100) + "px";
-    page_parent.style.top = (viewPosition.top + 100) + "px";
+    var pagePosition=getPagePostion(curPage,viewPosition);
+    setPagePostion(curPage,page_parent,pagePosition.left,pagePosition.top);
+    
 
 
     var page_parent_content = document.createElement("div");
@@ -660,6 +681,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
     //渲染标题栏
     if (title_display && curPage.type == "page") {
         var title_bar = document.createElement("div");
+        title_bar.style.position="relative";
         page_parent_content.appendChild(title_bar);
         pageHeight = pageHeight - title_bar.clientHeight;
         if (isDark(titleJson.background) && curPage.theme == "light") {
@@ -681,6 +703,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         var nav_bar = document.createElement("div");
         nav_bar.id = "nav_bar_" + p.key;
         nav_bar.className = "nav_bar";
+        nav_bar.style.position="relative";
         nav_bar.style.background = navJson.background;
         if (isDark(navJson.background) && curPage.theme == "light") {
             nav_bar.style.color = "#fff";
@@ -771,12 +794,13 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (le > viewWidth - sroll_h_block.clientWidth) {
                     le = viewWidth - sroll_h_block.clientWidth;
                 }
-                page_parent.style.left = (offsetLeft - le * sroll_h_rate) + 'px';
+                curPage.left = (offsetLeft - le * sroll_h_rate);
 
                 sroll_h_block.style.left = le + "px";
                 if (ruler_view != undefined) {
                     ruler_view.style.left = (100 - le * sroll_h_rate) + "px";
                 }
+                setPagePostion(curPage,page_parent,curPage.left,curPage.top);
 
             }
         }
@@ -825,7 +849,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 if (te > viewHeight - sroll_v_block.clientHeight) {
                     te = viewHeight - sroll_v_block.clientHeight;
                 }
-                page_parent.style.top = (offsetTop - te * sroll_v_rate) + 'px';
+                curPage.top = (offsetTop - te * sroll_v_rate);
 
                 sroll_v_block.style.top = te + "px";
                 if (ruler_view1 != undefined) {
@@ -838,7 +862,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 }
                 onScrollReal();
 
-
+                setPagePostion(curPage,page_parent,curPage.left,curPage.top);
             }
         }
         document.onmouseup = (eu) => {
@@ -872,10 +896,11 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
                 le = view_w - sroll_h_block_hh;
             }
 
-            page_parent.style.left = (offsetLeft - le * sroll_h_rate) + 'px';
+         
 
-
+            curPage.left= (offsetLeft - le * sroll_h_rate);
             sroll_h_block.style.left = +le + "px";
+            sroll_h_block.style.transform
             if (ruler_view != undefined) {
                 ruler_view.style.left = (100 - le * sroll_h_rate) + "px";
             }
@@ -897,8 +922,11 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
             if (te > viewHeight - sroll_v_block_hh) {
                 te = viewHeight - sroll_v_block_hh;
             }
+          
+            curPage.top=offsetTop - te * sroll_v_rate;
+           
 
-            page_parent.style.top = (offsetTop - te * sroll_v_rate) + 'px';
+          //  page_parent.style.top = (offsetTop - te * sroll_v_rate) + 'px';
             sroll_v_block.style.top = te + "px";
             if (ruler_view1 != undefined) {
                 ruler_view1.style.top = ((100 - te * sroll_v_rate) - ruler_width) + "px";
@@ -908,7 +936,7 @@ export function renderWorkbench(content: HTMLElement, titleJson: any, navJson: a
         }
 
 
-
+        setPagePostion(curPage,page_parent,curPage.left,curPage.top);
     }
 
 
@@ -1156,11 +1184,14 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
                 previewComponent = renderComponentPreview(page, component)
         }
         var dragStore = dargData.getData("store");
-        if (dragStore != undefined) {
-            //拖拽 商店 内容 至 界面
-            previewComponent = renderStorePreview(page, dragStore)
-
+        if (e.target.className == "page" && previewComponent == undefined) {
+            if (dragStore != undefined) {
+                //拖拽 商店 内容 至 界面
+                previewComponent = renderStorePreview(page, dragStore)
+    
+            }   
         }
+      
         if (getCurPage().mode == "fixed") {
             previewComponent.style.position = "absolute";
             previewComponent.style.left = e.clientX + "px";
@@ -1227,26 +1258,35 @@ export function renderPageBody(page: HTMLElement, curPage: IPage, pageWidth: num
         }
         var dragStore = dargData.getData("store");
         if (dragStore != undefined) {
-            //拖拽 商店 内容 至 界面
-            getStoreExtension(dragStore.key, (err: any, res: any, body: any) => {
-                if (err == null || err == undefined) {
-                    var cmpt: IComponent = body;
-                    copyComponent(cmpt);
-                    component.sort = curPage.children.length;
-                    curPage.children.push(cmpt);
-                    //右侧面板
-                    //  activePropertyPanel();
-                    renderComponent(page, cmpt);
+            var component:IComponent =JSON.parse(dragStore.data);
+            copyComponent (component);
+            if (curPage.children == undefined) {
+                curPage.children = [];
+            }
+            component.path = component.key;
+            component.sort = curPage.children.length;
+            curPage.children.push(component);
+            //右侧面板
+            //  activePropertyPanel();
+            //如果是扩展组件
+            if (component.isExpand) {
+                openExpand();
+                renderExpand(component);
 
-                    onAddComponents([cmpt]);
+            } else {
+                var div = renderComponent(page, component).root;
 
+                if (getCurPage().mode == "fixed") {
+                    div.style.position = "absolute";
+                    div.style.left = e.clientX + "px";
+                    div.style.top = e.clientY + "px";
+                    setComponentStyle(component, "position", "absolute", false);
+                    setComponentStyle(component, "left", div.style.left, false);
+                    setComponentStyle(component, "top", div.style.top, false);
 
-                } else {
-                    console.log(err);
                 }
-
-
-            })
+            }
+            onAddComponents([component]);
 
 
         }

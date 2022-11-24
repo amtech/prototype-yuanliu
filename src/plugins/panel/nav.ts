@@ -4,7 +4,7 @@ Copyright (c) taoyongwen. All rights reserved.
 底部  导航标签
 ***************************************************************************** */
 import { getNavBar, renderNavTrees } from "../../render/pageNav";
-import { setNavItems, getProjectTitleJson, getProjectNavJson, getCurPageContent, getCurViewContent } from "../../render/workbench";
+import { setNavItems, getProjectTitleJson, getProjectNavJson, getCurPageContent, getCurViewContent, getCurPage } from "../../render/workbench";
 import { getNavItems } from "../../render/workbench";
 import { IPanel } from "../../common/interfaceDefine";
 import * as form from "../../render/form";
@@ -12,6 +12,7 @@ import * as forms from "../../render/forms";
 import { ipcRendererSend } from "../../preload";
 import { getTitleBar } from "../../render/pageTitle";
 import { Editor } from "../../editor/editor";
+import { isDark } from "../../dialog/picker";
 var editor: any;
 const panel: IPanel = {
     key: "nav", name: "导航", hidden: true, sort: 0,
@@ -164,6 +165,7 @@ const panel: IPanel = {
             }
             titleJson.background = color;
             ipcRendererSend("saveTitle", JSON.stringify(getTitleBar()));
+            
         });
         // form.createDivInput(title, "标题背景色", titleJson.background, (color) => {
         //     var title = document.getElementById("title_bar");
@@ -202,10 +204,15 @@ const panel: IPanel = {
             if (navbars.length > 0) {
                 var navbar: any = navbars[0];
                 navbar.style.backgroundColor = color;
+                if (isDark(color)) {
+                    navbar.style.color = "#fff";
+                } else if (!isDark(color) ) {
+                    navbar.style.color = "#000";
+                }
             }
-
             navJson.background = color;
             ipcRendererSend("saveNav", JSON.stringify(getNavBar()));
+          
         });
     }
 

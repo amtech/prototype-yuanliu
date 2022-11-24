@@ -4,18 +4,15 @@ Copyright (c) taoyongwen. All rights reserved.
 底部  页面标签
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
-import { cal_gradient } from "../../render/propertypanel";
 import { IBackground, IComponent, IPanel } from "../../common/interfaceDefine";
 import { ipcRendererSend } from "../../preload";
 import * as form from "../../render/form";
 import * as forms from "../../render/forms";
-import { renderPageLayout } from "../../render/pageLayout";
-import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectNavJson, getProjectTitleJson, renderPageBackground, reRenderPage, updatePageViewScrollH, updatePageViewScrollV } from "../../render/workbench";
 import { pushHistory } from "../../render/history";
-import { saveSimplePage } from "../../render/toolbar";
+import { renderPageLayout } from "../../render/pageLayout";
+import { cal_gradient } from "../../render/propertypanel";
+import { getCurPage, getCurPageContent, getCurViewContent, getLayers, getProjectTitleJson, renderPageBackground, reRenderPage, updatePageViewScrollH, updatePageViewScrollV } from "../../render/workbench";
 import { getProject, openExpand, renderExpand, showMessageBox } from "../../render/workspace";
-import { showStatusLoadding } from "../../render/statusBar";
-import { mode } from "d3";
 var image: HTMLImageElement;
 var formHeight: forms.FormNumber;
 var formWidth: forms.FormNumber;
@@ -36,13 +33,13 @@ var formBackgroundImageDiv: HTMLElement;
 var formInfo: forms.FormPragraph;
 var component_list: HTMLElement;
 var hiddenMap = new Map();
-var formMode:forms.FormIcons;
-var lastPageKey:string;
+var formMode: forms.FormIcons;
+var lastPageKey: string;
 const panel: IPanel = {
   key: "page", name: "页面", hidden: true, sort: 0,
   render: (content: HTMLElement) => {
 
-    
+
 
     //image
 
@@ -57,11 +54,11 @@ const panel: IPanel = {
 
 
     image = document.createElement("img");
-    image.style.position="relative";
+    image.style.position = "relative";
     image.style.maxWidth = "200px";
     image.style.maxHeight = "200px";
-    image.style.borderRadius="5px";
-    image.style.boxShadow = "0px 0px 10px rgb(157 157 157 / 50%)";
+    image.style.borderRadius = "5px";
+    // image.style.boxShadow = "0px 0px 10px rgb(157 157 157 / 50%)";
     //image.src=getProject().work+"/images/cover.png";
     imageDiv.appendChild(image);
     image.ondblclick = () => {
@@ -87,7 +84,7 @@ const panel: IPanel = {
 
 
     var setting = document.createElement("div");
-    setting.style.position="relative";
+    setting.style.position = "relative";
     setting.style.flex = "1";
     setting.style.marginLeft = "10px";
     setting.style.marginRight = "10px";
@@ -135,7 +132,7 @@ const panel: IPanel = {
     setting.appendChild(style);
 
     //
-    ipcRendererSend("loadPlugins","styles");
+    ipcRendererSend("loadPlugins", "styles");
     ipcRenderer.on("_loadPlugins_styles", (event, args) => {
       console.log("_loadPluginsStyle", args);
       var styles: { label: string, value: any }[] = [
@@ -199,18 +196,18 @@ const panel: IPanel = {
     formBackgroundPanel.appendChild(formBackgroundImageDiv);
     formBackgroundImageDiv.style.paddingLeft = "5px";
 
-    
+
     ipcRendererSend("loadPluginsBg");
     ipcRenderer.on("_loadPluginsBg", (event, args) => {
-      var list:any = [];
+      var list: any = [];
 
       args.forEach((item: string) => {
         try {
           // console.log(item);
-          var bg: IBackground = require("../background/"+item).default;
+          var bg: IBackground = require("../background/" + item).default;
           if (bg != undefined) {
             list.push({
-              label:bg.title,value:bg.key
+              label: bg.title, value: bg.key
             })
 
           }
@@ -226,7 +223,7 @@ const panel: IPanel = {
 
     })
     //mode 
-    formMode=new forms.FormIcons("设计模式",["bi bi-columns-gap","bi bi-pin-angle"]);
+    formMode = new forms.FormIcons("设计模式", ["bi bi-columns-gap", "bi bi-pin-angle"]);
     formMode.render(setting);
 
 
@@ -246,16 +243,16 @@ const panel: IPanel = {
   },
   update: () => {
 
-   
+
     if (getCurPage() == undefined) {
       return;
     }
-    if(lastPageKey!=undefined&&getCurPage().key==lastPageKey){
+    if (lastPageKey != undefined && getCurPage().key == lastPageKey) {
       return;
     }
-   
-    lastPageKey=getCurPage().key;
-    console.log("page update:",lastPageKey);
+
+    lastPageKey = getCurPage().key;
+    console.log("page update:", lastPageKey);
     image.src = getProject().work + "/images/" + getCurPage().key + ".jpeg";
     formHeight.update(getCurPage().height + "", (value) => {
       var h = parseFloat(value);
@@ -313,7 +310,7 @@ const panel: IPanel = {
     formStyle.update(getCurPage().style, (style) => {
       getCurPage().style = style;
       var exStyles = eval("require(style).default()");
-     
+
       getCurPage().styles = exStyles;
       reRenderPage();
       pushHistory(getCurPage());
@@ -324,7 +321,7 @@ const panel: IPanel = {
 
       pushHistory(getCurPage());
     });
-    
+
     var bgType = 0;
     if (getCurPage().backgroundType != undefined) {
       bgType = getCurPage().backgroundType;
@@ -450,31 +447,31 @@ const panel: IPanel = {
         formBackgroundImageDiv.style.display = "block";
 
         formBackgroundImage.update(getCurPage().backgroundColor, (value) => {
-         
-            getCurPage().backgroundColor = value;
-            renderPageBackground(getCurPage());
-          
-     
+
+          getCurPage().backgroundColor = value;
+          renderPageBackground(getCurPage());
+
+
         })
       }
     }
 
     //mode
 
-    var mode=0;
-    if(getCurPage().mode!=undefined){
-      mode=["flex","fixed"].indexOf(getCurPage().mode);
+    var mode = 0;
+    if (getCurPage().mode != undefined) {
+      mode = ["flex", "fixed"].indexOf(getCurPage().mode);
     }
-    formMode.update(mode,(val)=>{
+    formMode.update(mode, (val) => {
       console.log(getCurPage().children);
-      if(getCurPage().children.length==0){
-        getCurPage().mode=val==0?"flex":"fixed";
+      if (getCurPage().children.length == 0) {
+        getCurPage().mode = val == 0 ? "flex" : "fixed";
         reRenderPage();
-      }else{
-        showMessageBox("不能修改该页面模式，请先删除页面所有组价。","info");
+      } else {
+        showMessageBox("不能修改该页面模式，请先删除页面所有组价。", "info");
 
       }
-     
+
     })
 
     //component_list  展示隐藏的组件
@@ -509,7 +506,7 @@ const panel: IPanel = {
           component_item.onclick = () => {
 
             if (layer.isExpand) {
-             // renderExpand(layer);
+              // renderExpand(layer);
               openExpand();
               renderExpand(layer);
 

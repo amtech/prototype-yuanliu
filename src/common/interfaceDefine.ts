@@ -268,6 +268,8 @@ export interface IPage {
     key: string;
     name: string,
     path?: string;
+    left?:number;
+    top?:number;
     width?: number;
     height?: number;
     backgroundType?:number;
@@ -475,7 +477,8 @@ export interface IExtension {
     version: string;
     author: string;
     readmeUrl: string;
-    type:"component"|"image"|"style"|"group"
+    type:"component"|"image"|"style"|"group",
+    data?:any;
 
 }
 export interface IStyle {

@@ -1,3 +1,4 @@
+
 import { IComponent } from "../../common/interfaceDefine"
 
 const component: IComponent = {
@@ -28,6 +29,7 @@ const component: IComponent = {
 
         else
             button = document.createElement("div");
+
         var bg = document.createElement("div");
         bg.className = "component_bg";
         bg.style.position = "absolute";

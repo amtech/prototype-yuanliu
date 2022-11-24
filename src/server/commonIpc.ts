@@ -53,7 +53,14 @@ export function loadCommonIpc() {
         sendData(event, "_loadPlugins_" + arg, result);
 
     });
-  
+    ipcMain.on("readExtensions", (event: IpcMainEvent, arg: any) => {
+        var config = storage.readExtensions();
+        sendData(event, "_readExtensions", config);
+    })
+    ipcMain.on("saveExtensions", (event: IpcMainEvent, arg: any) => {
+         storage.saveExtensions(arg);
+        
+    })
 
     ipcMain.on("readProjects", (event: any, arg: any) => {
         var projects = storage.readProjects();

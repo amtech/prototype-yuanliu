@@ -112,7 +112,14 @@ function renderNav() {
     nav_bar = document.createElement("div");
     nav_bar.className = "nav_bar";
     nav_bar.id = "nav_bar";
+    nav_bar.style.position = "relative";
     nav_bar.style.background = nav_data.background;
+    if (isDark(nav_data.background)) {
+        nav_bar.style.color = "#fff";
+    } else {
+        nav_bar.style.color = "#222";
+    }
+
 
     app.appendChild(nav_bar);
     renderNavTrees(nav_bar, nav_data.items);
@@ -221,12 +228,17 @@ var title_bar;
 
 function renderTitle() {
     var app = document.getElementById("titleBar");
-
+    app.style.position = "relative";
     title_bar = document.createElement("div");
     title_bar.className = "title_bar";
     title_bar.id = "title_bar";
     app.appendChild(title_bar);
     title_bar.style.background = title_data.background;
+    if (isDark(title_data.background)) {
+        app.style.color = "#fff";
+    } else {
+        app.style.color = "#222";
+    }
 
 
     if (title_data.page != undefined)
@@ -315,21 +327,21 @@ export function renderPage(pageJson, content, isLaunch, pageIndex) {
 
     }
 
-    //nav title
-    if (isDark(title_data.background) && getCurPage().theme == "light") {
-        if (title_bar != undefined)
-            title_bar.style.color = "#fff";
-    } else if (!isDark(title_data.background) && getCurPage().theme == "dark") {
-        if (title_bar != undefined)
-            title_bar.style.color = "#000";
-    }
-    if (isDark(nav_data.background) && getCurPage().theme == "light") {
-        if (nav_bar != undefined)
-            nav_bar.style.color = "#fff";
-    } else if (!isDark(nav_data.background) && getCurPage().theme == "dark") {
-        if (nav_bar != undefined)
-            nav_bar.style.color = "#000";
-    }
+    // //nav title
+    // if (isDark(title_data.background) && getCurPage().theme == "light") {
+    //     if (title_bar != undefined)
+    //         title_bar.style.color = "#fff";
+    // } else if (!isDark(title_data.background) && getCurPage().theme == "dark") {
+    //     if (title_bar != undefined)
+    //         title_bar.style.color = "#000";
+    // }
+    // if (isDark(nav_data.background) && getCurPage().theme == "light") {
+    //     if (nav_bar != undefined)
+    //         nav_bar.style.color = "#fff";
+    // } else if (!isDark(nav_data.background) && getCurPage().theme == "dark") {
+    //     if (nav_bar != undefined)
+    //         nav_bar.style.color = "#000";
+    // }
 
 
 
@@ -1021,6 +1033,14 @@ function isDark(color) {
         console.log("is dark ", color);
         return false;
     }
+    if (color == "var(--theme-color)") {
+
+        color = project_data.themeColor;
+    } else if (color == "var(--light-color)") {
+
+        color = project_data.lightColor;
+    }
+
 
     if (color.startsWith("#")) {
         var rgb = set16ToRgb(color);

@@ -9,7 +9,7 @@ Copyright (c) taoyongwen. All rights reserved.
 }
 
 .light {
-    background: rgb(245, 240, 236);
+    background: rgb(235, 230, 226);
     color: #222;
     border-color: #999;
 }
@@ -35,13 +35,21 @@ Copyright (c) taoyongwen. All rights reserved.
 }
 
 .dark .surface {
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(20px);
+    background: rgba(20, 20, 20, 1);
 }
 
 .light .surface {
+    background: rgb(245, 240, 236);
+}
+
+.dark[data-colorfull=true] .surface {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.light[data-colorfull=true] .surface {
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
 }
 
 .dark .background {
@@ -86,11 +94,11 @@ Copyright (c) taoyongwen. All rights reserved.
     background: #fff;
 }
 
-.light .page_parent {
+.light[data-colorfull=true] .page_parent {
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
 }
 
-.dark .page_parent {
+.dark[data-colorfull=true] .page_parent {
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -254,25 +262,21 @@ button {
 .light .contextMenu {
     background-color: rgba(255, 255, 255, 0.6);
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
 }
 
 .dark .contextMenu {
     background-color: rgba(0, 0, 0, 0.6);
     box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
 }
 
 .light .messageBox {
     background-color: rgba(255, 255, 255, 0.6);
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
 }
 
 .dark .messageBox {
     background-color: rgba(0, 0, 0, 0.6);
     box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
 }
 
 .light .contextMenuItem:hover {
@@ -498,27 +502,23 @@ button {
 
 .picker {
     background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
     border: 1px solid #999;
 }
 
 .hub_setting {
     background-color: rgba(35, 40, 45, 0.9);
-    backdrop-filter: blur(5px);
     border: 1px solid #999;
     color: #fff;
 }
 
 .hub_catalog {
     background-color: rgba(35, 40, 45, 0.9);
-    backdrop-filter: blur(5px);
     border: 1px solid #999;
     color: #fff;
 }
 
 .hub_blue {
     background-color: rgba(35, 40, 45, 0.9);
-    backdrop-filter: blur(5px);
     border: 1px solid #999;
     color: #fff;
 }
@@ -545,12 +545,10 @@ button {
 
 .light .dialog {
     background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(5px);
 }
 
 .dark .dialog {
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
 }
 
 .light .dialog_tap {
@@ -569,11 +567,11 @@ button {
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.light .recent_card {
+.light[data-colorfull=true] .recent_card {
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
 }
 
-.dark .recent_card {
+.dark[data-colorfull=true] .recent_card {
     box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
 }
 

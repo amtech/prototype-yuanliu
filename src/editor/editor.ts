@@ -116,9 +116,10 @@ export class Editor {
         // this.navBar.style.background = "rgba(227,227,227)";
         this.navBar.style.position = "relative";
         this.navBar.style.zIndex = "100";
+        this.navBar.className="surface";
         this.navBar.style.userSelect = "none";
         this.navBar.style.height = "100%";
-        this.navBar.style.cssText += "backdrop-filter:blur(10px);";
+       // this.navBar.style.cssText += "backdrop-filter:blur(10px);";
         context.appendChild(this.navBar);
         this.view = document.createElement("div");
         this.view.style.left = this.numBarWidth + "px";

@@ -14,20 +14,6 @@ body {
     height: 100%;
 }
 
-#app_bg {
-    position: absolute;
-    inset: 0;
-    opacity: 0.2;
-    filter: blur(30px);
-    overflow: hidden;
-}
-
-#app_bg_img {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
 input {
     border: 0;
     outline: none;
@@ -77,8 +63,6 @@ select {
     height: max-content;
     overflow: hidden;
     position: absolute;
-    left: 100px;
-    top: 100px;
     /* transition: top 0.2s, left 0.2s; */
 }
 
@@ -631,7 +615,6 @@ table {
 
 ::-webkit-scrollbar-thumb {
     background-color: rgba(127, 127, 127, 0.2);
-    backdrop-filter: blur(10px);
     border-radius: 10px;
 }
 
@@ -1180,7 +1163,6 @@ iframe {
     text-align: center;
     line-height: 14px;
     cursor: pointer;
-    backdrop-filter: blur(2px);
 }
 
 .page_sacle::after {
@@ -1445,7 +1427,6 @@ iframe {
 }
 
 .hub_catalog {
-    backdrop-filter: blur(10px);
     padding: 10px 20px 20px 10px;
     margin: 10px;
     min-height: 500px;
@@ -1467,7 +1448,7 @@ iframe {
 }
 
 .hub_setting {
-    backdrop-filter: blur(10px);
+    /* backdrop-filter: blur(10px);*/
     padding: 10px 20px 20px 10px;
     margin: 10px;
     min-width: 300px;
@@ -1510,7 +1491,6 @@ iframe {
     height: 100%;
     width: 100%;
     position: fixed;
-    backdrop-filter: blur(1px);
     top: 0;
     left: 0;
     right: 0;
@@ -1662,7 +1642,6 @@ iframe {
 
 .project_recent {
     user-select: none;
-    backdrop-filter: blur(100px);
 }
 
 .project_recent>div {
@@ -1676,7 +1655,6 @@ iframe {
     padding: 0px 10px 0px 10px;
     min-width: 400px;
     background-color: rgba(157, 157, 157, 0.3);
-    backdrop-filter: blur(5px);
     display: none;
     box-shadow: 0px 0px 5px rgba(157, 157, 157, 0.3);
 }
@@ -1698,7 +1676,6 @@ iframe {
     line-height: 30px;
     left: 0;
     text-align: center;
-    backdrop-filter: blur(1px);
 }
 
 .recent_card {
@@ -1759,11 +1736,10 @@ iframe {
     display: block;
     height: 14px;
     min-width: 20px;
-    background-color: var(--light-color);
+    background-color: var(--theme-color);
     position: absolute;
     left: 0px;
     bottom: -10px;
-    backdrop-filter: blur(2px);
     border-radius: 5px;
     transition: bottom 0.3s;
 }
@@ -1787,8 +1763,7 @@ iframe {
     display: block;
     width: 14px;
     min-height: 20px;
-    background-color: var(--light-color);
-    backdrop-filter: blur(2px);
+    background-color: var(--theme-color);
     position: absolute;
     top: 0px;
     right: -10px;
@@ -1825,18 +1800,6 @@ iframe {
 
 .dark .page_bg {
     background-color: #000;
-}
-
-.title_bar {
-    backdrop-filter: blur(5px);
-}
-
-.nav_bar {
-    backdrop-filter: blur(5px);
-}
-
-.page {
-    backdrop-filter: blur(2px);
 }
 
 .ace_editor {

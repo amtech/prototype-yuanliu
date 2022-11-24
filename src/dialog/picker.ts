@@ -4,6 +4,7 @@ Copyright (c) taoyongwen. All rights reserved.
 选择 颜色等
 ***************************************************************************** */
 import { ipcRenderer } from "electron";
+import { getProject } from "../render/workspace";
 import { ipcRendererSend } from "../preload";
 
 function toString(selectColor: { r: number, g: number, b: number, a: number }) {
@@ -584,6 +585,14 @@ function hsvToRgb(h: number, s: number, v: number) {
 
 
 export function isDark(color:string){
+
+    if (color == "var(--theme-color)") {
+
+        color = getProject().themeColor;
+    } else if (color == "var(--light-color)") {
+
+        color = getProject().lightColor;
+    }
    
     if(color.startsWith("#")){
         var rgb=set16ToRgb(color);

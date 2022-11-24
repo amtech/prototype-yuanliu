@@ -49,18 +49,17 @@ export function renderStorePreview(content: HTMLElement, extension: IExtension, 
 
     var preview = document.createElement("div");
     preview.className = "component_canvas";
-    preview.style.margin = "10px 0px 10px 0px";
-    preview.style.padding = "10px";
+    preview.style.margin = "0";
+    preview.style.padding = "0px";
     preview.style.pointerEvents = "none";
-    preview.style.height = "120px";
-    preview.style.width = "200px";
-    preview.className = "form_bg";
-    preview.style.borderRadius = "5px";
+    // preview.style.height = "120px";
+    // preview.style.width = "200px";
+    preview.style.borderRadius = "0px";
     preview.style.pointerEvents = "none";
     var i = document.createElement("img");
     i.src = extension.cover;
-    i.style.minWidth = "200px";
-    i.style.maxHeight = "100px";
+    // i.style.minWidth = "200px";
+    // i.style.maxHeight = "100px";
     i.style.pointerEvents = "none";
     preview.appendChild(i);
     if (dropIndex != undefined && dropIndex >= 0) {
@@ -1132,11 +1131,10 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
         var dragStore = dargData.getData("store");
         if (dragStore != undefined) {
             //拖拽 商店 内容 至 界面
-            if (previewComponent != null) {
-                previewComponent.remove();
-                previewComponent = undefined;
+            if (previewComponent == null) {
+                previewComponent = renderStorePreview(body, dragStore, dropIndex)
             }
-            previewComponent = renderStorePreview(body, dragStore, dropIndex)
+       
             e.preventDefault();
             return;
         }
@@ -1373,7 +1371,34 @@ function componentOnDrags(eventEle: HTMLElement, component: IComponent, body: HT
         }
         var dragStore = dargData.getData("store");
         if (dragStore != undefined) {
+            if (previewComponent != null) {
+                previewComponent.remove();
+                previewComponent = null;
+                previewParent = undefined;
+            }
             //拖拽 商店 内容 至 界面
+            var subComponent:IComponent =JSON.parse(dragStore.data);
+            copyComponent (subComponent);
+       
+            //    var component = JSON.parse(e.dataTransfer.getData("component"));
+            //  console.log(component);
+            if (component.children == undefined) {
+                component.children = [subComponent];
+            } else {
+                //  console.log("dropIndex", dropIndex);
+                if (dropIndex >= 0) {
+                    component.children.splice(dropIndex, 0, subComponent);
+                    subComponent.sort = dropIndex;
+                }
+                else {
+                    component.children.push(subComponent);
+                    subComponent.sort = component.children.length - 1;
+                }
+
+            }
+            subComponent.path = component.path + "/" + subComponent.key;
+            renderComponent(body, subComponent, dropIndex);
+            onAddComponents([subComponent]);
 
         }
 

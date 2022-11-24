@@ -69,6 +69,21 @@ export function readConfig(): any {
     }
     return JSON.parse(fs.readFileSync(titlePath).toString());
 }
+export function saveExtensions(extensions: any) {
+    checkAppData();
+    var configPath = path.join(appData, "extensions.json");
+    return fs.writeFileSync(configPath, JSON.stringify(extensions));
+}
+export function readExtensions(): any {
+    checkAppData();
+    //config
+    var titlePath = path.join(appData, "extensions.json");
+    if (!fs.existsSync(titlePath)) {
+        return [];
+    }
+    return JSON.parse(fs.readFileSync(titlePath).toString());
+}
+
 export function readDataCatolog(): any {
     checkAppData();
     //title

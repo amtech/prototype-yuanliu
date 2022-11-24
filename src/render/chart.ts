@@ -11,7 +11,7 @@ import { getCurPage } from "./workbench";
 
 export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boolean) {
     // console.log("loadChart---",component.key,isMap);
-
+    
     setTimeout(() => {
         try {
 
@@ -55,6 +55,9 @@ export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boo
 
                         //
                         var myChart = echarts.init(chart, theme, { renderer: "svg" });
+                        myChart._$eventProcessor=undefined
+                        var el:any=chart.children.item(0);
+                        el.style.pointerEvents="none";
                         myChart.clear();
                         var option: any;
                         if (component.option != undefined) {
@@ -72,6 +75,10 @@ export function loadChart(chart: HTMLElement, component: IComponent, isMap?: boo
 
             } else {
                 var myChart = echarts.init(chart, theme, { renderer: "svg" });
+                myChart._$eventProcessor=undefined
+                var el:any=chart.children.item(0);
+                el.style.pointerEvents="none";
+               
                 myChart.clear();
                 var option;
                 if (component.option != undefined) {
