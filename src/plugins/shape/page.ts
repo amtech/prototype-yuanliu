@@ -4,6 +4,7 @@ var shape:IShape={
     title:"页",
     key:"page",
     onRender(svg, fill, stroke) {
+      
         var w=svg.clientWidth-2;
         var h=svg.clientHeight-2;
 
@@ -31,7 +32,6 @@ var shape:IShape={
      
         svg.appendChild(path);
 
-       
         
     },
 }

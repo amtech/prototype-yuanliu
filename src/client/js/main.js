@@ -783,10 +783,11 @@ function renderComponentShape(component, root) {
     svg.style.width = w + "px";
     svg.style.height = h + "px";
     bg.appendChild(svg);
-
-    var shape = shapes_data.find(b => "../plugins/shape/" + b.key == component.shape);
+   
+    var shape = shapes_data.find(b => b.key == component.shape);
     if (shape != undefined) {
         root.style.background = "";
+        document.getElementById(component.key).removeAttribute("hover");
         shape.onRender(svg, bgcolor, "var(--theme-color)");
 
     }

@@ -20,12 +20,7 @@ const component: IComponent = {
         }
         var bg=document.createElement("div");
         bg.className="component_bg";
-        bg.style.position="absolute";
-        bg.style.top="0";
-        bg.style.left="0";
-        bg.style.bottom="0";
-        bg.style.right="0";
-        bg.style.zIndex="-1";
+
         label.appendChild(bg);
         var body=document.createElement("div");
         body .className = "component_body";

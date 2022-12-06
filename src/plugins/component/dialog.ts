@@ -48,13 +48,7 @@ import { IComponent } from "../../common/interfaceDefine"
       
             var gridBg=document.createElement("div");
             gridBg.className="component_bg";
-            gridBg.style.position="absolute";
-            gridBg.style.top="0";
-            gridBg.style.left="0";
-            gridBg.style.bottom="0";
-            gridBg.style.right="0";
-            gridBg.style.zIndex="-1";
-   
+         
             var gridContent=document.createElement("div");
             gridContent.className = "component_body";
             dialog.appendChild(gridBg);

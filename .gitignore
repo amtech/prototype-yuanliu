@@ -6,3 +6,4 @@ builder/
 .DS_Store
 .git
 package-lock.json
+out/

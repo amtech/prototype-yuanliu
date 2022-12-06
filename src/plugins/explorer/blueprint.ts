@@ -55,8 +55,15 @@ function renderBlueExploer(content: HTMLElement) {
             label.innerText = obj.name;
             var componentDiv = document.createElement("div");
             componentDiv.className = "component";
-            componentDiv.appendChild(icon);
-            componentDiv.appendChild(label);
+            // componentDiv.appendChild(icon);
+            // componentDiv.appendChild(label);
+
+            var componentContent = document.createElement("div");
+            componentContent.className = "component_content";
+            componentDiv.appendChild(componentContent);
+            componentContent.appendChild(icon);
+            componentContent.appendChild(label);
+
             componentDiv.draggable = true;
             componentsDiv.appendChild(componentDiv);
 
@@ -100,8 +107,11 @@ function renderBlueExploer(content: HTMLElement) {
             label.innerText = method.name;
             var componentDiv = document.createElement("div");
             componentDiv.className = "component";
-            componentDiv.appendChild(icon);
-            componentDiv.appendChild(label);
+            var componentContent = document.createElement("div");
+            componentContent.className = "component_content";
+            componentDiv.appendChild(componentContent);
+            componentContent.appendChild(icon);
+            componentContent.appendChild(label);
             componentDiv.draggable = true;
             componentsDiv.appendChild(componentDiv);
 
@@ -187,7 +197,9 @@ function renderBlueExploer(content: HTMLElement) {
         ]
     },{
         component: "date", key: "blue_hub_get_date", name: "当前日期", icon: "bi bi-calendar3", type: "date",
-        events: [],
+        events: [
+            {label:"tick",name:"tick"}
+        ],
         properties: [
             {label:"年份",name:"yyyy"},
             {label:"年月",name:"yyyymm"},

@@ -11,7 +11,7 @@ import * as dargData from "../render/DragData";
 import { copyComponents } from "../render/pageTitle";
 import { getComponentStyle, setComponentStyle } from "../render/propertypanel";
 import { getMousePosition } from "../render/shorcuts";
-import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getRootComponentHeight, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
+import { clearDargTimer, clipboardPaste, findCurPageComponent, getCurPage, getCurPageContent, getDragTimer, getPagePostion, getRootComponentHeight, getSelectComponents, hideComponentsOutLine, setSelectComponents, shortcutInsertComponent, showComponentsOutLine, startDargTimer } from "../render/workbench";
 import { getConfig, getProject, getViewPosition } from "../render/workspace";
 import { onAddComponents, onDelComponents, onMoveComponent, onSelectComponents } from "./componentEvent";
 import { IMenuItem, openContextMenu, showComponentContextMenu } from "./contextmenu";
@@ -318,14 +318,15 @@ export function renderRootComponents(content: HTMLElement, components: IComponen
                                 root.style.height=h;
                                 root.setAttribute("data-height", "true");
                             }
+                       
+                            var pagePosition= getPagePostion(getCurPage(),viewPosition);
 
-                            if (root.offsetTop > viewHeigh - parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100) {
+                            if (root.offsetTop > viewHeigh -pagePosition.top+ viewPosition.top + 100) {
                                 //设置上次的高度
                              
                                 body.innerHTML = "";
-                            } else if (root.offsetTop + root.clientHeight < -(parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100)) {
+                            } else if (root.offsetTop + root.clientHeight < -(pagePosition.top + viewPosition.top + 100)) {
                                   //设置上次的高度
-                                 
                                  
                                 body.innerHTML = "";
                             } else {
@@ -1441,7 +1442,7 @@ export function renderComponentShape(component?: IComponent, root?: HTMLElement)
     svg.style.height = h + "px";
     bg.appendChild(svg);
 
-    var shape: IShape = require(component.shape).default;
+    var shape: IShape = require("../plugins/shape/"+component.shape).default;
     if (shape != undefined) {
 
         shape.onRender(svg, bgcolor, "var(--theme-color)");

@@ -32,13 +32,6 @@ const component: IComponent = {
 
         var bg = document.createElement("div");
         bg.className = "component_bg";
-        bg.style.position = "absolute";
-        bg.style.top = "0";
-        bg.style.left = "0";
-        bg.style.bottom = "0";
-        bg.style.right = "0";
-        bg.style.zIndex = "-1";
-
         button.appendChild(bg);
         var body = document.createElement("div");
         body.className = "component_body";
@@ -48,7 +41,7 @@ const component: IComponent = {
 
         if (component.property.icon != undefined && component.property.icon.context.length > 1) {
             var icon = document.createElement("i");
-            icon.className = component.property.icon.context;
+            icon.className ="bi bi-"+component.property.icon.context;
             icon.style.paddingRight = "5px";
             body.appendChild(icon);
         }

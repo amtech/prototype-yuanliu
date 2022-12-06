@@ -261,7 +261,7 @@ function layout(app: HTMLElement) {
     row.style.left = sideBarWidth + "px";
     row.style.right =  edgePanelWidth+ "px";
     row.style.overflow = "hidden";
-    row.style.zIndex="100";
+    row.style.zIndex="99999";
     row.className="surface";
 
     app.appendChild(row);

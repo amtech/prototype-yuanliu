@@ -18,11 +18,7 @@ const component: IComponent = {
         var pageBg = document.createElement("div");
         pageBg.className = "component_bg";
         pageBg.style.position = "absolute";
-        pageBg.style.top = "0";
-        pageBg.style.left = "0";
-        pageBg.style.bottom = "0";
-        pageBg.style.right = "0";
-        pageBg.style.zIndex = "-1";
+
         var pageContent = document.createElement("div");
         pageContent.style.position="relative";
         pageContent.style.display="flex";

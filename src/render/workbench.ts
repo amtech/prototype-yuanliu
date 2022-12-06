@@ -440,6 +440,8 @@ export function renderPage(page: IPage) {
             renderEditorPage(pageView, page.path);
 
         }  else {
+            page.top=undefined;
+            page.left=undefined;
             renderWorkbench(pageView, projectTitleJson, projectNavJson, page);
         }
 
@@ -574,7 +576,7 @@ export function pushLayer(component: IComponent): void {
 
     getCurPage().children.push(component);
 }
-function getPagePostion(curPage:IPage,viewPosition:any):{left:number,top:number}{
+export function getPagePostion(curPage:IPage,viewPosition:any):{left:number,top:number}{
 
     if(curPage.left==undefined){
         curPage.left=viewPosition.left+100;
@@ -965,9 +967,9 @@ function onScrollReal() {
             } else {
                 body = root;
             }
-
+            var pagePosition= getPagePostion(page,viewPosition);
             //TODO  给即将不渲染 父级组件 设置高度，以免影响整体布局
-            if (root.offsetTop > viewHeigh - parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100) {
+            if (root.offsetTop > viewHeigh - pagePosition.top + viewPosition.top + 100) {
             
                 if (body.innerHTML != "") {
                     if (root.style.height.indexOf("%") > 0 || root.style.height.indexOf("px") > 0) {
@@ -980,7 +982,7 @@ function onScrollReal() {
                     root.style.background = "";
                     body.innerHTML = "";
                 }
-            } else if (root.offsetTop + root.clientHeight < -(parseFloat(page_parent.style.top.replace("px", "")) + viewPosition.top + 100)) {
+            } else if (root.offsetTop + root.clientHeight < -(pagePosition.top + viewPosition.top + 100)) {
               
                 if (body.innerHTML != "") {
                     if (root.style.height.indexOf("%") > 0 || root.style.height.indexOf("px") > 0) {

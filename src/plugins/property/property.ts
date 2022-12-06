@@ -1184,8 +1184,8 @@ function renderThemeProperty(context: HTMLElement) {
     formBackdrop.render(body);
 
 
-    ipcRendererSend("loadPluginsShape");
-    ipcRenderer.on("_loadPluginsShape", (event, args) => {
+    ipcRendererSend("loadPlugins","shape");
+    ipcRenderer.on("_loadPlugins_shape", (event, args) => {
         var ops = [{
             label: "请选择", value: ""
         }];
